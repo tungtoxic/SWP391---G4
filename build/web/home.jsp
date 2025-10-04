@@ -3,7 +3,6 @@
     Created on : Oct 3, 2025, 9:51:05 PM
     Author     : Helios 16
 --%>
-
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
@@ -19,3 +18,4 @@
     </div>
 </body>
 </html>
+

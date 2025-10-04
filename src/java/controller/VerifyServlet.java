@@ -14,69 +14,60 @@ import java.io.IOException;
 @WebServlet("/VerifyServlet")
 public class VerifyServlet extends HttpServlet {
 
-    private UserDao userDAO = new UserDao();
+    private final UserDao userDAO = new UserDao();
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
-        String inputOtp = request.getParameter("otp");
-        HttpSession session = request.getSession();
-
+        HttpSession session = req.getSession();
+        String inputOtp = req.getParameter("otp");
         String otp = (String) session.getAttribute("otp");
         Long otpTime = (Long) session.getAttribute("otpTime");
         User tempUser = (User) session.getAttribute("tempUser");
         String authType = (String) session.getAttribute("authType");
 
-        String error = null;
-
-        if (otp != null && otpTime != null && otp.equals(inputOtp)
-                && (System.currentTimeMillis() - otpTime) < 5 * 60 * 1000) {
-
-            try {
-                if ("register".equals(authType)) {
-                    // ✅ Trường hợp đăng ký: lưu user mới
-                    boolean inserted = userDAO.insertUser(tempUser);
-                    if (inserted) {
-                        session.removeAttribute("otp");
-                        session.removeAttribute("otpTime");
-                        session.removeAttribute("tempUser");
-                        session.removeAttribute("authType");
-
-                        session.setAttribute("user", tempUser);
-                        response.sendRedirect("home.jsp"); // về trang home
-                        return;
-                    } else {
-                        error = "Không thể lưu user. Vui lòng thử lại.";
-                    }
-
-                } else if ("login".equals(authType)) {
-                    // ✅ Trường hợp login: không insert, chỉ login
-                    session.removeAttribute("otp");
-                    session.removeAttribute("otpTime");
-                    session.removeAttribute("authType");
-
-                    session.setAttribute("user", tempUser);
-                    response.sendRedirect("profile.jsp"); // về trang profile
-                    return;
-
-                } else {
-                    error = "Không xác định được loại xác thực!";
-                }
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                error = "Lỗi hệ thống: " + e.getMessage();
-            }
-
-        } else {
-            error = "OTP không hợp lệ hoặc đã hết hạn.";
+        if (otp == null || otpTime == null || tempUser == null || authType == null) {
+            req.setAttribute("error", "Phiên làm việc đã hết hạn, vui lòng đăng nhập lại.");
+            req.getRequestDispatcher("login.jsp").forward(req, resp);
+            return;
         }
 
-        // Nếu có lỗi → quay lại verify.jsp
-        request.setAttribute("error", error);
-        request.getRequestDispatcher("verify.jsp").forward(request, response);
+        // 🔹 Kiểm tra OTP hợp lệ và chưa hết hạn (5 phút)
+        long diff = System.currentTimeMillis() - otpTime;
+        if (otp.equals(inputOtp) && diff <= 5 * 60 * 1000) {
+            if ("register".equals(authType)) {
+                try {
+                    boolean inserted = userDAO.insertUser(tempUser);
+                    if (inserted) {
+                        cleanup(session);
+                        session.setAttribute("user", tempUser);
+                        resp.sendRedirect("home.jsp");
+                        return;
+                    } else {
+                        req.setAttribute("error", "Không thể lưu tài khoản, vui lòng thử lại.");
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    req.setAttribute("error", "Lỗi hệ thống: " + e.getMessage());
+                }
+            } else if ("login".equals(authType)) {
+                cleanup(session);
+                session.setAttribute("user", tempUser);
+                resp.sendRedirect("profile.jsp");
+                return;
+            }
+        } else {
+            req.setAttribute("error", "Mã OTP không đúng hoặc đã hết hạn.");
+        }
+
+        req.getRequestDispatcher("verify.jsp").forward(req, resp);
+    }
+
+    private void cleanup(HttpSession session) {
+        session.removeAttribute("otp");
+        session.removeAttribute("otpTime");
+        session.removeAttribute("authType");
+        session.removeAttribute("tempUser");
     }
 }
-
-
