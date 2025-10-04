@@ -9,108 +9,121 @@
     String message = (String) request.getAttribute("message");
 %>
 <html>
-<head>
-    <title>Xác minh OTP</title>
-    <link rel="stylesheet" href="css/verify.css">
-</head>
-<body>
-<div class="verify-container">
-    <h2>Xác minh OTP</h2>
+    <head>
+        <title>Xác minh OTP</title>
+        <link rel="stylesheet" href="css/verify.css">
+    </head>
+    <body>
+        <div class="verify-container">
+            <h2>Xác minh OTP</h2>
 
-    <% if (error != null) { %>
-        <p class="error"><%= error %></p>
-    <% } else if (message != null) { %>
-        <p class="message"><%= message %></p>
-    <% } %>
+            <% if (error != null) { %>
+            <p class="error"><%= error %></p>
+            <% } else if (message != null) { %>
+            <p class="message"><%= message %></p>
+            <% } %>
 
-    <!-- Form xác minh OTP -->
-    <form action="VerifyServlet" method="post" id="otpForm">
-        <div class="otp-box">
-            <label for="otp">Nhập mã OTP (6 số):</label><br>
-            <input type="text" name="otp" id="otp" maxlength="6"
-                   pattern="[0-9]{6}" required
-                   placeholder="Nhập mã gồm 6 chữ số"
-                   class="otp-input">
+            <!-- Form xác minh OTP -->
+            <form action="VerifyServlet" method="post" id="otpForm">
+                <div class="otp-box">
+                    <label for="otp">Nhập mã OTP (6 số):</label><br>
+                    <input type="text" name="otp" id="otp" maxlength="6"
+                           pattern="[0-9]{6}" required
+                           placeholder="Nhập mã gồm 6 chữ số"
+                           class="otp-input">
+                </div>
+                <input type="submit" value="Xác minh" class="btn-verify">
+            </form>
+
+            <!-- Nút gửi lại OTP -->
+            <button id="resendBtn" class="btn-resend">Gửi lại OTP</button>
+            <p id="resendMsg" class="message"></p>
+
+            <!-- Countdown -->
+            <div class="countdown">
+                <div>
+                    <p class="countdown-text">Mã OTP sẽ hết hạn trong vòng <span class="countdown-item">5:00</span> phút</p>
+                </div>
+            </div>
         </div>
-        <input type="submit" value="Xác minh" class="btn-verify">
-    </form>
 
-    <!-- Nút gửi lại OTP -->
-    <button id="resendBtn" class="btn-resend">Gửi lại OTP</button>
-    <p id="resendMsg" class="message"></p>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const otpInput = document.getElementById('otp');
+                const resendBtn = document.getElementById("resendBtn");
+                const resendMsg = document.getElementById("resendMsg");
+                const itemCountDown = document.querySelector('.countdown-item');
 
-    <!-- Countdown -->
-    <div id="countdown" style="margin-top:15px;font-weight:bold;color:#333;">
-        ⏳ Mã OTP hết hạn sau: <span id="timer">05:00</span>
-    </div>
-</div>
+                // ✅ Chỉ cho phép nhập số
+                otpInput.addEventListener('input', () => {
+                    otpInput.value = otpInput.value.replace(/[^0-9]/g, '');
+                });
 
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    const otpInput = document.getElementById('otp');
-    const countdownDisplay = document.getElementById("timer");
-    const resendBtn = document.getElementById("resendBtn");
-    const resendMsg = document.getElementById("resendMsg");
+                let countdownInterval; // Lưu interval để dừng khi reset
 
-    // ✅ Chỉ cho phép nhập số
-    otpInput.addEventListener('input', () => {
-        otpInput.value = otpInput.value.replace(/[^0-9]/g, '');
-    });
+                // ✅ Hàm bắt đầu đếm ngược
+                function startCountdown() {
+                    clearInterval(countdownInterval); // Dừng đếm cũ nếu có
 
-    // ✅ Bộ đếm 5 phút (300 giây)
-    let timeLeft = 300;
-    let countdownInterval;
+                    let time = 5 * 60; // 5 phút = 300 giây
 
-    function startCountdown() {
-        clearInterval(countdownInterval);
-        countdownInterval = setInterval(() => {
-            const minutes = Math.floor(timeLeft / 60);
-            const seconds = timeLeft % 60;
-            countdownDisplay.textContent = `${minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
+                    countdownInterval = setInterval(function () {
+                        const phut = Math.floor(time / 60);
+                        const giay = time % 60;
 
-            if (timeLeft <= 0) {
-                clearInterval(countdownInterval);
-                countdownDisplay.textContent = "Hết hạn!";
-                document.getElementById("countdown").style.color = "red";
-            }
-            timeLeft--;
-        }, 1000);
-    }
+                        // Hiển thị mm:ss, thêm 0 khi <10
+                        itemCountDown.innerHTML = phut + ":" + (giay < 10 ? "0" + giay : giay);
 
-    startCountdown();
+                        if (time <= 0) {
+                            clearInterval(countdownInterval);
+                            itemCountDown.innerHTML = "Hết hạn!";
+                            itemCountDown.style.color = "red";
+                            resendBtn.disabled = false; // Cho phép gửi lại OTP
+                        }
 
-    // ✅ Gửi lại OTP (demo fetch)
-    resendBtn.addEventListener("click", async () => {
-        resendBtn.disabled = true;
-        resendMsg.textContent = "⏳ Đang gửi lại OTP...";
+                        time--;
+                    }, 1000);
+                }
 
-        try {
-            // Giả lập gọi API (bạn thay 'resendOtp' bằng servlet thật)
-            const response = await fetch("resendOtp", { method: "POST" });
-            let data;
-            try {
-                data = await response.json();
-            } catch {
-                // Nếu server không trả JSON, tạo phản hồi giả
-                data = { status: "success", message: "Đã gửi lại OTP mới!" };
-            }
-
-            if (data.status === "success") {
-                resendMsg.textContent = data.message;
-                timeLeft = 300;
+                // ✅ Bắt đầu đếm khi load trang
                 startCountdown();
-            } else {
-                resendMsg.textContent = data.message;
-            }
-        } catch (error) {
-            resendMsg.textContent = "⚠️ Lỗi khi gửi lại OTP.";
-        }
 
-        resendBtn.disabled = false;
-    });
-});
-</script>
-</body>
+                // ✅ Khi bấm Gửi lại OTP
+                resendBtn.addEventListener("click", async () => {
+                    resendBtn.disabled = true;
+                    resendMsg.textContent = "⏳ Đang gửi lại OTP...";
+                    itemCountDown.style.color = "#333";
+
+                    try {
+                        // Giả lập gọi API
+                        const response = await fetch("resendOtp", {method: "POST"});
+                        let data;
+                        try {
+                            data = await response.json();
+                        } catch {
+                            data = {status: "success", message: "✅ Đã gửi lại OTP mới!"};
+                        }
+
+                        if (data.status === "success") {
+                            resendMsg.textContent = data.message;
+
+                            // 🔁 Reset countdown về 5:00
+                            startCountdown();
+                        } else {
+                            resendMsg.textContent = data.message || "❌ Gửi lại OTP thất bại.";
+                        }
+                    } catch (error) {
+                        resendMsg.textContent = "⚠️ Lỗi khi gửi lại OTP.";
+                    }
+
+                    // Cho phép gửi lại sau 2 giây để tránh spam
+                    setTimeout(() => {
+                        resendBtn.disabled = false;
+                    }, 2000);
+                });
+            });
+        </script>
+    </body>
 </html>
 
 
