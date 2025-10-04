@@ -16,22 +16,13 @@ import utility.PasswordUtils;
 
 @WebServlet("/LoginServlet")
 public class LoginServlet extends HttpServlet {
-
     private UserDao userDAO;
 
     @Override
-    public void init() throws ServletException {
+    public void init() {
         userDAO = new UserDao();
     }
 
-    // GET -> hiển thị form login
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        request.getRequestDispatcher("login.jsp").forward(request, response);
-    }
-
-    // POST -> xử lý login
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -50,28 +41,21 @@ public class LoginServlet extends HttpServlet {
                 session.setAttribute("tempUser", user);
                 session.setAttribute("otp", String.valueOf(otpValue));
                 session.setAttribute("otpTime", System.currentTimeMillis());
-                session.setAttribute("authType", "login"); // 👈 xác định đây là đăng nhập
+                session.setAttribute("authType", "login"); // 👈 Quan trọng!
 
-                // ✅ Gửi OTP qua email
-                try {
-                    EmailUtil.sendEmail(
-                            user.getEmail(),
-                            "Mã OTP đăng nhập",
-                            "Xin chào " + user.getFullName()
-                            + ",\n\nMã OTP đăng nhập của bạn là: " + otpValue
-                            + "\nOTP có hiệu lực trong 5 phút."
-                    );
-                } catch (Exception e) {
-                    request.setAttribute("error", "Không gửi được OTP: " + e.getMessage());
-                    request.getRequestDispatcher("login.jsp").forward(request, response);
-                    return;
-                }
+                // ✅ Gửi mail
+                EmailUtil.sendEmail(
+                        user.getEmail(),
+                        "Mã OTP đăng nhập",
+                        "<h3>Xin chào " + user.getFullName() + ",</h3>"
+                        + "<p>Mã OTP đăng nhập của bạn là: <b>" + otpValue + "</b></p>"
+                        + "<p>OTP có hiệu lực trong 5 phút.</p>"
+                );
 
-                // Sang verify.jsp
+                // Chuyển đến verify.jsp
                 request.getRequestDispatcher("verify.jsp").forward(request, response);
-
             } else {
-                request.setAttribute("error", "Sai username hoặc password");
+                request.setAttribute("error", "Sai username hoặc password!");
                 request.getRequestDispatcher("login.jsp").forward(request, response);
             }
 

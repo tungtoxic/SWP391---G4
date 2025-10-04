@@ -60,15 +60,12 @@ public class RegisterServlet extends HttpServlet {
             }
 
             if (error == null) {
-                // ✅ Hash mật khẩu
                 String hashedPassword = PasswordUtils.hashPassword(password);
-
-                // ✅ Lấy role_id từ DB
                 int roleId = userDAO.getRoleIdByName(roleName);
+
                 if (roleId == -1) {
                     error = "Vai trò không hợp lệ!";
                 } else {
-                    // ✅ Tạo user tạm (chưa lưu DB)
                     User user = new User();
                     user.setUsername(username);
                     user.setPasswordHash(hashedPassword);
@@ -76,7 +73,7 @@ public class RegisterServlet extends HttpServlet {
                     user.setEmail(email);
                     user.setPhoneNumber(phoneNumber);
                     user.setRoleId(roleId);
-                    user.setStatus("Active"); // ✅ phù hợp ENUM DB
+                    user.setStatus("Active");
 
                     // ✅ Sinh OTP
                     int otpValue = 100000 + new Random().nextInt(900000);
@@ -91,10 +88,10 @@ public class RegisterServlet extends HttpServlet {
                     try {
                         EmailUtil.sendEmail(
                                 user.getEmail(),
-                                "Mã OTP xác thực tài khoản",
+                                "Mã đăng ký",   // 👈 đổi tiêu đề
                                 "Xin chào " + user.getFullName()
-                                        + ",\n\nMã OTP của bạn là: " + otpValue
-                                        + "\nOTP có hiệu lực trong 5 phút."
+                                        + ",\n\nMã đăng ký của bạn là: " + otpValue
+                                        + "\nMã có hiệu lực trong 5 phút."
                         );
                     } catch (Exception e) {
                         error = "Không gửi được OTP: " + e.getMessage();
