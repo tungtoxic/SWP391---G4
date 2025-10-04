@@ -16,13 +16,16 @@
 <html>
 <head>
     <title>Home</title>
+    <link rel="stylesheet" type="text/css" href="css/home.css">
 </head>
 <body>
-<h2>Welcome, <%= user.getFullName() %>!</h2>
-<p>Email: <%= user.getEmail() %></p>
-<p>Role ID: <%= user.getRoleId() %></p>
-<p>Status: <%= user.getStatus() %></p>
+    <div class="profile-card">
+        <h2>Welcome, <%= user.getFullName() %>!</h2>
+        <p><strong>Email:</strong> <%= user.getEmail() %></p>
+        <p><strong>Role ID:</strong> <%= user.getRoleId() %></p>
+        <p><strong>Status:</strong> <%= user.getStatus() %></p>
 
-<a href="logout">Logout</a>
+        <a href="logout" class="btn-logout">Logout</a>
+    </div>
 </body>
 </html>

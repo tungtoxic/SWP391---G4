@@ -7,24 +7,29 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
-    <title>Login</title>
+    <title>Đăng nhập</title>
+    <link rel="stylesheet" href="css/login.css">
 </head>
 <body>
-<h2>Login</h2>
+<div class="form-box">
+    <h2>Đăng nhập</h2>
 
-<form action="LoginServlet" method="post">
-    <label>Email:</label>
-    <input type="text" name="username" required><br><br>
+    <form action="LoginServlet" method="post">
+        <input type="text" name="username" placeholder="Email hoặc Username" required>
+        <input type="password" name="password" placeholder="Mật khẩu" required>
+        <button type="submit" class="btn">Đăng nhập</button>
+    </form>
 
-    <label>Password:</label>
-    <input type="password" name="password" required><br><br>
+    <p class="redirect-text">Chưa có tài khoản?
+        <a href="register.jsp">Đăng ký</a>
+    </p>
 
-    <input type="submit" value="Login">
-</form>
-
-<% String error = (String) request.getAttribute("error");
-   if (error != null) { %>
-    <p style="color:red;"><%= error %></p>
-<% } %>
+    <%
+        String error = (String) request.getAttribute("error");
+        if (error != null) {
+    %>
+        <div class="error"><%= error %></div>
+    <% } %>
+</div>
 </body>
 </html>
