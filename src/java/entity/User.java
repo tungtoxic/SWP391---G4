@@ -8,7 +8,6 @@ package entity;
  *
  * @author Helios 16
  */
-import java.time.LocalDateTime;
 import java.util.Date;
 
 public class User {
@@ -23,12 +22,13 @@ public class User {
     private String status;
     private Date createdAt;
     private Date updatedAt;
+       private String roleName;
 
     public User() {
     }
 
     public User(int userId, String username, String passwordHash, String fullName, String email,
-            String phoneNumber, int roleId, String status, Date createdAt, Date updatedAt) {
+            String phoneNumber, int roleId, String status, Date createdAt, Date updatedAt, String roleName) {
         this.userId = userId;
         this.username = username;
         this.passwordHash = passwordHash;
@@ -39,6 +39,15 @@ public class User {
         this.status = status;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        this.roleName = roleName;
+    }
+
+    public String getRoleName() {
+        return roleName;
+    }
+
+    public void setRoleName(String roleName) {
+        this.roleName = roleName;
     }
 
     public void setUserId(int userId) {
