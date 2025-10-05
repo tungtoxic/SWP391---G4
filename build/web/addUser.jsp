@@ -23,7 +23,7 @@
 <html>
     <head>
         <title>Thêm người dùng</title>
-        <link rel="stylesheet" href="../css/bootstrap.min.css">
+        <link rel="stylesheet" href="./css/bootstrap.min.css">
     </head>
     <body class="container mt-4">
 
@@ -36,7 +36,7 @@
         </div>
         <% } %>
 
-        <form action="<%= request.getContextPath() %>/admin/management" method="post">
+        <form action="<%= request.getContextPath() %>/addUser" method="post">
             <input type="hidden" name="action" value="add"/>
 
             <div class="mb-3">

@@ -68,7 +68,7 @@
             </div>
 
             <button type="submit" class="btn btn-primary">Cập nhật</button>
-            <a href="usermanagement.jsp" class="btn btn-secondary">Quay lại</a>
+            <a href="<%= request.getContextPath() %>/usermanagement.jsp" class="btn btn-secondary">Quay lại</a>
         </form>
 
     </body>
