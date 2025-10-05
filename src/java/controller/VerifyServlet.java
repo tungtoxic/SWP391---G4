@@ -7,8 +7,8 @@ package controller;
 import dao.UserDao;
 import entity.User;
 import jakarta.servlet.*;
-import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
+import jakarta.servlet.http.*;
 import java.io.IOException;
 
 @WebServlet("/VerifyServlet")
@@ -54,7 +54,21 @@ public class VerifyServlet extends HttpServlet {
             } else if ("login".equals(authType)) {
                 cleanup(session);
                 session.setAttribute("user", tempUser);
-                resp.sendRedirect("profile.jsp");
+              
+               int roleId = tempUser.getRoleId();
+               switch(roleId){
+                   case 1:
+                       resp.sendRedirect("agent/dashboard");
+                       break;
+                        case 3:
+                       resp.sendRedirect("AdminDashboard.jsp");
+                       break;
+                        case 4:
+                       resp.sendRedirect("management/dashboard");
+                       break;
+                       default:
+                           resp.sendRedirect("profile.jsp");
+            }
                 return;
             }
         } else {

@@ -4,11 +4,11 @@
  */
 package controller;
 
-import entity.User;
 import dao.*;
+import entity.User;
 import jakarta.servlet.*;
-import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
+import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.util.Random;
 import utility.EmailUtil;
@@ -29,7 +29,6 @@ public class LoginServlet extends HttpServlet {
 
         String username = request.getParameter("username");
         String password = request.getParameter("password");
-
         try {
             User user = userDAO.login(username);
 
