@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.security.SecureRandom;
 import utility.EmailUtil;
+import utility.PasswordUtils;
 
 /**
  *
