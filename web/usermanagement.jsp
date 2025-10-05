@@ -42,6 +42,8 @@
                 color: #e74c3c;
             }
         </style>
+       
+
     </head>
     <body>
         <h2>User Management</h2>
@@ -75,7 +77,10 @@
             </tr>
             <% } %>
         </table>
+        <div style="text-align: right; margin-top: 20px">
+            <a href="<%= request.getContextPath() %>/AdminDashboard.jsp" class="btn btn-secondary">⬅ Quay lại Dashboard</a>
 
+        </div>
         <br>
 
     </body>
