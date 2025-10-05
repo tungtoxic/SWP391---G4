@@ -23,7 +23,7 @@
 <html>
     <head>
         <title>Thêm người dùng</title>
-        <link rel="stylesheet" href="../css/bootstrap.min.css">
+        <link rel="stylesheet" href="./css/bootstrap.min.css">
     </head>
     <body class="container mt-4">
 
