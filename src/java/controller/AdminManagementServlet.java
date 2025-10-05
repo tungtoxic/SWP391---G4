@@ -172,10 +172,12 @@ public class AdminManagementServlet extends HttpServlet {
         // Tạo password ngẫu nhiên 8 ký tự
         String password = generateRandomPassword(8);
 
+       // Hash mật khẩu trước khi lưu
+        String hashedPassword = PasswordUtils.hashPassword(password);
         // Tạo đối tượng user
         User newUser = new User();
         newUser.setUsername(username);
-        newUser.setPasswordHash(password); // lưu password (hoặc hash nếu muốn)
+        newUser.setPasswordHash(hashedPassword); // lưu hash vào DB
         newUser.setFullName(fullName);
         newUser.setEmail(email);
         newUser.setPhoneNumber(phone);
