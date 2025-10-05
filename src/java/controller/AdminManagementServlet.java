@@ -13,9 +13,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.security.SecureRandom;
-import utility.EmailUtil;
-import utility.PasswordUtils;
 
 /**
  *
@@ -119,9 +116,7 @@ public class AdminManagementServlet extends HttpServlet {
         String action = request.getParameter("action");
 
         try {
-            if ("add".equals(action)) {
-                handleAddUser(request, response);
-            } else if ("edit".equals(action)) {
+          if ("edit".equals(action)) {
                 handleUpdateUser(request, response);
             } else {
                 response.sendRedirect(request.getContextPath() + "/usermanagement.jsp");
@@ -131,81 +126,7 @@ public class AdminManagementServlet extends HttpServlet {
         }
     }
 
-    // Tạo password ngẫu nhiên
-    private String generateRandomPassword(int length) {
-        SecureRandom random = new SecureRandom();
-        StringBuilder sb = new StringBuilder(length);
-        for (int i = 0; i < length; i++) {
-            sb.append(PASSWORD_CHARS.charAt(random.nextInt(PASSWORD_CHARS.length())));
-        }
-        return sb.toString();
-    }
-
-    private void handleAddUser(HttpServletRequest request, HttpServletResponse response)
-            throws Exception {
-
-        String username = request.getParameter("username").trim();
-        String fullName = request.getParameter("fullName").trim();
-        String email = request.getParameter("email").trim();
-        String phone = request.getParameter("phoneNumber").trim();
-        int roleId = Integer.parseInt(request.getParameter("role_id"));
-        String status = request.getParameter("status");
-
-        // Kiểm tra trùng username, email, phone
-        if (userDao.isUsernameExists(username)) {
-            request.setAttribute("error", "Username đã tồn tại.");
-            request.getRequestDispatcher("/addUser.jsp").forward(request, response);
-            return;
-        }
-
-        if (userDao.checkEmailExists(email)) {
-            request.setAttribute("error", "Email đã tồn tại.");
-            request.getRequestDispatcher("/addUser.jsp").forward(request, response);
-            return;
-        }
-
-        if (userDao.isPhoneExists(phone)) {
-            request.setAttribute("error", "Số điện thoại đã tồn tại.");
-            request.getRequestDispatcher("/addUser.jsp").forward(request, response);
-            return;
-        }
-
-        // Tạo password ngẫu nhiên 8 ký tự
-        String password = generateRandomPassword(8);
-
-        
-       // Hash mật khẩu trước khi lưu
-        String hashedPassword = PasswordUtils.hashPassword(password);
-        // Tạo đối tượng user
-        User newUser = new User();
-        newUser.setUsername(username);
-        newUser.setPasswordHash(hashedPassword); // lưu hash vào DB
-        newUser.setFullName(fullName);
-        newUser.setEmail(email);
-        newUser.setPhoneNumber(phone);
-        newUser.setRoleId(roleId);
-        newUser.setStatus(status);
-
-
-        boolean inserted = userDao.insertUser(newUser);
-
-        if (inserted) {
-            // Gửi mail với password
-            String subject = "Thông tin tài khoản của bạn";
-            String content = "<p>Chào " + fullName + ",</p>"
-                    + "<p>Tài khoản của bạn đã được tạo thành công.</p>"
-                    + "<p><b>Username:</b> " + username + "<br>"
-                    + "<b>Password:</b> " + password + "</p>"
-                    + "<p>Vui lòng đổi mật khẩu sau khi đăng nhập lần đầu.</p>";
-            EmailUtil.sendEmail(email, subject, content);
-
-            response.sendRedirect(request.getContextPath() + "/usermanagement.jsp");
-        } else {
-            request.setAttribute("error", "Thêm user thất bại.");
-            request.getRequestDispatcher("/addUser.jsp").forward(request, response);
-        }
-    }
-
+    
     private void handleUpdateUser(HttpServletRequest request, HttpServletResponse response)
             throws Exception {
 
