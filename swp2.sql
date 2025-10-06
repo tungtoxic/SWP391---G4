@@ -1,4 +1,4 @@
-<< << << << < Temporary merge branch 1 create Roles (
+create Roles (
     role_id INT AUTO_INCREMENT PRIMARY KEY,
     role_name ENUM('Admin', 'Manager', 'Agent') NOT NULL UNIQUE,
     description VARCHAR(255)
@@ -442,4 +442,3 @@ SET FOREIGN_KEY_CHECKS = 0;
 TRUNCATE TABLE Users;
 -- Bật lại kiểm tra khoá ngoại
 SET FOREIGN_KEY_CHECKS = 1;
->> >> >> >> > Temporary merge branch 2
