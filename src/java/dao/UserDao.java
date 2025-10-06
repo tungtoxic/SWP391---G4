@@ -224,5 +224,15 @@ public class UserDao {
             return ps.executeUpdate() > 0;
         }
     }
+      // update password
+  public void updatePassword(int userId, String newPasswordHash) throws Exception {
+    String sql = "UPDATE Users SET password = ? WHERE id = ?";
+    try (Connection con = DBConnector.makeConnection();
+         PreparedStatement ps = con.prepareStatement(sql)) {
+        ps.setString(1, newPasswordHash);
+        ps.setInt(2, userId);
+        ps.executeUpdate();
+    }
+}
 
 }
