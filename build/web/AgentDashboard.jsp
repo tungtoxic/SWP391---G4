@@ -1,14 +1,14 @@
 <%-- 
-    Document   : AdminDashboard
-    Created on : Oct 5, 2025, 11:02:43 AM
-    Author     : hoang
+    Document   : AgentDashboard
+    Created on : Oct 6, 2025, 4:49:19 PM
+    Author     : Nguyễn Tùng
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Admin Dashboard</title>
+        <title>Agent Dashboard</title>
         <style>
             body {
                 margin: 0;
@@ -59,16 +59,13 @@
         <div class="container">
             <!-- Navbar -->
             <div class="navbar">
-                <h2>Admin Dashboard</h2>
-                <a href="usermanagement.jsp">User Management</a>
-                <a href="agentmanagement.jsp">Agent Management</a>
-                <a href="contracts">Contract Detail</a>
-                <a href="ChangePassword">Change Password</a>
+                <h2>Agent Dashboard</h2>
+                
             </div>
 
             <!-- Content-->
             <div class="content">
-                <h2>Welcome, Admin</h2>
+                <h2>Welcome, Agent</h2>
                 <p>Chọn chức năng ở thanh menu bên trái.</p>
             </div>
         </div>
