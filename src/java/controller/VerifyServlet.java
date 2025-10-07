@@ -54,21 +54,22 @@ public class VerifyServlet extends HttpServlet {
             } else if ("login".equals(authType)) {
                 cleanup(session);
                 session.setAttribute("user", tempUser);
-              
-               int roleId = tempUser.getRoleId();
-               switch(roleId){
-                   case 1:
-                       resp.sendRedirect("AdminDashboard.jsp");
-                       break;
-                        case 3:
-                       resp.sendRedirect("agent/dashboard");
-                       break;
-                        case 2:
-                       resp.sendRedirect("management/dashboard");
-                       break;
-                       default:
-                           resp.sendRedirect("profile.jsp");
-            }
+
+                int roleId = tempUser.getRoleId();
+                switch (roleId) {
+                    case 1:
+                        resp.sendRedirect("AdminDashboard.jsp");
+                        break;
+                    case 2:
+                        resp.sendRedirect("management/dashboard");
+                        break;
+                    case 3:
+                        resp.sendRedirect("agent/dashboard");
+                        break;
+
+                    default:
+                        resp.sendRedirect("profile.jsp");
+                }
                 return;
             }
         } else {
