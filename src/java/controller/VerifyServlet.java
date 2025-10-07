@@ -58,12 +58,12 @@ public class VerifyServlet extends HttpServlet {
                int roleId = tempUser.getRoleId();
                switch(roleId){
                    case 1:
-                       resp.sendRedirect("agent/dashboard");
-                       break;
-                        case 3:
                        resp.sendRedirect("AdminDashboard.jsp");
                        break;
-                        case 4:
+                        case 3:
+                       resp.sendRedirect("agent/dashboard");
+                       break;
+                        case 2:
                        resp.sendRedirect("management/dashboard");
                        break;
                        default:
