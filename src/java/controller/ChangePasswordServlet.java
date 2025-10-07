@@ -46,7 +46,7 @@ public class ChangePasswordServlet extends HttpServlet {
         try {
             if (PasswordUtils.verifyPassword(oldPassword, user.getPasswordHash())) {
                 String newHash = PasswordUtils.hashPassword(newPassword);
-                userDao.updatePassword(user.getId(), newHash); // ✅ bây giờ chạy được
+                userDao.updatePassword(user.getUserId(), newHash); // ✅ bây giờ chạy được
                 request.setAttribute("message", "Đổi mật khẩu thành công!");
             } else {
                 request.setAttribute("error", "Mật khẩu cũ không đúng!");
