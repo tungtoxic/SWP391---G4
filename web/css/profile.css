@@ -1,64 +1,101 @@
 /*
-Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
-Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css to edit this template
+    File: profile.css
+    Author: Helios 16
+    Created: Oct 8, 2025
 */
-/* 
-    Created on : Oct 4, 2025, 11:18:47 AM
-    Author     : Helios 16
-*/
+
 body {
     margin: 0;
     padding: 0;
-    font-family: "Arial", sans-serif;
-    background: #f5f6fa;
+    font-family: "Poppins", sans-serif;
+    background: linear-gradient(135deg, #e0f7fa 0%, #e3f2fd 100%);
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
 }
 
+/* ===== Profile Card ===== */
 .profile-card {
-    background: #fff;
-    padding: 30px 40px;
-    border-radius: 15px;
-    box-shadow: 0px 4px 15px rgba(0,0,0,0.1);
-    width: 350px;
+    background: #ffffff;
+    padding: 40px 50px;
+    border-radius: 20px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
     text-align: center;
-    animation: fadeIn 0.6s ease-in-out;
+    max-width: 420px;
+    width: 100%;
+    animation: fadeIn 0.8s ease-in-out;
 }
 
-h2 {
-    margin-bottom: 15px;
+.profile-card h2 {
     color: #333;
+    font-size: 26px;
+    margin-bottom: 10px;
+    font-weight: 600;
 }
 
-p {
-    font-size: 14px;
+.profile-card p {
     color: #555;
-    margin: 6px 0;
+    font-size: 15px;
+    margin: 8px 0;
 }
 
-p strong {
-    color: #111;
+.profile-card p strong {
+    color: #1976d2;
+}
+
+/* ===== Avatar (optional if you want to add later) ===== */
+.profile-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #64b5f6, #1e88e5);
+    margin: 0 auto 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 40px;
+    font-weight: bold;
+}
+
+/* ===== Buttons ===== */
+.btn {
+    display: inline-block;
+    padding: 12px 30px;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: 0.3s;
+    color: #fff;
+    font-size: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.btn-change {
+    background: linear-gradient(45deg, #43e97b, #38f9d7);
+    margin-top: 20px;
+    display: block;
+}
+
+.btn-change:hover {
+    transform: translateY(-2px);
+    opacity: 0.9;
 }
 
 .btn-logout {
-    display: inline-block;
-    margin-top: 20px;
-    padding: 10px 25px;
-    background: #ff6600;
-    color: #fff;
-    text-decoration: none;
-    border-radius: 25px;
-    font-size: 14px;
-    transition: background 0.3s;
+    background: linear-gradient(45deg, #ff6a00, #ee0979);
+    margin-top: 15px;
+    display: block;
 }
 
 .btn-logout:hover {
-    background: #e65c00;
+    transform: translateY(-2px);
+    opacity: 0.9;
 }
 
+/* ===== Animation ===== */
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-20px); }
+    from { opacity: 0; transform: translateY(30px); }
     to { opacity: 1; transform: translateY(0); }
 }
