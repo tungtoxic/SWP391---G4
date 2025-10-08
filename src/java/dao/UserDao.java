@@ -225,13 +225,16 @@ public class UserDao {
         }
     }
       // update password
-  public void updatePassword(int userId, String newPasswordHash) throws Exception {
-    String sql = "UPDATE Users SET password = ? WHERE id = ?";
+  public boolean updatePassword(int userId, String newPasswordHash) {
+    String sql = "UPDATE Users SET password_hash = ? WHERE user_id = ?";
     try (Connection con = DBConnector.makeConnection();
          PreparedStatement ps = con.prepareStatement(sql)) {
         ps.setString(1, newPasswordHash);
         ps.setInt(2, userId);
-        ps.executeUpdate();
+        return ps.executeUpdate() > 0;
+    } catch (SQLException e) {
+        e.printStackTrace(); // xem log server để biết chi tiết lỗi
+        return false;
     }
 }
 
