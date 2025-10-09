@@ -11,7 +11,7 @@ import jakarta.servlet.annotation.*;
 import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.util.Random;
-import utility.EmailUtil;
+import utility.*;
 import utility.PasswordUtils;
 
 @WebServlet("/LoginServlet")

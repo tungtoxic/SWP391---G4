@@ -58,13 +58,13 @@ public class VerifyServlet extends HttpServlet {
                 int roleId = tempUser.getRoleId();
                 switch (roleId) {
                     case 1:
-                        resp.sendRedirect("AdminDashboard.jsp");
+                        resp.sendRedirect("AgentDashboard.jsp");
                         break;
                     case 2:
                         resp.sendRedirect("management/dashboard");
                         break;
                     case 3:
-                        resp.sendRedirect("agent/dashboard");
+                        resp.sendRedirect("AdminDashboard.jsp");
                         break;
 
                     default:
@@ -86,3 +86,4 @@ public class VerifyServlet extends HttpServlet {
         session.removeAttribute("tempUser");
     }
 }
+
