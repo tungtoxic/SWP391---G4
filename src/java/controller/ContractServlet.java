@@ -12,17 +12,27 @@ import java.util.List;
 public class ContractServlet extends HttpServlet {
     private final ContractDao dao = new ContractDao();
 
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+   @Override
+protected void doGet(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
 
-        List<Contract> contracts = dao.getAllContracts();
+    String agent = request.getParameter("agent");
+    String status = request.getParameter("status");
+    String keyword = request.getParameter("search");
 
-        // Gán dữ liệu sang JSP
-        request.setAttribute("contracts", contracts);
+    ContractDao dao = new ContractDao();
+    List<Contract> contracts = dao.getContractsFiltered(agent, status, keyword);
 
-        // Forward sang contractDetails.jsp
-        RequestDispatcher rd = request.getRequestDispatcher("contractDetail.jsp");
-        rd.forward(request, response);
-    }
+    // Summary
+    int totalContracts = dao.countContracts();
+    double totalPremium = dao.sumPremium();
+
+    request.setAttribute("contracts", contracts);
+    request.setAttribute("totalContracts", totalContracts);
+    request.setAttribute("totalPremium", totalPremium);
+
+    RequestDispatcher rd = request.getRequestDispatcher("contractDetail.jsp");
+    rd.forward(request, response);
+}
+
 }
