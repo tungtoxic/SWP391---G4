@@ -12,9 +12,7 @@ public class ProductDao {
         List<Product> list = new ArrayList<>();
         String sql = "SELECT * FROM Products";
 
-        try (Connection conn = DBConnector.makeConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+        try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 Product p = new Product();
@@ -32,27 +30,31 @@ public class ProductDao {
     }
 
     // ================== Lấy sản phẩm theo ID ==================
-    public Product getProductById(int id) throws Exception {
+    public Product getProductById(int id) {
+        Product product = null;
         String sql = "SELECT * FROM Products WHERE product_id = ?";
+
         try (Connection conn = DBConnector.makeConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, id);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    Product p = new Product();
-                    p.setProductId(rs.getInt("product_id"));
-                    p.setProductName(rs.getString("product_name"));
-                    p.setDescription(rs.getString("description"));
-                    p.setBasePrice(rs.getDouble("base_price"));
-                    p.setCategoryId(rs.getInt("category_id"));
-                    p.setCreatedAt(rs.getTimestamp("created_at"));
-                    p.setUpdatedAt(rs.getTimestamp("updated_at"));
-                    return p;
-                }
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                product = new Product();
+                product.setProductId(rs.getInt("product_id"));
+                product.setProductName(rs.getString("product_name"));
+                product.setDescription(rs.getString("description"));
+                product.setBasePrice(rs.getDouble("base_price"));
+                product.setCategoryId(rs.getInt("category_id"));
+                product.setCreatedAt(rs.getTimestamp("created_at"));
+                product.setUpdatedAt(rs.getTimestamp("updated_at"));
             }
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        return null;
+        return product;
     }
 
     // ================== Thêm sản phẩm mới ==================
@@ -62,8 +64,7 @@ public class ProductDao {
             VALUES (?, ?, ?, ?, NOW())
         """;
 
-        try (Connection conn = DBConnector.makeConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, p.getProductName());
             ps.setString(2, p.getDescription());
@@ -81,8 +82,7 @@ public class ProductDao {
             WHERE product_id = ?
         """;
 
-        try (Connection conn = DBConnector.makeConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, p.getProductName());
             ps.setString(2, p.getDescription());
@@ -96,8 +96,7 @@ public class ProductDao {
     // ================== Xóa sản phẩm ==================
     public boolean deleteProduct(int id) throws Exception {
         String sql = "DELETE FROM Products WHERE product_id = ?";
-        try (Connection conn = DBConnector.makeConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             return ps.executeUpdate() > 0;
         }
@@ -107,8 +106,7 @@ public class ProductDao {
     public List<Product> getProductsByCategory(int categoryId) {
         List<Product> list = new ArrayList<>();
         String sql = "SELECT * FROM Products WHERE category_id = ?";
-        try (Connection conn = DBConnector.makeConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, categoryId);
             ResultSet rs = ps.executeQuery();
@@ -128,5 +126,24 @@ public class ProductDao {
             e.printStackTrace();
         }
         return list;
+    }
+
+    // 🧩 Thêm hàm main để test nhanh
+    public static void main(String[] args) {
+        ProductDao dao = new ProductDao();
+        int testId = 4; // 👉 ID bạn muốn test trong database
+
+        Product p = dao.getProductById(testId);
+
+        if (p != null) {
+            System.out.println("✅ Tìm thấy sản phẩm:");
+            System.out.println("ID: " + p.getProductId());
+            System.out.println("Tên: " + p.getProductName());
+            System.out.println("Giá: " + p.getBasePrice());
+            System.out.println("Mô tả: " + p.getDescription());
+            System.out.println("Danh mục: " + p.getCategoryId());
+        } else {
+            System.out.println("❌ Không tìm thấy sản phẩm với ID = " + testId);
+        }
     }
 }
