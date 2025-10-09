@@ -167,7 +167,7 @@
                 <td><%= p.getCreatedAt() %></td>
                 <td><%= p.getUpdatedAt() %></td>
                 <td>
-                    <a href="editproduct.jsp?id=<%= p.getProductId() %>" class="action-btn edit-btn">Sửa</a>
+                    <a href="ProductServlet?action=edit&id=<%= p.getProductId() %>" class="action-btn edit-btn">Sửa</a>
                     <a href="ProductServlet?action=delete&id=<%= p.getProductId() %>"
                        class="action-btn delete-btn"
                        onclick="return confirm('Bạn có chắc muốn xóa sản phẩm này không?');">
