@@ -17,11 +17,15 @@ import utility.DBConnector;
 public class UserDao {
     // Hàm login check DB
 
-    public User login(String username) throws SQLException {
-        String sql = "SELECT * FROM Users WHERE username = ?";
-        try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, username);
-            try (ResultSet rs = ps.executeQuery()) {
+    public User login(String username, String password) {
+        try {
+            Connection conn = DBConnector.makeConnection();
+            if (conn != null) {
+                String sql = "SELECT * FROM Users WHERE username = ? AND password_hash = ?";
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ps.setString(1, username);
+                ps.setString(2, password);
+                ResultSet rs = ps.executeQuery();
                 if (rs.next()) {
                     User user = new User();
                     user.setUserId(rs.getInt("user_id"));
@@ -33,8 +37,11 @@ public class UserDao {
                     user.setRoleId(rs.getInt("role_id"));
                     user.setStatus(rs.getString("status"));
                     return user;
+
                 }
             }
+        }catch (Exception e) {
+            
         }
         return null;
     }
@@ -224,18 +231,18 @@ public class UserDao {
             return ps.executeUpdate() > 0;
         }
     }
-      // update password
-  public boolean updatePassword(int userId, String newPasswordHash) {
-    String sql = "UPDATE Users SET password_hash = ? WHERE user_id = ?";
-    try (Connection con = DBConnector.makeConnection();
-         PreparedStatement ps = con.prepareStatement(sql)) {
-        ps.setString(1, newPasswordHash);
-        ps.setInt(2, userId);
-        return ps.executeUpdate() > 0;
-    } catch (SQLException e) {
-        e.printStackTrace(); // xem log server để biết chi tiết lỗi
-        return false;
+    // update password
+
+    public boolean updatePassword(int userId, String newPasswordHash) {
+        String sql = "UPDATE Users SET password_hash = ? WHERE user_id = ?";
+        try (Connection con = DBConnector.makeConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, newPasswordHash);
+            ps.setInt(2, userId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace(); // xem log server để biết chi tiết lỗi
+            return false;
+        }
     }
-}
 
 }

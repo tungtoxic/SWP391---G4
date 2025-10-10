@@ -60,7 +60,6 @@ public class RegisterServlet extends HttpServlet {
             }
 
             if (error == null) {
-                String hashedPassword = PasswordUtils.hashPassword(password);
                 int roleId = userDAO.getRoleIdByName(roleName);
 
                 if (roleId == -1) {
@@ -68,7 +67,7 @@ public class RegisterServlet extends HttpServlet {
                 } else {
                     User user = new User();
                     user.setUsername(username);
-                    user.setPasswordHash(hashedPassword);
+                    user.setPasswordHash(password);
                     user.setFullName(fullName);
                     user.setEmail(email);
                     user.setPhoneNumber(phoneNumber);

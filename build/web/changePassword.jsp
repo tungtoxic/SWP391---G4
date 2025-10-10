@@ -8,114 +8,155 @@
 
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background: #f5f5f5;
+            margin: 0;
+            height: 100vh;
+            font-family: "Poppins", sans-serif;
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            color: white;
+            animation: fadeIn 1s ease-in-out;
         }
 
         .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 50px 60px;
+            border-radius: 20px;
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            max-width: 500px;
             width: 100%;
-            max-width: 400px;
-            padding: 20px;
-        }
-
-        .form-box {
-            background: #fff;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0px 0px 15px rgba(0,0,0,0.1);
             text-align: center;
         }
 
-        .form-box h2 {
+        .container h1 {
+            font-size: 26px;
+            margin-bottom: 25px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        form {
+            text-align: left;
+        }
+
+        .form-group {
             margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            margin-bottom: 6px;
+            color: #e0e0e0;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.85);
+            font-size: 14px;
+            outline: none;
             color: #333;
         }
 
-        .form-box input {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ccc;
-            border-radius: 5px;
+        input:focus {
+            box-shadow: 0 0 10px rgba(255,255,255,0.4);
         }
 
-        .form-box .btn {
-            width: 100%;
-            padding: 10px;
-            background: #28a745;
-            color: #fff;
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
             border: none;
-            border-radius: 5px;
             cursor: pointer;
+            transition: 0.3s;
+            color: #fff;
+            font-size: 15px;
         }
 
-        .form-box .btn:hover {
-            background: #218838;
+        .btn-confirm {
+            background: #43e97b;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .btn-confirm:hover {
+            background: #38d16a;
+            transform: translateY(-2px);
+        }
+
+        .btn-back {
+            background: #ff6a00;
+            margin-top: 15px;
+        }
+
+        .btn-back:hover {
+            background: #e65c00;
+            transform: translateY(-2px);
+        }
+
+        .alert {
+            margin-top: 20px;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 500;
         }
 
         .success {
-            color: green;
-            margin-top: 10px;
+            background: rgba(67, 233, 123, 0.2);
+            border: 1px solid #43e97b;
         }
 
         .error {
-            color: red;
-            margin-top: 10px;
+            background: rgba(255, 106, 0, 0.2);
+            border: 1px solid #ff6a00;
         }
 
-        .section-title {
-            margin-top: 20px;
-            margin-bottom: 10px;
-            font-weight: bold;
-            color: #555;
-            text-align: left;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="form-box">
+    <h1>Đổi mật khẩu</h1>
 
-        <!-- ======================== Phần 1: Header / Title ======================== -->
-        <h2>Đổi mật khẩu</h2>
-
-        <!-- ======================== Phần 2: Form đổi mật khẩu ======================== -->
-        <form action="ChangePasswordServlet" method="post">
-            <!-- Mật khẩu cũ -->
-            <div class="section-title">Mật khẩu cũ</div>
+    <form action="ChangePassword" method="post">
+        <div class="form-group">
+            <label>Mật khẩu cũ</label>
             <input type="password" name="oldPassword" placeholder="Nhập mật khẩu cũ" required>
+        </div>
 
-            <!-- Mật khẩu mới -->
-            <div class="section-title">Mật khẩu mới</div>
+        <div class="form-group">
+            <label>Mật khẩu mới</label>
             <input type="password" name="newPassword" placeholder="Nhập mật khẩu mới" required>
+        </div>
 
-            <!-- Nhập lại mật khẩu mới -->
-            <div class="section-title">Xác nhận mật khẩu mới</div>
+        <div class="form-group">
+            <label>Xác nhận mật khẩu mới</label>
             <input type="password" name="confirmPassword" placeholder="Nhập lại mật khẩu mới" required>
+        </div>
 
-            <button type="submit" class="btn">Đổi mật khẩu</button>
-        </form>
+        <button type="submit" class="btn btn-confirm">Đổi mật khẩu</button>
+    </form>
 
-        <!-- ======================== Phần 3: Thông báo lỗi / thành công ======================== -->
-        <c:if test="${not empty message}">
-            <div class="success">${message}</div>
-        </c:if>
+    <c:if test="${not empty message}">
+        <div class="alert success">${message}</div>
+    </c:if>
 
-        <c:if test="${not empty error}">
-            <div class="error">${error}</div>
-        </c:if>
+    <c:if test="${not empty error}">
+        <div class="alert error">${error}</div>
+    </c:if>
 
-        <!-- ======================== Phần 4: Link điều hướng ======================== -->
-        <p class="redirect-text">
-            <a href="profile.jsp">Quay lại Profile</a>
-        </p>
-
-    </div>
+    <a href="profile.jsp" class="btn btn-back">← Quay lại Profile</a>
 </div>
 
 </body>

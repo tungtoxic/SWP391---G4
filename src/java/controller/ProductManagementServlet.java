@@ -27,7 +27,9 @@ public class ProductManagementServlet extends HttpServlet {
             throws ServletException, IOException {
 
         String action = request.getParameter("action");
-        if (action == null) action = "list";
+        if (action == null) {
+            action = "list";
+        }
 
         try {
             switch (action) {
@@ -50,7 +52,6 @@ public class ProductManagementServlet extends HttpServlet {
     }
 
     // ======================= GET Actions =======================
-
     private void listProducts(HttpServletRequest request, HttpServletResponse response)
             throws Exception {
         List<Product> productList = productDao.getAllProducts();
@@ -73,8 +74,16 @@ public class ProductManagementServlet extends HttpServlet {
         Product product = productDao.getProductById(id);
         List<ProductCategory> categories = categoryDao.getAllCategories();
 
+        // Đảm bảo có dữ liệu
+        if (product == null) {
+            request.setAttribute("error", "Không tìm thấy sản phẩm có ID: " + id);
+            request.getRequestDispatcher("/error.jsp").forward(request, response);
+            return;
+        }
+
         request.setAttribute("product", product);
-        request.setAttribute("categories", categories);
+        request.setAttribute("categories", categories); // 👈 thêm dòng này
+
         request.getRequestDispatcher("/editProduct.jsp").forward(request, response);
     }
 
@@ -86,7 +95,6 @@ public class ProductManagementServlet extends HttpServlet {
     }
 
     // ======================= POST Actions =======================
-
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -112,7 +120,6 @@ public class ProductManagementServlet extends HttpServlet {
     }
 
     // ======================= POST Handlers =======================
-
     private void insertProduct(HttpServletRequest request, HttpServletResponse response)
             throws Exception {
 
