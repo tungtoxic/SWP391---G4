@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Agent Dashboard</title>
+        <title>Manager Dashboard</title>
         <style>
             /* Reset */
             * {
@@ -104,9 +104,9 @@
                     <div class="nav-links">
                         <a href="dashboard.jsp">🏠 Trang chủ</a>
                         <a href="CustomerServlet">👥 Khách hàng</a>
-                        <a href="productmanagement.jsp">📦 Sản phẩm</a>
+                        <a href="ProductServlet?action=list">📦 Sản phẩm</a>
                         <a href="ContractServlet">📝 Hợp đồng</a>
-                        <a href="CommissionServlet">💰 Hoa hồng</a>
+                        <a href="agentmanagement.jsp">Agent</a>
                     </div>
                 </div>
 
