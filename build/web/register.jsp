@@ -26,7 +26,6 @@
             <option value="">-- Chọn vai trò --</option>
             <option value="Agent">Agent</option>
             <option value="Manager">Manager</option>
-            <option value="Admin">Admin</option>
         </select>
 
         <div class="g-recaptcha" data-sitekey="6Lf4T90rAAAAADT-sr3o4XIGcVECgAVjmg9Zm6qE"></div>
