@@ -4,18 +4,18 @@
  */
 package controller;
 
-import entity.User;
 import dao.*;
+import entity.User;
 import jakarta.servlet.*;
-import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
+import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.util.Random;
-import utility.EmailUtil;
-import utility.PasswordUtils;
+import utility.*;
 
 @WebServlet("/LoginServlet")
 public class LoginServlet extends HttpServlet {
+
     private UserDao userDAO;
 
     @Override
@@ -30,37 +30,29 @@ public class LoginServlet extends HttpServlet {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
 
-        try {
-            User user = userDAO.login(username);
+        User user = userDAO.login(username, password);
+        HttpSession session = request.getSession();
+        if (user != null) {
+            session.setAttribute("user", user);
+            int roleId = user.getRoleId();
+            switch (roleId) {
+                case 1:
+                    response.sendRedirect("AgentDashboard.jsp");
+                    break;
+                case 2:
+                    response.sendRedirect("management/dashboard");
+                    break;
+                case 3:
+                    response.sendRedirect("AdminDashboard.jsp");
+                    break;
 
-            if (user != null && PasswordUtils.verifyPassword(password, user.getPasswordHash())) {
-                // ✅ Sinh OTP
-                int otpValue = 100000 + new Random().nextInt(900000);
-
-                HttpSession session = request.getSession();
-                session.setAttribute("tempUser", user);
-                session.setAttribute("otp", String.valueOf(otpValue));
-                session.setAttribute("otpTime", System.currentTimeMillis());
-                session.setAttribute("authType", "login"); // 👈 Quan trọng!
-
-                // ✅ Gửi mail
-                EmailUtil.sendEmail(
-                        user.getEmail(),
-                        "Mã OTP đăng nhập",
-                        "<h3>Xin chào " + user.getFullName() + ",</h3>"
-                        + "<p>Mã OTP đăng nhập của bạn là: <b>" + otpValue + "</b></p>"
-                        + "<p>OTP có hiệu lực trong 5 phút.</p>"
-                );
-
-                // Chuyển đến verify.jsp
-                request.getRequestDispatcher("verify.jsp").forward(request, response);
-            } else {
-                request.setAttribute("error", "Sai username hoặc password!");
-                request.getRequestDispatcher("login.jsp").forward(request, response);
+                default:
+                    response.sendRedirect("profile.jsp");
             }
-
-        } catch (Exception e) {
-            throw new ServletException("Login failed", e);
+        } else {
+            request.setAttribute("error", "Sai username hoặc password!");
+            request.getRequestDispatcher("login.jsp").forward(request, response);
         }
+
     }
 }

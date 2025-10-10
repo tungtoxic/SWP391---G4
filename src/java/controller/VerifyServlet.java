@@ -7,8 +7,8 @@ package controller;
 import dao.UserDao;
 import entity.User;
 import jakarta.servlet.*;
-import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
+import jakarta.servlet.http.*;
 import java.io.IOException;
 
 @WebServlet("/VerifyServlet")
@@ -51,12 +51,7 @@ public class VerifyServlet extends HttpServlet {
                     e.printStackTrace();
                     req.setAttribute("error", "Lỗi hệ thống: " + e.getMessage());
                 }
-            } else if ("login".equals(authType)) {
-                cleanup(session);
-                session.setAttribute("user", tempUser);
-                resp.sendRedirect("profile.jsp");
-                return;
-            }
+            } 
         } else {
             req.setAttribute("error", "Mã OTP không đúng hoặc đã hết hạn.");
         }
@@ -71,3 +66,4 @@ public class VerifyServlet extends HttpServlet {
         session.removeAttribute("tempUser");
     }
 }
+
