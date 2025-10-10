@@ -41,7 +41,7 @@ public class LoginServlet extends HttpServlet {
                 session.setAttribute("otp", String.valueOf(otpValue));
                 session.setAttribute("otpTime", System.currentTimeMillis());
                 session.setAttribute("authType", "login"); // 👈 Quan trọng!
-
+                System.out.print(otpValue);
                 // ✅ Gửi mail
                 EmailUtil.sendEmail(
                         user.getEmail(),

@@ -63,7 +63,7 @@
                 <a href="usermanagement.jsp">User Management</a>
                 <a href="agentmanagement.jsp">Agent Management</a>
                 <a href="contracts">Contract Detail</a>
-                <a href="ChangePassword">Change Password</a>
+               
             </div>
 
             <!-- Content-->
