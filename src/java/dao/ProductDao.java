@@ -343,67 +343,20 @@ public class ProductDao {
 
     // 🔍 TEST FUNCTION
     public static void main(String[] args) {
-        System.out.println("===== 🧩 KIỂM TRA KẾT NỐI DATABASE & HÀM DAO =====");
+        ProductDao productDao = new ProductDao(); // giả sử bạn đã có ProductDao
 
-        // ✅ Test kết nối
-        try (Connection conn = DBConnector.makeConnection()) {
-            if (conn != null && !conn.isClosed()) {
-                System.out.println("✅ Kết nối DB thành công!");
-            } else {
-                System.out.println("❌ Kết nối DB thất bại (conn = null hoặc đã đóng).");
-                return;
-            }
-        } catch (Exception e) {
-            System.err.println("❌ Lỗi khi kết nối DB:");
-            e.printStackTrace();
-            return;
-        }
-
-        // ✅ Test hàm DAO
-        System.out.println("\n===== 🔍 KIỂM TRA getInsuranceProductDetailsByProductId() =====");
         try {
-            ProductDao dao = new ProductDao();
+            List<Product> products = productDao.getAllProducts();
+            System.out.println("Số lượng sản phẩm: " + products.size());
 
-            int testProductId = 4; // ⚙️ Đổi ID này theo sản phẩm thật trong DB
-
-            InsuranceProductDetails d = dao.getInsuranceProductDetailsByProductId(testProductId);
-
-            if (d == null) {
-                System.out.println("⚠️ Không tìm thấy chi tiết sản phẩm cho product_id = " + testProductId);
-            } else {
-                System.out.println("✅ Tìm thấy chi tiết sản phẩm cho product_id = " + testProductId);
-                System.out.println("─────────────────────────────────────────────");
-                System.out.println("🆔 Product ID: " + d.getProductId());
-                System.out.println("📦 Category ID: " + d.getCategoryId());
-                System.out.println("🏷️ Product Type: " + d.getProductType());
-                System.out.println("💰 Coverage Amount: " + d.getCoverageAmount());
-                System.out.println("📅 Duration Years: " + d.getDurationYears());
-
-                // 🧍 Life Insurance
-                System.out.println("👨‍👩‍👧 Beneficiaries: " + d.getBeneficiaries());
-                System.out.println("🎯 Maturity Benefit: " + d.getMaturityBenefit());
-                System.out.println("💵 Maturity Amount: " + d.getMaturityAmount());
-
-                // 🏥 Health Insurance
-                System.out.println("🏥 Hospitalization Limit: " + d.getHospitalizationLimit());
-                System.out.println("🔪 Surgery Limit: " + d.getSurgeryLimit());
-                System.out.println("🤰 Maternity Limit: " + d.getMaternityLimit());
-                System.out.println("⏳ Waiting Period: " + d.getWaitingPeriod());
-                System.out.println("🤰 Max age: " + d.getMaxAge());
-                System.out.println("⏳ Min age: " + d.getMinAge());
-
-                // 🚗 Car Insurance
-                System.out.println("🚗 Vehicle Type: " + d.getVehicleType());
-                System.out.println("💸 Vehicle Value: " + d.getVehicleValue());
-                System.out.println("🛡️ Coverage Type: " + d.getCoverageType());
-
-                // 🔹 System timestamps
-                System.out.println("🕒 Created At: " + d.getCreatedAt());
-                System.out.println("🕓 Updated At: " + d.getUpdatedAt());
-                System.out.println("─────────────────────────────────────────────");
+            for (Product p : products) {
+                System.out.println("ID: " + p.getProductId()
+                        + ", Name: " + p.getProductName()
+                        + ", CategoryId: " + p.getCategoryId()
+                        + ", BasePrice: " + p.getBasePrice()
+                        + ", CreatedAt: " + p.getCreatedAt());
             }
         } catch (Exception e) {
-            System.err.println("❌ Lỗi khi thực thi getInsuranceProductDetailsByProductId():");
             e.printStackTrace();
         }
     }

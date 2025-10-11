@@ -121,7 +121,7 @@ public class ProductManagementServlet extends HttpServlet {
         request.setAttribute("product", product);
         request.setAttribute("details", details);
         request.setAttribute("categories", categories);
-        request.getRequestDispatcher("/editProduct.jsp").forward(request, response);
+        request.getRequestDispatcher("/editproduct.jsp").forward(request, response);
     }
 
     private void updateProduct(HttpServletRequest request, HttpServletResponse response)
