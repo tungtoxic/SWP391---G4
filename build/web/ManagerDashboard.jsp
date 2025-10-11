@@ -100,13 +100,21 @@
             <!-- Navbar -->
             <div class="navbar">
                 <div>
+<<<<<<< HEAD
                     <h2>Agent Panel</h2>
+=======
+                    <h2>Manager Panel</h2>
+>>>>>>> thanhhe180566
                     <div class="nav-links">
                         <a href="dashboard.jsp">🏠 Trang chủ</a>
                         <a href="CustomerServlet">👥 Khách hàng</a>
                         <a href="ProductServlet?action=list">📦 Sản phẩm</a>
                         <a href="ContractServlet">📝 Hợp đồng</a>
+<<<<<<< HEAD
                         <a href="agentmanagement.jsp">Agent</a>
+=======
+                        <a href="AgentManagementServlet?action=">Agent</a>
+>>>>>>> thanhhe180566
                     </div>
                 </div>
 
@@ -117,7 +125,11 @@
 
             <!-- Content -->
             <div class="content">
+<<<<<<< HEAD
                 <h1>Chào mừng, Đại lý!</h1>
+=======
+                <h1>Chào mừng, Manager!</h1>
+>>>>>>> thanhhe180566
                 <p>Hãy chọn một chức năng từ menu bên trái để bắt đầu quản lý hệ thống bảo hiểm.</p>
             </div>
         </div>

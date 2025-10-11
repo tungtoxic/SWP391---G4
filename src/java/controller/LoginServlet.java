@@ -37,10 +37,17 @@ public class LoginServlet extends HttpServlet {
             int roleId = user.getRoleId();
             switch (roleId) {
                 case 1:
+<<<<<<< HEAD
                     response.sendRedirect("ManagerDashboard.jsp");
                     break;
                 case 2:
                     response.sendRedirect("AgentDashboard.jsp");
+=======
+                    response.sendRedirect("AgentDashboard.jsp");
+                    break;
+                case 2:
+                    response.sendRedirect("ManagerDashboard.jsp");
+>>>>>>> thanhhe180566
                     break;
                 case 3:
                     response.sendRedirect("AdminDashboard.jsp");

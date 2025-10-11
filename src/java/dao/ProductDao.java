@@ -343,6 +343,7 @@ public class ProductDao {
 
     // 🔍 TEST FUNCTION
     public static void main(String[] args) {
+<<<<<<< HEAD
         System.out.println("===== 🧩 KIỂM TRA KẾT NỐI DATABASE & HÀM DAO =====");
 
         // ✅ Test kết nối
@@ -404,6 +405,22 @@ public class ProductDao {
             }
         } catch (Exception e) {
             System.err.println("❌ Lỗi khi thực thi getInsuranceProductDetailsByProductId():");
+=======
+        ProductDao productDao = new ProductDao(); // giả sử bạn đã có ProductDao
+
+        try {
+            List<Product> products = productDao.getAllProducts();
+            System.out.println("Số lượng sản phẩm: " + products.size());
+
+            for (Product p : products) {
+                System.out.println("ID: " + p.getProductId()
+                        + ", Name: " + p.getProductName()
+                        + ", CategoryId: " + p.getCategoryId()
+                        + ", BasePrice: " + p.getBasePrice()
+                        + ", CreatedAt: " + p.getCreatedAt());
+            }
+        } catch (Exception e) {
+>>>>>>> thanhhe180566
             e.printStackTrace();
         }
     }

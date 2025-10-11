@@ -10,6 +10,7 @@
     List<Product> carList = new ArrayList<>();
 
     if (productList != null) {
+<<<<<<< HEAD
         for (Product p : productList) {
             for (ProductCategory c : categoryList) {
                 if (c.getCategoryId() == p.getCategoryId()) {
@@ -18,6 +19,16 @@
             }
         }
     }
+=======
+    for (Product p : productList) {
+        switch (p.getCategoryId()) {
+            case 1: lifeList.add(p); break;   // nhân thọ
+            case 2: healthList.add(p); break; // sức khỏe
+            case 3: carList.add(p); break;    // ô tô
+        }
+    }
+}
+>>>>>>> thanhhe180566
 %>
 
 <html>
@@ -148,7 +159,11 @@
             <!-- BẢNG SỨC KHỎE -->
             <table id="healthTable">
                 <tr>
+<<<<<<< HEAD
                     <th>ID</th><th>Tên sản phẩm</th><th>Giới hạn nằm viện</th><th>Giới hạn phẫu thuật</th><th>Giới hạn sinh đẻ</th><th>Giá trị bảo hiểm</th><th>Độ tuổi nhỏ nhất</th><th>Độ tuổi lớn nhất</th><th>Thời gian chờ</th><th>Giá cơ bản</th><th>Ngày tạo</th>
+=======
+                    <th>ID</th><th>Tên sản phẩm</th><th>Thời hạn</th><th>Giới hạn nằm viện</th><th>Giới hạn phẫu thuật</th><th>Giới hạn sinh đẻ</th><th>Giá trị bảo hiểm</th><th>Độ tuổi nhỏ nhất</th><th>Độ tuổi lớn nhất</th><th>Thời gian chờ</th><th>Giá cơ bản</th><th>Ngày tạo</th>
+>>>>>>> thanhhe180566
                 </tr>
                 <% if (!healthList.isEmpty()) {
                     for (Product p : healthList) {
@@ -157,6 +172,10 @@
                 <tr>
                     <td><%= p.getProductId() %></td>
                     <td><%= p.getProductName() %></td>
+<<<<<<< HEAD
+=======
+                    <td><%= d != null ? d.getDurationYears()+" năm" : "-" %></td>
+>>>>>>> thanhhe180566
                     <td><%= d != null ? String.format("%,.0f VNĐ", d.getHospitalizationLimit()) : "-" %></td>
                     <td><%= d != null ? String.format("%,.0f VNĐ", d.getSurgeryLimit()) : "-" %></td>
                     <td><%= d != null ? String.format("%,.0f VNĐ", d.getMaternityLimit()) : "-" %></td>
