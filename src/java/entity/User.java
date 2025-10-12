@@ -14,7 +14,7 @@ public class User {
 
     private int userId;
     private String username;
-    private String passwordHash;
+    private String password;
     private String fullName;
     private String email;
     private String phoneNumber;
@@ -22,16 +22,21 @@ public class User {
     private String status;
     private Date createdAt;
     private Date updatedAt;
+<<<<<<< HEAD
        private String roleName;
+=======
+    private String roleName;
+    private boolean isFirstLogin = true;
+>>>>>>> thanhhe180566
 
     public User() {
     }
 
-    public User(int userId, String username, String passwordHash, String fullName, String email,
+    public User(int userId, String username, String password, String fullName, String email,
             String phoneNumber, int roleId, String status, Date createdAt, Date updatedAt, String roleName) {
         this.userId = userId;
         this.username = username;
-        this.passwordHash = passwordHash;
+        this.password = password;
         this.fullName = fullName;
         this.email = email;
         this.phoneNumber = phoneNumber;
@@ -58,8 +63,15 @@ public class User {
         this.username = username;
     }
 
-    public void setPasswordHash(String passwordHash) {
-        this.passwordHash = passwordHash;
+    public void setPasswordHash(String password) {
+        this.password = password;
+<<<<<<< HEAD
+=======
+    }
+
+    public String getPassword() {
+        return password;
+>>>>>>> thanhhe180566
     }
 
     public void setFullName(String fullName) {
@@ -99,7 +111,7 @@ public class User {
     }
 
     public String getPasswordHash() {
-        return passwordHash;
+        return password;
     }
 
     public String getFullName() {
@@ -128,6 +140,14 @@ public class User {
 
     public Date getUpdatedAt() {
         return updatedAt;
+    }
+
+    public boolean getIsFirstLogin() {
+        return isFirstLogin;
+    }
+
+    public void setIsFirstLogin(boolean isFirstLogin) {
+        this.isFirstLogin = isFirstLogin;
     }
 
     // getters + setters...
