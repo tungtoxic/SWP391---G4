@@ -27,18 +27,20 @@ public class ContractDao {
             GROUP BY c.contract_id
         """;
 
-        try (Connection con = DBConnector.makeConnection(); PreparedStatement ps = con.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+        try (Connection con = DBConnector.makeConnection();
+             PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 Contract c = new Contract(
-                        rs.getInt("contract_id"),
-                        rs.getString("customer"),
-                        rs.getString("agent"),
-                        rs.getString("product"),
-                        rs.getDate("start_date"),
-                        rs.getDate("end_date"),
-                        rs.getString("status"),
-                        rs.getDouble("premium_amount")
+                    rs.getInt("contract_id"),
+                    rs.getString("customer"),
+                    rs.getString("agent"),
+                    rs.getString("product"),
+                    rs.getDate("start_date"),
+                    rs.getDate("end_date"),
+                    rs.getString("status"),
+                    rs.getDouble("premium_amount")
                 );
                 list.add(c);
             }
@@ -70,7 +72,8 @@ public class ContractDao {
               AND (? = '' OR u.username = ?)
         """;
 
-        try (Connection con = DBConnector.makeConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+        try (Connection con = DBConnector.makeConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
 
             String kw = "%" + (keyword == null ? "" : keyword.toLowerCase()) + "%";
             ps.setString(1, kw);
@@ -84,14 +87,14 @@ public class ContractDao {
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     Contract c = new Contract(
-                            rs.getInt("contract_id"),
-                            rs.getString("customer"),
-                            rs.getString("agent"),
-                            rs.getString("product"),
-                            rs.getDate("start_date"),
-                            rs.getDate("end_date"),
-                            rs.getString("status"),
-                            rs.getDouble("premium_amount")
+                        rs.getInt("contract_id"),
+                        rs.getString("customer"),
+                        rs.getString("agent"),
+                        rs.getString("product"),
+                        rs.getDate("start_date"),
+                        rs.getDate("end_date"),
+                        rs.getString("status"),
+                        rs.getDouble("premium_amount")
                     );
                     list.add(c);
                 }
@@ -105,10 +108,10 @@ public class ContractDao {
     // Đếm tổng hợp đồng
     public int countContracts() {
         String sql = "SELECT COUNT(*) FROM Contracts";
-        try (Connection con = DBConnector.makeConnection(); PreparedStatement ps = con.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
-            if (rs.next()) {
-                return rs.getInt(1);
-            }
+        try (Connection con = DBConnector.makeConnection();
+             PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) return rs.getInt(1);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -118,10 +121,10 @@ public class ContractDao {
     // Tính tổng premium
     public double sumPremium() {
         String sql = "SELECT SUM(premium_amount) FROM Contracts";
-        try (Connection con = DBConnector.makeConnection(); PreparedStatement ps = con.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
-            if (rs.next()) {
-                return rs.getDouble(1);
-            }
+        try (Connection con = DBConnector.makeConnection();
+             PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) return rs.getDouble(1);
         } catch (Exception e) {
             e.printStackTrace();
         }

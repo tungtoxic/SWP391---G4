@@ -22,12 +22,8 @@ public class User {
     private String status;
     private Date createdAt;
     private Date updatedAt;
-<<<<<<< HEAD
-       private String roleName;
-=======
     private String roleName;
     private boolean isFirstLogin = true;
->>>>>>> thanhhe180566
 
     public User() {
     }
@@ -65,13 +61,10 @@ public class User {
 
     public void setPasswordHash(String password) {
         this.password = password;
-<<<<<<< HEAD
-=======
     }
 
     public String getPassword() {
         return password;
->>>>>>> thanhhe180566
     }
 
     public void setFullName(String fullName) {
