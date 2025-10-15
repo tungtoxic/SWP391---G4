@@ -13,9 +13,7 @@ public class ProductDao {
         List<Product> list = new ArrayList<>();
         String sql = "SELECT * FROM Products";
 
-        try (Connection conn = DBConnector.makeConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+        try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 Product p = new Product();
@@ -36,8 +34,7 @@ public class ProductDao {
         Product product = null;
         String sql = "SELECT * FROM Products WHERE product_id = ?";
 
-        try (Connection conn = DBConnector.makeConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
@@ -46,7 +43,6 @@ public class ProductDao {
                 product = new Product();
                 product.setProductId(rs.getInt("product_id"));
                 product.setProductName(rs.getString("product_name"));
-                product.setDescription(rs.getString("description"));
                 product.setBasePrice(rs.getDouble("base_price"));
                 product.setCategoryId(rs.getInt("category_id"));
                 product.setCreatedAt(rs.getTimestamp("created_at"));
@@ -113,11 +109,15 @@ public class ProductDao {
             return true;
 
         } catch (SQLException e) {
-            if (conn != null) conn.rollback();
+            if (conn != null) {
+                conn.rollback();
+            }
             e.printStackTrace();
             return false;
         } finally {
-            if (conn != null) conn.close();
+            if (conn != null) {
+                conn.close();
+            }
         }
     }
 
@@ -166,11 +166,15 @@ public class ProductDao {
             conn.commit();
             return true;
         } catch (SQLException e) {
-            if (conn != null) conn.rollback();
+            if (conn != null) {
+                conn.rollback();
+            }
             e.printStackTrace();
             return false;
         } finally {
-            if (conn != null) conn.close();
+            if (conn != null) {
+                conn.close();
+            }
         }
     }
 
@@ -199,8 +203,7 @@ public class ProductDao {
     public List<Product> getProductsByCategory(int categoryId) {
         List<Product> list = new ArrayList<>();
         String sql = "SELECT * FROM Products WHERE category_id = ?";
-        try (Connection conn = DBConnector.makeConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, categoryId);
             ResultSet rs = ps.executeQuery();
@@ -226,8 +229,7 @@ public class ProductDao {
         String sql = "SELECT * FROM insurance_product_details WHERE product_id = ?";
         InsuranceProductDetails d = null;
 
-        try (Connection conn = DBConnector.makeConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, productId);
             ResultSet rs = ps.executeQuery();
@@ -258,13 +260,50 @@ public class ProductDao {
         return d;
     }
 
+    public InsuranceProductDetails getInsuranceDetailsByProductId(int productId) {
+        String sql = "SELECT * FROM insurance_product_details WHERE product_id = ?";
+        try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, productId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    InsuranceProductDetails d = new InsuranceProductDetails();
+
+                    d.setProductId(rs.getInt("product_id"));
+                    d.setCategoryId(rs.getInt("category_id"));
+                    d.setDurationYears(rs.getInt("duration_years"));
+                    d.setCoverageAmount(rs.getDouble("coverage_amount"));
+                    d.setBeneficiaries(rs.getString("beneficiaries"));
+                    d.setMaturityBenefit(rs.getString("maturity_benefit"));
+                    d.setMaturityAmount(rs.getDouble("maturity_amount"));
+                    d.setHospitalizationLimit(rs.getDouble("hospitalization_limit"));
+                    d.setSurgeryLimit(rs.getDouble("surgery_limit"));
+                    d.setMaternityLimit(rs.getDouble("maternity_limit"));
+                    d.setMinAge(rs.getInt("min_age"));
+                    d.setMaxAge(rs.getInt("max_age"));
+                    d.setWaitingPeriod(rs.getInt("waiting_period"));
+                    d.setVehicleType(rs.getString("vehicle_type"));
+                    d.setVehicleValue(rs.getDouble("vehicle_value"));
+                    d.setCoverageType(rs.getString("coverage_type"));
+
+                    return d;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     // ================== TEST MAIN ==================
     public static void main(String[] args) {
         try {
             ProductDao dao = new ProductDao();
             System.out.println("✅ Số lượng sản phẩm: " + dao.getAllProducts().size());
             Product p = dao.getProductById(1);
-            if (p != null) System.out.println("🧩 Tên sản phẩm: " + p.getProductName());
+            if (p != null) {
+                System.out.println("🧩 Tên sản phẩm: " + p.getProductName());
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
