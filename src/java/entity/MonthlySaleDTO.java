@@ -9,6 +9,7 @@ package entity;
  * @author Nguyễn Tùng
  */
 public class MonthlySaleDTO {
+
     private String monthYear;
     private double totalPremium;
 
@@ -17,12 +18,22 @@ public class MonthlySaleDTO {
         this.monthYear = monthYear;
         this.totalPremium = totalPremium;
     }
-    
+
     // Getters
-    public String getMonthYear() { return monthYear; }
-    public double getTotalPremium() { return totalPremium; }
-    
+    public String getMonthYear() {
+        return monthYear;
+    }
+
+    public double getTotalPremium() {
+        return totalPremium;
+    }
+
     // Setters
-    public void setMonthYear(String monthYear) { this.monthYear = monthYear; }
-    public void setTotalPremium(double totalPremium) { this.totalPremium = totalPremium; }
+    public void setMonthYear(String monthYear) {
+        this.monthYear = monthYear;
+    }
+
+    public void setTotalPremium(double totalPremium) {
+        this.totalPremium = totalPremium;
+    }
 }

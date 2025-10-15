@@ -449,6 +449,24 @@ public class UserDao {
         }
         return 0;
     }
+    
+    public int getLeadsCountByAgent(int agentId) {
+    String sql = "SELECT COUNT(*) FROM Customers WHERE created_by = ? AND customer_type = 'Lead'";
+    
+    try (Connection conn = DBConnector.makeConnection();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+        
+        ps.setInt(1, agentId);
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return 0;
+}
 
 
     public List<String> getRenewalAlerts(int agentId) {
