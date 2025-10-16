@@ -100,6 +100,7 @@
             <!-- Navbar -->
             <div class="navbar">
                 <div>
+                    <a href="<%= request.getContextPath() %>/profile.jsp" class="profile-btn">👤 Profile</a>
                     <h2>Agent Panel</h2>
                     <div class="nav-links">
                         <a href="dashboard.jsp">🏠 Trang chủ</a>
