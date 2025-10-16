@@ -91,7 +91,7 @@
         <label>Thời hạn (năm):</label>
         <input type="number" name="duration_years" value="<%= details.getDurationYears() %>" required>
 
-        <label>Giá trị bảo hiểm:</label>
+        <label>Giá trị bảo hiểm (coverage_amount):</label>
         <input type="number" name="coverage_amount" value="<%= details.getCoverageAmount() %>" required>
 
         <!-- BẢO HIỂM NHÂN THỌ -->
