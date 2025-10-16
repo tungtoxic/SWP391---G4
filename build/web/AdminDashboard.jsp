@@ -60,6 +60,7 @@
             <!-- Navbar -->
             <div class="navbar">
                 <h2>Admin Dashboard</h2>
+                <a href="<%= request.getContextPath() %>/profile.jsp">👤 Profile</a>
                 <a href="usermanagement.jsp">User Management</a>
                 <a href="agentmanagement.jsp">Agent Management</a>
                 <a href="contracts">Contract Detail</a>

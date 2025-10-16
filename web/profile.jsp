@@ -80,7 +80,7 @@
     <!-- Chế độ xem -->
     <div id="view-mode">
         <p><strong>Email:</strong> <%= user.getEmail() %></p>
-        <p><strong>Phone:</strong> <%= user.getPhoneNumber() %></p>
+        <p><strong>Phone Number:</strong> <%= user.getPhoneNumber() %></p>
         <p><strong>Role ID:</strong> <%= user.getRoleId() %></p>
         <p><strong>Status:</strong> <%= user.getStatus() %></p>
 
@@ -90,18 +90,26 @@
 
     <!--Edit-->
     <form id="edit-mode" action="UpdateProfileServlet" method="post" style="display:none;">
-        <input type="hidden" name="userId" value="<%= user.getUserId() %>">
-        <input type="text" name="fullName" value="<%= user.getFullName() %>" placeholder="Full Name" required><br>
-        <input type="email" name="email" value="<%= user.getEmail() %>" placeholder="Email" required><br>
-        <input type="tel" name="phoneNumber" value="<%= user.getPhoneNumber() %>" placeholder="Phone Number"><br>
-        <label><strong>Status:</strong></label><br>
-        <select name="status" required>
-            <option value="Active" <%= "Active".equalsIgnoreCase(user.getStatus()) ? "selected" : "" %>>Active</option>
-            <option value="Inactive" <%= "Inactive".equalsIgnoreCase(user.getStatus()) ? "selected" : "" %>>Inactive</option>
-        </select><br>
-        <button type="submit" class="btn btn-save">Save</button>
-        <button type="button" class="btn btn-cancel" onclick="switchToView()">Cancel</button>
-    </form>
+    <input type="hidden" name="userId" value="<%= user.getUserId() %>">
+
+    <label>Full Name:</label>
+    <input type="text" id="fullName" name="fullName" value="<%= user.getFullName() %>" required><br>
+
+    <label>Email:</label>
+    <input type="email" id="email" name="email" value="<%= user.getEmail() %>" required><br>
+
+    <label>Phone Number:</label>
+    <input type="tel" id="phoneNumber" name="phoneNumber" value="<%= user.getPhoneNumber()%>" required ><br>
+
+    <label for="status">Status:</label>
+    <select id="status" name="status" required>
+        <option value="Active" <%= "Active".equalsIgnoreCase(user.getStatus()) ? "selected" : "" %>>Active</option>
+        <option value="Inactive" <%= "Inactive".equalsIgnoreCase(user.getStatus()) ? "selected" : "" %>>Inactive</option>
+    </select><br>
+
+    <button type="submit" class="btn btn-save">Save</button>
+    <button type="button" class="btn btn-cancel" onclick="switchToView()">Cancel</button>
+</form>
 </div>
 
 <script>
