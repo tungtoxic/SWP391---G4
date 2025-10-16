@@ -99,10 +99,10 @@
         <div class="container">
             <!-- Navbar -->
             <div class="navbar">
-                <div>
-                    <a href="<%= request.getContextPath() %>/profile.jsp" class="profile-btn">👤 Profile</a>
+                <div>                  
                     <h2>Manager Panel</h2>
                     <div class="nav-links">
+                        <a href="<%= request.getContextPath() %>/profile.jsp" class="profile-btn">👤 Profile</a>
                         <a href="dashboard.jsp">🏠 Trang chủ</a>
                         <a href="CustomerServlet">👥 Khách hàng</a>
                         <a href="ProductServlet?action=list">📦 Sản phẩm</a>

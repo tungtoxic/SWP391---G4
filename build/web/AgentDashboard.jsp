@@ -92,6 +92,7 @@
                 font-size: 16px;
                 color: #555;
             }
+            
         </style>
     </head>
     <body>
@@ -99,10 +100,10 @@
         <div class="container">
             <!-- Navbar -->
             <div class="navbar">
-                <div>
-                    <a href="<%= request.getContextPath() %>/profile.jsp" class="profile-btn">👤 Profile</a>
+                <div>                   
                     <h2>Agent Panel</h2>
                     <div class="nav-links">
+                        <a href="<%= request.getContextPath() %>/profile.jsp">👤 Profile</a>
                         <a href="dashboard.jsp">🏠 Trang chủ</a>
                         <a href="CustomerServlet">👥 Khách hàng</a>
                         <a href="productmanagement.jsp">📦 Sản phẩm</a>
