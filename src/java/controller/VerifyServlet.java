@@ -51,6 +51,7 @@ public class VerifyServlet extends HttpServlet {
                     e.printStackTrace();
                     req.setAttribute("error", "Lỗi hệ thống: " + e.getMessage());
                 }
+<<<<<<< HEAD
             } else if ("login".equals(authType)) {
                 cleanup(session);
                 session.setAttribute("user", tempUser);
@@ -72,6 +73,9 @@ public class VerifyServlet extends HttpServlet {
                 }
                 return;
             }
+=======
+            } 
+>>>>>>> thanhhe180566
         } else {
             req.setAttribute("error", "Mã OTP không đúng hoặc đã hết hạn.");
         }

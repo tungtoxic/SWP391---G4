@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.security.SecureRandom;
 import utility.EmailUtil;
-import utility.PasswordUtils;
 
 /**
  *
@@ -137,13 +136,10 @@ public class AddNewUserServlet extends HttpServlet {
         // Tạo password ngẫu nhiên 8 ký tự
         String password = generateRandomPassword(8);
 
-        
-       // Hash mật khẩu trước khi lưu
-        String hashedPassword = PasswordUtils.hashPassword(password);
         // Tạo đối tượng user
         User newUser = new User();
         newUser.setUsername(username);
-        newUser.setPasswordHash(hashedPassword); // lưu hash vào DB
+        newUser.setPasswordHash(password); // lưu hash vào DB
         newUser.setFullName(fullName);
         newUser.setEmail(email);
         newUser.setPhoneNumber(phone);

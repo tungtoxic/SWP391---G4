@@ -41,6 +41,10 @@ public class UserDao {
 
                 }
             }
+<<<<<<< HEAD
+=======
+
+>>>>>>> thanhhe180566
         } catch (Exception e) {
 
         }
@@ -247,6 +251,10 @@ public class UserDao {
         }
     }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> thanhhe180566
     public boolean activateUserById(int id) throws SQLException {
         String sql = "UPDATE Users SET status = 'Active' WHERE user_id = ?";
         try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -263,6 +271,10 @@ public class UserDao {
         }
     }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> thanhhe180566
     public int getContractCountByAgent(int agentId) {
         String sql = "SELECT COUNT(*) FROM Contracts WHERE agent_id = ?";
         try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -342,6 +354,7 @@ public class UserDao {
             e.printStackTrace(); // xem log server để biết chi tiết lỗi
             return false;
         }
+<<<<<<< HEAD
     }
 
     public boolean registerUser(User user) throws SQLException {
@@ -467,6 +480,26 @@ public class UserDao {
     }
     return 0;
 }
+=======
+    }
+
+    public boolean registerUser(User user) throws SQLException {
+        String sql = "INSERT INTO Users (full_name, email, phone_number, role_id, status, is_first_login) "
+                + "VALUES (?, ?, ?, ?, ?, ?)";
+        try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, user.getFullName());
+            ps.setString(2, user.getEmail());
+            ps.setString(3, user.getPhoneNumber());
+            ps.setInt(4, user.getRoleId());
+            ps.setString(5, user.getStatus()); // Inactive
+            ps.setBoolean(6, user.getIsFirstLogin());
+
+            int rows = ps.executeUpdate();
+            return rows > 0;
+        }
+    }
+>>>>>>> thanhhe180566
 
 
     public List<String> getRenewalAlerts(int agentId) {
