@@ -1,20 +1,18 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="entity.Product, entity.ProductCategory, dao.ProductCategoryDao, java.util.List" %>
+<%@ page import="dao.ProductCategoryDao, entity.ProductCategory, java.util.List" %>
 <%
-
-    Product product = (Product) request.getAttribute("product");
-    if (product == null) {
-        out.println("<p style='color:red'>❌ Không có dữ liệu sản phẩm để chỉnh sửa.</p>");
-        return;
-    }
-    String error = (String) request.getAttribute("error");
+    // Lấy danh sách danh mục từ DB
     ProductCategoryDao categoryDao = new ProductCategoryDao();
     List<ProductCategory> categories = categoryDao.getAllCategories();
+
+    String error = (String) request.getAttribute("error");
+    String message = (String) request.getAttribute("message");
 %>
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Chỉnh sửa sản phẩm</title>
+        <meta charset="UTF-8">
+        <title>➕ Thêm sản phẩm mới</title>
         <style>
             body {
                 font-family: Arial, sans-serif;
@@ -65,7 +63,7 @@
             .btn-container input {
                 padding: 10px 20px;
                 border: none;
-                background-color: #3498db;
+                background-color: #27ae60;
                 color: white;
                 font-weight: bold;
                 border-radius: 5px;
@@ -73,11 +71,17 @@
             }
 
             .btn-container input:hover {
-                background-color: #2980b9;
+                background-color: #1e8449;
             }
 
             .error {
                 color: red;
+                text-align: center;
+                margin-bottom: 10px;
+            }
+
+            .success {
+                color: green;
                 text-align: center;
                 margin-bottom: 10px;
             }
@@ -98,37 +102,36 @@
     <body>
 
         <div class="container">
-            <h2>✏️ Chỉnh sửa sản phẩm</h2>
+            <h2>➕ Thêm sản phẩm bảo hiểm</h2>
 
             <% if (error != null) { %>
-            <p class="error"><%= error %></p>
+                <p class="error"><%= error %></p>
+            <% } else if (message != null) { %>
+                <p class="success"><%= message %></p>
             <% } %>
 
             <form action="ProductServlet" method="post">
-                <input type="hidden" name="action" value="edit">
-                <input type="hidden" name="product_id" value="<%= product.getProductId() %>">
+                <input type="hidden" name="action" value="add">
 
                 <label>Tên sản phẩm:</label>
-                <input type="text" name="product_name" value="<%= product.getProductName() %>" required>
+                <input type="text" name="product_name" placeholder="Nhập tên sản phẩm" required>
 
                 <label>Mô tả:</label>
-                <textarea name="description" rows="4"><%= product.getDescription() %></textarea>
+                <textarea name="description" rows="4" placeholder="Mô tả chi tiết sản phẩm"></textarea>
 
                 <label>Giá cơ bản:</label>
-                <input type="number" step="0.01" name="base_price" value="<%= product.getBasePrice() %>" required>
+                <input type="number" step="0.01" name="base_price" placeholder="Nhập giá sản phẩm" required>
 
                 <label>Danh mục:</label>
                 <select name="category_id" required>
+                    <option value="">-- Chọn danh mục --</option>
                     <% for (ProductCategory c : categories) { %>
-                    <option value="<%= c.getCategoryId() %>"
-                            <%= (product.getCategoryId() == c.getCategoryId()) ? "selected" : "" %>>
-                        <%= c.getCategoryName() %>
-                    </option>
+                        <option value="<%= c.getCategoryId() %>"><%= c.getCategoryName() %></option>
                     <% } %>
                 </select>
 
                 <div class="btn-container">
-                    <input type="submit" value="💾 Cập nhật">
+                    <input type="submit" value="💾 Thêm sản phẩm">
                 </div>
             </form>
 
@@ -137,4 +140,3 @@
 
     </body>
 </html>
-

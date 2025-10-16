@@ -25,22 +25,4 @@ public class ProductCategoryDao {
         }
         return list;
     }
-    public ProductCategory getCategoryByName(String categoryName) throws Exception {
-        String sql = "SELECT * FROM Product_Categories WHERE category_name LIKE ?";
-        try (Connection conn = DBConnector.makeConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setString(1, "%" + categoryName + "%");
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    ProductCategory category = new ProductCategory();
-                    category.setCategoryId(rs.getInt("category_id"));
-                    category.setCategoryName(rs.getString("category_name"));
-                    category.setDescription(rs.getString("description"));
-                    return category;
-                }
-            }
-        }
-        return null;
-    }
 }

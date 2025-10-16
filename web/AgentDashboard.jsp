@@ -33,14 +33,12 @@
     </style>
 </head>
 <body>
-    <%-- ... (Phần Navbar không đổi) ... --%>
     <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom fixed-top">
         <div class="container-fluid">
             <a class="navbar-brand fw-bold" href="<%=ctx%>/home.jsp">Company</a>
             <div>
                 <ul class="navbar-nav d-flex flex-row align-items-center">
                     <li class="nav-item me-3"><a class="nav-link" href="<%=ctx%>/home.jsp">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="<%=ctx%>/logout"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
                 </ul>
             </div>
         </div>

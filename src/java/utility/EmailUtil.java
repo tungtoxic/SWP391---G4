@@ -11,7 +11,7 @@ import java.util.Properties;
 public class EmailUtil {
 
     private static final String FROM = "thanh200417@gmail.com";
-    private static final String PASSWORD = "rsjc suuk gepx hkfo"; // App password của Gmail
+    private static final String PASSWORD = "kmka suoi tyva ylmh"; // App password của Gmail
 
     public static void sendEmail(String to, String subject, String content) {
         Properties props = new Properties();
@@ -48,16 +48,4 @@ public class EmailUtil {
         }
     }
 
-    public static void sendTempPassword(String toEmail, String username, String tempPassword) {
-        String subject = "Your Agent Account Details";
-        String content = "<p>Hello " + username + ",</p>"
-                + "<p>Your account has been created by Manager.</p>"
-                + "<p>Username: " + username + "</p>"
-                + "<p>Temporary Password: " + tempPassword + "</p>"
-                + "<p>Please login and change your password immediately.</p>"
-                + "<p>Regards,<br>Admin Team</p>";
-
-        // Gọi hàm sendEmail có sẵn
-        sendEmail(toEmail, subject, content);
-    }
 }

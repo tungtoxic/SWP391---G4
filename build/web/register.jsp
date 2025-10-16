@@ -15,14 +15,18 @@
 <div class="form-box">
     <h2>Đăng ký tài khoản</h2>
     <form action="register" method="post">
+        <input type="text" name="username" placeholder="Tên đăng nhập" required>
         <input type="text" name="fullName" placeholder="Họ và tên" required>
         <input type="email" name="email" placeholder="Email" required>
+        <input type="password" name="password" placeholder="Mật khẩu" required>
+        <input type="password" name="confirmPassword" placeholder="Nhập lại mật khẩu" required>
         <input type="text" name="phoneNumber" placeholder="Số điện thoại" required>
 
         <select name="role" required>
             <option value="">-- Chọn vai trò --</option>
             <option value="Agent">Agent</option>
             <option value="Manager">Manager</option>
+            <option value="Admin">Admin</option>
         </select>
 
         <div class="g-recaptcha" data-sitekey="6Lf4T90rAAAAADT-sr3o4XIGcVECgAVjmg9Zm6qE"></div>

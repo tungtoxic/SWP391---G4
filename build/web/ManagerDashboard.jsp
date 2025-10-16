@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 <%--
     Document   : ManagerDashboard
     Created on : Oct 13, 2025
@@ -36,7 +35,6 @@
             <div>
                 <ul class="navbar-nav d-flex flex-row align-items-center">
                     <li class="nav-item me-3"><a class="nav-link" href="<%=ctx%>/home.jsp">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="<%=ctx%>/logout"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
                 </ul>
             </div>
         </div>
@@ -59,7 +57,7 @@
             <a class="nav-link text-white py-2" href="<%=ctx%>/profile.jsp"><i class="fas fa-user me-2"></i> Profile</a>
             <a class="nav-link text-white py-2" href="#"><i class="fas fa-users-cog me-2"></i> Team Management</a>
             <a class="nav-link text-white py-2" href="#"><i class="fas fa-file-invoice-dollar me-2"></i> Commission Policies</a>
-            <a class="nav-link text-white py-2" href="#"><i class="fas fa-box me-2"></i> Product</a>
+            <a class="nav-link text-white py-2" href="<%=ctx%>/productmanagement.jsp"><i class="fas fa-box me-2"></i> Product</a>
             <a class="nav-link text-white py-2" href="#"><i class="fas fa-file-alt me-2"></i> Policies</a>
             <div class="mt-3 px-2">
                 <a class="btn btn-danger w-100" href="<%=ctx%>/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
