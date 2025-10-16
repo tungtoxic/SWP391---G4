@@ -100,6 +100,7 @@
             <!-- Navbar -->
             <div class="navbar">
                 <div>
+                    <a href="profile.jsp" class="profile-btn">👤 Profile</a>
                     <h2>Manager Panel</h2>
                     <div class="nav-links">
                         <a href="dashboard.jsp">🏠 Trang chủ</a>
