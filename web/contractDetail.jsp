@@ -22,7 +22,7 @@
     <div class="card shadow-lg">
         <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
             <h3 class="mb-0">📑 Contract Details</h3>
-            <a href="<%=dashboardUrl%>" class="btn btn-light">⬅ Back to Dashboard</a>
+            <a href="<%=dashboardUrl%>" class="btn btn-light">⬅ Back Dashboard</a>
         </div>
 
         <div class="card-body">
