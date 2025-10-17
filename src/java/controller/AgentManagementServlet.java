@@ -32,6 +32,8 @@ public class AgentManagementServlet extends HttpServlet {
                 deactivateAgent(request, response);
             } else if ("delete".equals(action)) {
                 deleteAgent(request, response);
+            } else if ("edit".equals(action)) {
+                showEditForm(request, response);
             } else {
                 listAgents(request, response);
             }
@@ -93,7 +95,7 @@ public class AgentManagementServlet extends HttpServlet {
         newAgent.setEmail(email);
         newAgent.setPhoneNumber(phone);
         newAgent.setStatus("Active");
-        newAgent.setRoleId(3); // Agent
+        newAgent.setRoleId(1); // Agent
         newAgent.setIsFirstLogin(true);
         if (userDAO.checkUsernameExists(username)) {
             request.setAttribute("message", "Username already exists!");
@@ -117,37 +119,67 @@ public class AgentManagementServlet extends HttpServlet {
         }
     }
 
-    @Override
-protected void doPost(HttpServletRequest request, HttpServletResponse response)
-        throws ServletException, IOException {
+    private void updateAgent(HttpServletRequest request, HttpServletResponse response)
+            throws SQLException, IOException, ServletException {
 
-    request.setCharacterEncoding("UTF-8");
-    String action = request.getParameter("action");
+        int id = Integer.parseInt(request.getParameter("id"));
+        String fullName = request.getParameter("fullName");
+        String email = request.getParameter("email");
+        String phone = request.getParameter("phoneNumber");
 
-    try {
-        if ("approve".equals(action)) {
-            approveAgent(request, response);
-            return; // stop sau approve
+        User agent = userDAO.getUserById(id);
+        agent.setFullName(fullName);
+        agent.setEmail(email);
+        agent.setPhoneNumber(phone);
 
-        } else if ("create".equals(action)) {
-            createAgent(request, response);
-            return;
-
-        } else if ("edit".equals(action)) {
-            // handle edit
-            return;
+        boolean success = userDAO.updateUser(agent);
+        if (success) {
+            response.sendRedirect("AgentManagementServlet?message=Agent updated successfully!");
+        } else {
+            request.setAttribute("message", "Error updating agent!");
+            request.setAttribute("agent", agent);
+            request.getRequestDispatcher("editAgent.jsp").forward(request, response);
         }
-
-        // các action khác...
-    } catch (Exception e) {
-        e.printStackTrace();
-        request.setAttribute("message", "Error: " + e.getMessage());
-        request.getRequestDispatcher("agentmanagement.jsp").forward(request, response);
     }
 
-    response.sendRedirect("AgentManagementServlet");
-}
+    private void showEditForm(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException, SQLException {
+        int id = Integer.parseInt(request.getParameter("id"));
+        User existingAgent = userDAO.getUserById(id);
+        request.setAttribute("agent", existingAgent);
+        request.getRequestDispatcher("editAgent.jsp").forward(request, response);
+    }
 
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        request.setCharacterEncoding("UTF-8");
+        String action = request.getParameter("action");
+
+        try {
+            if ("approve".equals(action)) {
+                approveAgent(request, response);
+                return; // stop sau approve
+
+            } else if ("create".equals(action)) {
+                createAgent(request, response);
+                return;
+
+            } else if ("edit".equals(action)) {
+                updateAgent(request, response);
+                return;
+            }
+
+            // các action khác...
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("message", "Error: " + e.getMessage());
+            request.getRequestDispatcher("agentmanagement.jsp").forward(request, response);
+        }
+
+        response.sendRedirect("AgentManagementServlet");
+    }
 
     private void approveAgent(HttpServletRequest request, HttpServletResponse response)
             throws SQLException, IOException {
@@ -158,7 +190,7 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response)
 
         User agent = userDAO.getUserById(id);
         agent.setUsername(username);
-        agent.setPasswordHash(password); // không hash theo yêu cầu
+        agent.setPasswordHash(password); 
         agent.setStatus("Active");
 
         boolean success = userDAO.updateUser(agent); // update DB

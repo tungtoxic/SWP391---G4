@@ -136,7 +136,7 @@ public class UserDao {
         }
         return -1; // Không tìm thấy role
     }
-   
+
     //lấy toàn bộ user 
     public List<User> getAllUsers() throws SQLException {
         List<User> list = new ArrayList<>();
@@ -233,22 +233,6 @@ public class UserDao {
     }
 
     //update thông tin cua user 
-    public boolean updateUser(User user) throws SQLException {
-        String sql = "UPDATE Users SET username=?,password_hash=?, full_name=?, email=?, phone_number=?, role_id=?, status=? WHERE user_id=?";
-        try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, user.getUsername());
-            ps.setString(2, user.getPasswordHash());
-            ps.setString(3, user.getFullName());
-            ps.setString(4, user.getEmail());
-            ps.setString(5, user.getPhoneNumber());
-            ps.setInt(6, user.getRoleId());
-            ps.setString(7, user.getStatus());
-            ps.setInt(8, user.getUserId());
-            return ps.executeUpdate() > 0;
-        }
-    }
-
-
     public boolean activateUserById(int id) throws SQLException {
         String sql = "UPDATE Users SET status = 'Active' WHERE user_id = ?";
         try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -264,7 +248,6 @@ public class UserDao {
             return ps.executeUpdate() > 0;
         }
     }
-
 
     public int getContractCountByAgent(int agentId) {
         String sql = "SELECT COUNT(*) FROM Contracts WHERE agent_id = ?";
@@ -363,5 +346,16 @@ public class UserDao {
             return rows > 0;
         }
     }
+
+    public boolean updateUser(User user) throws SQLException {
+    String sql = "UPDATE users SET username=?, password_hash=?, status=? WHERE user_id =?";
+    try (Connection conn = DBConnector.makeConnection();PreparedStatement ps = conn.prepareStatement(sql)) {
+        ps.setString(1, user.getUsername());
+        ps.setString(2, user.getPasswordHash());
+        ps.setString(3, user.getStatus());
+        ps.setInt(4, user.getUserId());
+        return ps.executeUpdate() > 0;
+    }
+}
 
 }

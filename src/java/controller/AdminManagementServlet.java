@@ -117,7 +117,7 @@ public class AdminManagementServlet extends HttpServlet {
 
         try {
           if ("edit".equals(action)) {
-                handleUpdateUser(request, response);
+               
             } else {
                 response.sendRedirect(request.getContextPath() + "/usermanagement.jsp");
             }
@@ -127,53 +127,7 @@ public class AdminManagementServlet extends HttpServlet {
     }
 
     
-    private void handleUpdateUser(HttpServletRequest request, HttpServletResponse response)
-            throws Exception {
-
-        int userId = Integer.parseInt(request.getParameter("userId"));
-        String username = request.getParameter("username").trim();
-        String fullName = request.getParameter("fullName").trim();
-        String email = request.getParameter("email").trim();
-        String phone = request.getParameter("phoneNumber").trim();
-        int roleId = Integer.parseInt(request.getParameter("role_id"));
-        String status = request.getParameter("status");
-
-        User user = userDao.getUserById(userId);
-        if (user == null) {
-            request.setAttribute("error", "Người dùng không tồn tại.");
-            request.getRequestDispatcher("/editUser.jsp").forward(request, response);
-            return;
-        }
-
-        // Kiểm tra trùng email, phone (ngoại trừ user hiện tại)
-        if (!user.getEmail().equals(email) && userDao.checkEmailExists(email)) {
-            request.setAttribute("error", "Email đã tồn tại.");
-            request.getRequestDispatcher("/editUser.jsp").forward(request, response);
-            return;
-        }
-
-        if (!user.getPhoneNumber().equals(phone) && userDao.isPhoneExists(phone)) {
-            request.setAttribute("error", "Số điện thoại đã tồn tại.");
-            request.getRequestDispatcher("/editUser.jsp").forward(request, response);
-            return;
-        }
-
-        user.setUsername(username);
-        user.setFullName(fullName);
-        user.setEmail(email);
-        user.setPhoneNumber(phone);
-        user.setRoleId(roleId);
-        user.setStatus(status);
-
-        boolean updated = userDao.updateUser(user);
-        if (updated) {
-            response.sendRedirect(request.getContextPath() + "/usermanagement.jsp");
-        } else {
-            request.setAttribute("error", "Cập nhật thất bại.");
-            request.getRequestDispatcher("/editUser.jsp").forward(request, response);
-        }
-
-    }
+    
 
     /**
      * Returns a short description of the servlet.
