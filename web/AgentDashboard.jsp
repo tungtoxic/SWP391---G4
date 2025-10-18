@@ -62,7 +62,7 @@
             <a class="nav-link text-white py-2" href="#"><i class="fas fa-trophy me-2"></i> Leader Board</a>
             <a class="nav-link text-white py-2" href="#"><i class="fas fa-percent me-2"></i> Commission Detail</a>
             <a class="nav-link text-white py-2" href="#"><i class="fas fa-box me-2"></i> Product</a>
-            <a class="nav-link text-white py-2" href="#"><i class="fas fa-users me-2"></i> Customer</a>
+            <a class="nav-link text-white py-2" href="<%=ctx%>/customerManagerment.jsp"><i class="fas fa-users me-2"></i> Customer</a>
             <a class="nav-link text-white py-2" href="#"><i class="fas fa-file-alt me-2"></i> Policies</a>
             <div class="mt-3 px-2">
                 <a class="btn btn-danger w-100" href="<%=ctx%>/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
