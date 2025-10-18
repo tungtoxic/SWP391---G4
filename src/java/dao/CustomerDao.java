@@ -110,5 +110,42 @@ public class CustomerDao {
         }
         return false;
     }
+    
+    // CustomerDao.java
+
+// 🟢 Lấy danh sách khách hàng theo ID Agent tạo ra
+public List<Customer> getAllCustomersByAgentId(int agentId) {
+    List<Customer> list = new ArrayList<>();
+    // Thêm điều kiện lọc WHERE created_by = ?
+    String sql = "SELECT * FROM Customers WHERE created_by = ? ORDER BY customer_id DESC";
+    
+    // Lưu ý: Đã thay đổi catch (Exception e) thành try/catch bên trong để quản lý tài nguyên
+    try (Connection conn = DBConnector.makeConnection();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+
+        ps.setInt(1, agentId); // Set ID của Agent
+        
+        try (ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                Customer c = new Customer();
+                c.setCustomerId(rs.getInt("customer_id"));
+                c.setFullName(rs.getString("full_name"));
+                c.setDateOfBirth(rs.getDate("date_of_birth"));
+                c.setPhoneNumber(rs.getString("phone_number"));
+                c.setEmail(rs.getString("email"));
+                c.setAddress(rs.getString("address"));
+                c.setCreatedBy(rs.getInt("created_by"));
+                c.setCreatedAt(rs.getTimestamp("created_at"));
+                c.setUpdatedAt(rs.getTimestamp("updated_at"));
+                list.add(c);
+            }
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    return list;
+}
+
+// Giữ nguyên các hàm khác (getCustomerById, insertCustomer, updateCustomer, deleteCustomer)
 }
 
