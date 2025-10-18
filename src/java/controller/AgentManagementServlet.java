@@ -110,7 +110,7 @@ public class AgentManagementServlet extends HttpServlet {
         boolean success = userDAO.createUser(newAgent);
         if (success) {
             // Gửi email
-            EmailUtil.sendTempPassword(email, username, tempPassword);
+            
             response.sendRedirect("AgentManagementServlet?message=Agent created & email sent!");
         } else {
             response.sendRedirect("AgentManagementServlet?message=Error creating agent!");
