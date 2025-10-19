@@ -12,30 +12,34 @@ import utility.DBConnector;
 public class CustomerDao {
 
     // 🟢 Lấy tất cả khách hàng
-    public List<Customer> getAllCustomers() {
-        List<Customer> list = new ArrayList<>();
-        String sql = "SELECT * FROM Customers ORDER BY customer_id DESC";
-        try (Connection conn = DBConnector.makeConnection();PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+// CustomerDao.java
 
-            while (rs.next()) {
-                Customer c = new Customer();
-                c.setCustomerId(rs.getInt("customer_id"));
-                c.setFullName(rs.getString("full_name"));
-                c.setDateOfBirth(rs.getDate("date_of_birth"));
-                c.setPhoneNumber(rs.getString("phone_number"));
-                c.setEmail(rs.getString("email"));
-                c.setAddress(rs.getString("address"));
-                c.setCreatedBy(rs.getInt("created_by"));
-                c.setCreatedAt(rs.getTimestamp("created_at"));
-                c.setUpdatedAt(rs.getTimestamp("updated_at"));
-                list.add(c);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+public List<Customer> getAllCustomers() throws SQLException { // <--- THÊM throws SQLException
+    List<Customer> list = new ArrayList<>();
+    String sql = "SELECT * FROM Customers ORDER BY customer_id DESC";
+    
+    try (Connection conn = DBConnector.makeConnection();
+         PreparedStatement ps = conn.prepareStatement(sql);
+         ResultSet rs = ps.executeQuery()) {
+
+        while (rs.next()) {
+            // ... (Ánh xạ DTO giữ nguyên) ...
+            Customer c = new Customer();
+            c.setCustomerId(rs.getInt("customer_id"));
+            c.setFullName(rs.getString("full_name"));
+            c.setDateOfBirth(rs.getDate("date_of_birth"));
+            c.setPhoneNumber(rs.getString("phone_number"));
+            c.setEmail(rs.getString("email"));
+            c.setAddress(rs.getString("address"));
+            c.setCreatedBy(rs.getInt("created_by"));
+            c.setCreatedAt(rs.getTimestamp("created_at"));
+            c.setUpdatedAt(rs.getTimestamp("updated_at"));
+            list.add(c);
         }
-        return list;
-    }
+    } 
+    // KHÔNG BẮT CATCH Ở ĐÂY NỮA, mà ném lên Servlet
+    return list;
+}
 
     // 🟢 Lấy khách hàng theo ID
     public Customer getCustomerById(int id) {

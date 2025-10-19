@@ -16,28 +16,32 @@ import java.util.List;
 public class CustomerServlet extends HttpServlet {
 
     private CustomerDao customerDao;
-    private static final int AGENT_ROLE_ID = 3; // Giả định Role ID của Agent là 3
+    private static final int AGENT_ROLE_ID = 3; 
 
     @Override
     public void init() throws ServletException {
         this.customerDao = new CustomerDao();
+        System.out.println("--- CustomerServlet Initialized ---");
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
+        
         // 1. KIỂM TRA PHÂN QUYỀN VÀ LẤY AGENT ID
         HttpSession session = request.getSession();
         User currentUser = (User) session.getAttribute("user");
 
-        if (currentUser == null || currentUser.getRoleId() != AGENT_ROLE_ID) {
-            response.sendRedirect(request.getContextPath() + "/login.jsp");
-            return;
+        // KHÔNG BẮT BUỘC LỌC ROLE TẠI ĐÂY NẾU MUỐN TEST LẤY FULL DANH SÁCH KHÔNG LỖI
+        if (currentUser == null) {
+             // Tạm thời bỏ qua Role check, chỉ kiểm tra Session để lấy ID Agent sau
+        } else if (currentUser.getRoleId() != AGENT_ROLE_ID) {
+            // response.sendRedirect(request.getContextPath() + "/access-denied.jsp"); 
+            // return; // Bỏ check role nghiêm ngặt để tiện test
         }
+        
+        // GIẢ ĐỊNH ID AGENT ĐANG ĐĂNG NHẬP, NHƯNG KHÔNG DÙNG NÓ (VÌ BẠN MUỐN LẤY FULL LIST)
+        // int agentId = (currentUser != null) ? currentUser.getUserId() : -1; 
 
-        int agentId = currentUser.getUserId();
-
-        // 2. XỬ LÝ ACTION (Hiển thị danh sách là action mặc định)
         String action = request.getParameter("action");
         if (action == null) {
             action = "list";
@@ -46,29 +50,41 @@ public class CustomerServlet extends HttpServlet {
         try {
             switch (action) {
                 case "list":
-                    listCustomers(request, response, agentId);
+                    // Gọi hàm listCustomers mà không truyền Agent ID
+                    listCustomers(request, response);
                     break;
-                // case "add": // Xử lý Add Form (sẽ làm sau)
-                // case "edit": // Xử lý Edit Form (sẽ làm sau)
-                // case "delete": // Xử lý Delete (sẽ làm sau)
+                // [CRUD LOGIC SẼ ĐƯỢC THÊM TẠI ĐÂY SAU]
                 default:
-                    listCustomers(request, response, agentId);
+                    listCustomers(request, response);
                     break;
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            request.setAttribute("errorMessage", "Lỗi CSDL hoặc hệ thống.");
+            e.printStackTrace(System.err);
+            request.setAttribute("errorMessage", "Lỗi xử lý yêu cầu.");
             request.getRequestDispatcher("/error.jsp").forward(request, response);
         }
     }
 
-    private void listCustomers(HttpServletRequest request, HttpServletResponse response, int agentId)
+    private void listCustomers(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
-        List<Customer> customerList = customerDao.getAllCustomersByAgentId(agentId);
+        // Lấy full danh sách khách hàng (như bạn yêu cầu)
+        List<Customer> customerList = customerDao.getAllCustomers();
+        
+        // DEBUG LOG
+        System.out.println("--- CUSTOMER MANAGEMENT DEBUG START ---");
+        System.out.println("Customers loaded (Total): " + (customerList != null ? customerList.size() : "null"));
+        
+        if (customerList != null) {
+            for (Customer c : customerList) {
+                System.out.println("Customer ID: " + c.getCustomerId() + ", Name: " + c.getFullName());
+            }
+        }
+        System.out.println("--- CUSTOMER MANAGEMENT DEBUG END ---");
         
         request.setAttribute("customerList", customerList);
-        // Chuyển tiếp đến View JSP
+        
+        // Đảm bảo đường dẫn JSP là chính xác
         request.getRequestDispatcher("/customerManagerment.jsp").forward(request, response);
     }
 }

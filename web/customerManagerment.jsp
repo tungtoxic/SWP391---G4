@@ -118,7 +118,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div>  
     </main>
 
     <footer class="main-footer text-muted">
