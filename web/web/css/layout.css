@@ -1,0 +1,102 @@
+/* layout.css - shared layout: navbar + sidebar + main spacing */
+:root{
+  --sidebar-width: 240px;
+  --navbar-height: 56px;
+  --bg-page: #f4f6f8;
+  --text: #2f3542;
+  --primary: #0d6efd;
+}
+
+/* Basic reset */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: var(--bg-page);
+  color: var(--text);
+  font-family: 'Source Sans Pro', 'Poppins', Arial, sans-serif;
+}
+
+/* Padding on top for fixed navbar */
+body {
+  padding-top: var(--navbar-height);
+}
+
+/* Navbar styling */
+.navbar {
+  height: var(--navbar-height);
+  box-shadow: 0 1px 0 rgba(0,0,0,0.04);
+}
+
+/* Sidebar fixed on left */
+.sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: var(--sidebar-width);
+  height: 100vh;
+  z-index: 1040;
+  padding-top: var(--navbar-height);
+  overflow-y: auto;
+}
+
+/* Sidebar content */
+.sidebar .sidebar-top { padding: 1rem; }
+.sidebar .nav-link {
+  color: rgba(255,255,255,0.95);
+  border-radius: 6px;
+}
+.sidebar .nav-link.active, .sidebar .nav-link:hover {
+  background: rgba(255,255,255,0.06);
+  color: #fff;
+}
+
+/* Main content margin-left to clear sidebar */
+.main-content {
+  margin-left: var(--sidebar-width);
+  min-height: calc(100vh - var(--navbar-height));
+  padding-top: 1rem;
+}
+
+/* Footer */
+.main-footer {
+  margin-left: var(--sidebar-width);
+  background: transparent;
+  color: #666;
+  border-top: 0;
+}
+
+/* Card basic look */
+.card {
+  background: #fff;
+  border: 0;
+  border-radius: 8px;
+  box-shadow: 0 0 8px rgba(0,0,0,0.04);
+}
+
+/* Chart helper */
+.chart-250 {
+  position: relative;
+  overflow: visible;      /* allow legend / labels to be visible outside the canvas area */
+  padding-bottom: 0.5rem;
+  min-height: 260px;
+}
+
+/* Force canvas to have enough height for chart + legend/labels.
+   You can tweak height (320px) if legend still gets cut. */
+.chart-250 canvas {
+  display: block;
+  width: 100% !important;
+  height: 320px !important;
+  box-sizing: border-box;
+}
+
+/* Chart-specific small spacing */
+.chart-250 .mt-2 {
+  margin-top: 0.6rem;
+}
+
+/* Responsive note: since project is desktop-only we don't collapse sidebar */
+@media (max-width: 991.98px) {
+  /* if you ever need mobile, you can add styles here */
+}
