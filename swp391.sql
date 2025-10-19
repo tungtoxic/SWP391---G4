@@ -206,7 +206,7 @@ INSERT INTO Users (username, password_hash, full_name, email, phone_number, role
 VALUES (
     'agent1',
     123,  
-    'Nguyễn Văn Quản Lý',
+    'Agent 1',
     'agent1@example.com',
     '0909123456',
     1,                    -- role_id của Agent
@@ -216,10 +216,21 @@ INSERT INTO Users (username, password_hash, full_name, email, phone_number, role
 VALUES (
     'manager2',
     123,  
-    'Nguyễn Văn',
+    'Manager 1',
     'agent@example.com',
     '0909123456',
     2,                    -- role_id của Manager
+    'Active'
+);
+
+INSERT INTO Users (username, password_hash, full_name, email, phone_number, role_id, status)
+VALUES (
+    'Admin1',
+    123,  
+    'Admin 1',
+    'admin1@example.com',
+    '0909123456',
+    3,                    -- role_id của Admin
     'Active'
 );
 
