@@ -1,7 +1,7 @@
 <%-- 
     Document    : agentperformance.jsp
     Mục đích    : Hiển thị bảng Agent Performance Matrix cho Manager.
-    (Phiên bản không dùng JSTL)
+  
 --%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@page import="java.util.List"%>
