@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.List;
 
 @WebServlet(name = "CustomerServlet", urlPatterns = {"/agent/customer-management"})
@@ -66,7 +67,7 @@ public class CustomerServlet extends HttpServlet {
     }
 
     private void listCustomers(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+            throws ServletException, IOException, SQLException {
         
         // Lấy full danh sách khách hàng (như bạn yêu cầu)
         List<Customer> customerList = customerDao.getAllCustomers();

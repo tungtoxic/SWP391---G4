@@ -397,4 +397,43 @@ public class UserDao {
         }
         return teamPerformance;
     }
+    
+    public List<AgentPerformanceDTO> getAllAgentsPerformance() {
+    List<AgentPerformanceDTO> allAgents = new ArrayList<>();
+    // Giả sử role_id của Agent là 1 (dựa trên AgentManagementServlet của bạn)
+    int agentRoleId = 1; 
+
+    String sql = """
+    SELECT 
+        u.user_id, 
+        u.full_name,
+        IFNULL(SUM(c.premium_amount), 0) AS total_premium,
+        COUNT(c.contract_id) AS contracts_count
+    FROM Users u
+    LEFT JOIN Contracts c ON u.user_id = c.agent_id AND c.status = 'Active'
+    WHERE u.role_id = ? 
+    GROUP BY u.user_id, u.full_name
+    ORDER BY total_premium DESC;
+    """;
+
+    try (Connection conn = DBConnector.makeConnection(); 
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+
+        ps.setInt(1, agentRoleId); // Lọc theo role_id của Agent
+        try (ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                AgentPerformanceDTO dto = new AgentPerformanceDTO(
+                        rs.getInt("user_id"),
+                        rs.getString("full_name"),
+                        rs.getDouble("total_premium"),
+                        rs.getInt("contracts_count")
+                );
+                allAgents.add(dto);
+            }
+        }
+    } catch (SQLException e) {
+        e.printStackTrace(); // Luôn in ra lỗi để dễ debug
+    }
+    return allAgents;
+}
 }
