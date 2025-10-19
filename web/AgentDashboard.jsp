@@ -60,7 +60,7 @@
             <a class="nav-link text-white active py-2" href="<%=ctx%>/AgentDashboard.jsp"><i class="fas fa-chart-line me-2"></i> Dashboard</a>
             <a class="nav-link text-white py-2" href="<%=ctx%>/profile.jsp"><i class="fas fa-user me-2"></i> Profile</a>
             <a class="nav-link text-white py-2" href="#"><i class="fas fa-trophy me-2"></i> Leader Board</a>
-            <a class="nav-link text-white py-2" href="#"><i class="fas fa-percent me-2"></i> Commission Report</a>
+            <a class="nav-link text-white py-2" href="<%=ctx%>/commission_report.jsp"><i class="fas fa-percent me-2"></i> Commission Report</a>
             <a class="nav-link text-white py-2" href="#"><i class="fas fa-box me-2"></i> Product</a>
             <a class="nav-link text-white py-2" href="<%=ctx%>/customerManagerment.jsp"><i class="fas fa-users me-2"></i> Customer</a>
             <a class="nav-link text-white py-2" href="#"><i class="fas fa-file-alt me-2"></i> Policies</a>
