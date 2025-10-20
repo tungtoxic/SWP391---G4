@@ -3,7 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package dao;
-
+import entity.AgentPerformanceDTO; 
 import entity.*;
 import java.sql.*;
 import java.util.ArrayList;
@@ -41,7 +41,6 @@ public class UserDao {
 
                 }
             }
-
         } catch (Exception e) {
 
         }
@@ -248,7 +247,6 @@ public class UserDao {
         }
     }
 
-
     public boolean activateUserById(int id) throws SQLException {
         String sql = "UPDATE Users SET status = 'Active' WHERE user_id = ?";
         try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -264,7 +262,6 @@ public class UserDao {
             return ps.executeUpdate() > 0;
         }
     }
-
 
     public int getContractCountByAgent(int agentId) {
         String sql = "SELECT COUNT(*) FROM Contracts WHERE agent_id = ?";
@@ -363,5 +360,80 @@ public class UserDao {
             return rows > 0;
         }
     }
+    // Bổ sung vào class UserDao.java (Nếu chưa có)
 
+    public List<AgentPerformanceDTO> getTeamPerformance(int managerId) {
+        List<AgentPerformanceDTO> teamPerformance = new ArrayList<>();
+        String sql = """
+        SELECT 
+            u.user_id, 
+            u.full_name,
+            IFNULL(SUM(c.premium_amount), 0) AS total_premium,
+            COUNT(c.contract_id) AS contracts_count
+        FROM Users u
+        JOIN Manager_Agent ma ON u.user_id = ma.agent_id
+        LEFT JOIN Contracts c ON u.user_id = c.agent_id AND c.status = 'Active'
+        WHERE ma.manager_id = ? 
+        GROUP BY u.user_id, u.full_name
+        ORDER BY total_premium DESC;
+    """;
+
+        try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, managerId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    AgentPerformanceDTO dto = new AgentPerformanceDTO(
+                            rs.getInt("user_id"),
+                            rs.getString("full_name"),
+                            rs.getDouble("total_premium"),
+                            rs.getInt("contracts_count")
+                    );
+                    teamPerformance.add(dto);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return teamPerformance;
+    }
+    
+    public List<AgentPerformanceDTO> getAllAgentsPerformance() {
+    List<AgentPerformanceDTO> allAgents = new ArrayList<>();
+    // Giả sử role_id của Agent là 1 (dựa trên AgentManagementServlet của bạn)
+    int agentRoleId = 1; 
+
+    String sql = """
+    SELECT 
+        u.user_id, 
+        u.full_name,
+        IFNULL(SUM(c.premium_amount), 0) AS total_premium,
+        COUNT(c.contract_id) AS contracts_count
+    FROM Users u
+    LEFT JOIN Contracts c ON u.user_id = c.agent_id AND c.status = 'Active'
+    WHERE u.role_id = ? 
+    GROUP BY u.user_id, u.full_name
+    ORDER BY total_premium DESC;
+    """;
+
+    try (Connection conn = DBConnector.makeConnection(); 
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+
+        ps.setInt(1, agentRoleId); // Lọc theo role_id của Agent
+        try (ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                AgentPerformanceDTO dto = new AgentPerformanceDTO(
+                        rs.getInt("user_id"),
+                        rs.getString("full_name"),
+                        rs.getDouble("total_premium"),
+                        rs.getInt("contracts_count")
+                );
+                allAgents.add(dto);
+            }
+        }
+    } catch (SQLException e) {
+        e.printStackTrace(); // Luôn in ra lỗi để dễ debug
+    }
+    return allAgents;
+}
 }
