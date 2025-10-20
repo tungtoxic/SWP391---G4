@@ -109,7 +109,8 @@
                     <div class="nav-links">
                         <a href="<%= request.getContextPath() %>/profile.jsp">👤 Profile</a>
                         <a href="usermanagement.jsp">User Management</a>
-                        <a href="agentmanagement.jsp">Agent Management</a>
+                        <a href="">Report</a>
+                        <a href="">Commission</a>
                         <a href="contracts">Contract Detail</a>
                     </div>
                 </div>   
