@@ -97,7 +97,7 @@
     <body>
 
         <div class="container">
-            <!-- Navbar -->
+       
             <div class="navbar">
                 <div>                   
                     <h2>Agent Panel</h2>
@@ -116,7 +116,6 @@
                 </div>
             </div>
 
-            <!-- Content -->
             <div class="content">
                 <h1>Chào mừng, Đại lý!</h1>
                 <p>Hãy chọn một chức năng từ menu bên trái để bắt đầu quản lý hệ thống bảo hiểm.</p>

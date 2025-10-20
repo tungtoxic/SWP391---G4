@@ -115,8 +115,7 @@
                     <a href="LogoutServlet">🚪 Đăng xuất</a>
                 </div>
             </div>
-
-            <!-- Content -->
+   
             <div class="content">
                 <h1>Chào mừng, Manager!</h1>
                 <p>Hãy chọn một chức năng từ menu bên trái để bắt đầu quản lý hệ thống bảo hiểm.</p>
