@@ -48,6 +48,9 @@
         </div>
 
         <nav class="nav flex-column px-2">
+            <a class="nav-link text-white active py-2" href="<%= request.getContextPath() %>/profile.jsp">
+                <i class="fas fa-desktop me-2"></i> Profile
+            </a>
             <a class="nav-link text-white active py-2" href="#"><i class="fas fa-desktop me-2"></i> Admin Dashboard</a>
             <a class="nav-link text-white py-2" href="usermanagement.jsp"><i class="fas fa-users-cog me-2"></i> User Management</a>
             <a class="nav-link text-white py-2" href="#"><i class="fas fa-tools me-2"></i> System Settings</a>
