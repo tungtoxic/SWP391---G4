@@ -19,7 +19,7 @@ import java.io.PrintWriter;
  * @author hoang
  */
 @WebServlet(name = "AdminManagementServlet", urlPatterns = {"/admin/management"})
-public class AdminManagementServlet extends HttpServlet {
+public class UserManagementServlet extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>

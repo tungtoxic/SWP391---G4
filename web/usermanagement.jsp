@@ -47,21 +47,24 @@
     </head>
     <body>
         <h2>User Management</h2>
-        <a href="addUser.jsp">➕ Thêm User</a>
+        <a href="addUser.jsp">➕ Add User</a>
         <table>
             <tr>
                 <th>ID</th>
                 <th>Username</th>
                 <th>Full Name</th>
                 <th>Email</th>
-                <th>Phone</th>
+                <th>Phone Number</th>
                 <th>Role</th>
                 <th>Status</th>
                 <th>Action</th>
             </tr>
             <%
-                for (User u : userList) {
-            %>
+            for (User u : userList) {
+                if ("Admin".equalsIgnoreCase(u.getRoleName())) {
+                    continue;
+                }
+        %>
             <tr>
                 <td><%= u.getUserId() %></td>
                 <td><%= u.getUsername() %></td>

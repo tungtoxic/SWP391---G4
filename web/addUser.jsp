@@ -22,7 +22,7 @@
     </head>
     <body class="container mt-4">
 
-        <h2>➕ Thêm Người Dùng</h2>
+        <h2>➕ Add User</h2>
 
         <% String error = (String) request.getAttribute("error"); %>
         <% if (error != null) { %>
@@ -40,7 +40,7 @@
             </div>
 
             <div class="mb-3">
-                <label class="form-label">Họ tên:</label>
+                <label class="form-label">Full Name:</label>
                 <input type="text" name="fullName" class="form-control"/>
             </div>
 
@@ -50,29 +50,28 @@
             </div>
 
             <div class="mb-3">
-                <label class="form-label">Số điện thoại:</label>
+                <label class="form-label">Phone Number:</label>
                 <input type="text" name="phoneNumber" class="form-control" required/>
             </div>
 
             <div class="mb-3">
-                <label class="form-label">Vai trò:</label>
+                <label class="form-label">Role:</label>
                 <select name="role_id" class="form-select">
-                    <% for(Role r : roles) { %>
-                    <option value="<%= r.getRoleId() %>"><%= r.getRoleName() %></option>
-                    <% } %>
+                    <option value="Agent">Agent</option>
+                    <option value="Manager">Manager</option>
                 </select>
             </div>
 
             <div class="mb-3">
-                <label class="form-label">Trạng thái:</label>
+                <label class="form-label">Status:</label>
                 <select name="status" class="form-select">
                     <option value="Active">Active</option>
                     <option value="Inactive">Inactive</option>
                 </select>
             </div>
 
-            <button type="submit" class="btn btn-success">Thêm</button>
-            <a href="<%= request.getContextPath() %>/usermanagement.jsp" class="btn btn-secondary">Quay lại</a>
+            <button type="submit" class="btn btn-success">Add</button>
+            <a href="<%= request.getContextPath() %>/usermanagement.jsp" class="btn btn-secondary">Return</a>
         </form>
 
     </body>
