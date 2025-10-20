@@ -4,11 +4,6 @@
     Author     : hoang
 --%>
 
-<%-- 
-    Document   : addUser
-    Created on : Oct 5, 2025, 11:51:15 AM
-    Author     : hoang
---%>
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.util.List" %>
