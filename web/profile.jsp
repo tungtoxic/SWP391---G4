@@ -71,13 +71,14 @@
 <body>
     
     <div class="profile-card">
-        <h2>Welcome, <%= user.getFullName() %>!</h2>
+        <h2>Welcome, <%= user.getUsername() %>!</h2>
          <% if (message != null) { %>
             <div class="message"><%= message %></div>
         <% } %>
 
         <!-- Chế độ xem -->
         <div id="view-mode">
+            <p><strong>Full Name:</strong> <%= user.getFullName() %></p>
             <p><strong>Email:</strong> <%= user.getEmail() %></p>
             <p><strong>Phone Number:</strong> <%= user.getPhoneNumber() %></p>
             <p><strong>Role ID:</strong> <%= user.getRoleId() %></p>
