@@ -1,10 +1,3 @@
-<%-- 
-    Document   : addUser
-    Created on : Oct 5, 2025, 11:51:15 AM
-    Author     : hoang
---%>
-
-
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.util.List" %>
 <%@ page import="entity.Role" %>
@@ -57,9 +50,11 @@
             <div class="mb-3">
                 <label class="form-label">Role:</label>
                 <select name="role_id" class="form-select">
-                    <option value="Agent">Agent</option>
-                    <option value="Manager">Manager</option>
+                    <option value="1" ${user.roleId == 1 ? "selected" : ""}>Agent</option>
+                    <option value="2" ${user.roleId == 2 ? "selected" : ""}>Manager</option>
+                    <option value="3" ${user.roleId == 3 ? "selected" : ""}>Admin</option>
                 </select>
+
             </div>
 
             <div class="mb-3">

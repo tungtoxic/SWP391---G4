@@ -48,7 +48,7 @@
         </div>
 
         <nav class="nav flex-column px-2">
-            <a class="nav-link text-white active py-2" href="<%= request.getContextPath() %>/profile.jsp">
+            <a class="nav-link text-white py-2" href="<%= request.getContextPath() %>/profile.jsp">
                 <i class="fas fa-desktop me-2"></i> Profile
             </a>
             <a class="nav-link text-white active py-2" href="#"><i class="fas fa-desktop me-2"></i> Admin Dashboard</a>
@@ -236,7 +236,7 @@
                     labels: ['Agents', 'Managers', 'Admins'],
                     datasets: [{
                         data: [120, 25, 5], // Số lượng người dùng theo vai trò
-                        backgroundColor: ['#198754', '#0d6efd', '#dc3545'],
+                        backgroundColor: ['#198754', '#0d6efd', '#dc3545']
                     }]
                 },
                 options: {
