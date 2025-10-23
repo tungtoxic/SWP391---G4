@@ -32,9 +32,14 @@
 
         h2 {color: #2cd02d;}
 
-        p { color: #555; margin: 8px 0; font-size: 15px; }
+        p {
+            color: #555;
+            margin: 10px 0;  
+            font-size: 15px;
+            line-height: 1.6;
+        }
 
-        input[type="text"], input[type="email"], input[type="tel"], select {
+        input[type="text"], input[type="email"], input[type="tel"]{
             width: 90%;
             padding: 8px;
             margin: 6px 0;
@@ -52,8 +57,18 @@
             border: none;
             cursor: pointer;
         }
+        .message {
+            text-align: center;
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 6px;
+            font-weight: bold;
+            color: #155724;
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+        }
 
-        .welcome-text {text-align: center; margin-bottom: 25px;}
+        .welcome-text {text-align: center; margin-bottom: 25px; font-size: 28px}
         .btn-group {text-align: center; margin-top: 15px;}
         .btn-change-pass { background-color: #3498db; }
         .btn-logout { background-color: #e74c3c; }
@@ -62,14 +77,57 @@
         .btn-cancel { background-color: #95a5a6; }
         .btn:hover { opacity: 0.9; }       
         .error { color: red; }
+        
+        form#edit-mode {
+            width: 400px;
+            margin: 0 auto;
+            display: none;
+            font-family: Arial, sans-serif;
+        }
+
+        form#edit-mode label {
+            display: inline-block;
+            font-weight: bold;
+            width: 120px;
+            margin-bottom: 10px;
+            vertical-align: middle;
+        }
+
+        form#edit-mode input, form#edit-mode select {
+            width: 250px;
+            padding: 6px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            vertical-align: middle;
+        }
+
+        .btn-container {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .btn-save {
+            background-color: #28a745;
+            color: white;
+            margin-right: 10px;
+        }
+
+        .btn-cancel {
+            background-color: #a0a0a0;
+            color: white;
+        }
     </style>
 </head>
 <body>
     
     <div class="profile-card">
         <h2 class="welcome-text">Welcome, <%= user.getUsername() %>!</h2>
-         <% if (message != null) { %>
-            <div><%= message %></div>
+        <% if (message != null) { %>
+            <div id="messageBox" class="message"><%= message %></div>
+        <% } else { %>
+            <div id="messageBox" class="message" style="display:none;"></div>
         <% } %>
 
         <div id="view-mode">
@@ -96,15 +154,11 @@
 
             <label>Phone Number:</label>
             <input type="tel" name="phoneNumber" value="<%= user.getPhoneNumber() %>" required><br>
-
-            <label>Status:</label>
-            <select name="status" required>
-                <option value="Active" <%= "Active".equalsIgnoreCase(user.getStatus()) ? "selected" : "" %>>Active</option>
-                <option value="Inactive" <%= "Inactive".equalsIgnoreCase(user.getStatus()) ? "selected" : "" %>>Inactive</option>
-            </select><br>
-
-            <button type="submit" class="btn btn-save">Save</button>
-            <button type="button" class="btn btn-cancel" onclick="switchToView()">Cancel</button>
+         
+            <div class="btn-group">
+                <button type="submit" class="btn btn-save">Save</button>
+                <button type="button" class="btn btn-cancel" onclick="switchToView()">Cancel</button>
+            </div>
         </form>
     </div>
 
@@ -112,6 +166,10 @@
         function switchToEdit() {
             document.getElementById("view-mode").style.display = "none";
             document.getElementById("edit-mode").style.display = "block";
+            const msgBox = document.getElementById("messageBox");
+            if (msgBox) {
+            msgBox.style.display = "none";
+            }
         }
 
         function switchToView() {
