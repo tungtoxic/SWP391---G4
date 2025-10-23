@@ -12,7 +12,6 @@
     <link rel="stylesheet" href="<%=ctx%>/css/layout.css" />
     <link rel="stylesheet" href="<%=ctx%>/css/admin-dashboard.css" />
     <style>
-        /* Tùy chỉnh nhỏ cho KPI cards và bảng */
         .kpi-card-icon { font-size: 2.5rem; opacity: 0.5; }
         .alert-widget { border-left: 5px solid #ffc107; }
     </style>
@@ -43,10 +42,8 @@
         </div>
 
         <nav class="nav flex-column px-2">
-            <a class="nav-link text-white py-2" href="<%= request.getContextPath() %>/profile.jsp">
-                <i class="fas fa-desktop me-2"></i> Profile
-            </a>
-            <a class="nav-link text-white active py-2" href="#"><i class="fas fa-desktop me-2"></i> Admin Dashboard</a>
+            <a class="nav-link text-white active py-2" href="#"><i class="fas fa-desktop me-2"></i> Dashboard</a>
+            <a class="nav-link text-white py-2" href="<%= request.getContextPath() %>/profile.jsp"><i class="fas fa-desktop me-2"></i> Profile</a>           
             <a class="nav-link text-white py-2" href="usermanagement.jsp"><i class="fas fa-users-cog me-2"></i> User Management</a>
             <a class="nav-link text-white py-2" href="#"><i class="fas fa-tools me-2"></i> Commission Management</a>
             <a class="nav-link text-white py-2" href="ReportServlet"><i class="fas fa-file-export me-2"></i> Performance Report</a>
@@ -146,7 +143,6 @@
                                 <li class="list-group-item text-center">
                                     <a href="#"><i class="fas fa-cog me-1"></i> Go to Admin Logs</a>
                                 </li>
-                                <%-- End Dữ liệu giả lập --%>
                             </ul>
                         </div>
                     </div>
