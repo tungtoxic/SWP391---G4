@@ -8,11 +8,11 @@ import utility.DBConnector;
 public class ReportDao {
 
     public ReportSummary getOverallPerformance() {
-    ReportSummary summary = new ReportSummary(); // luôn khởi tạo
+    ReportSummary summary = new ReportSummary();
     try (Connection conn = DBConnector.makeConnection()) {
         if (conn == null) {
             System.out.println("⚠️ Connection is null");
-            return summary; // trả về object rỗng, không null
+            return summary;
         }
 
         // ---- Ví dụ query tổng hợp ----
@@ -29,7 +29,6 @@ public class ReportDao {
             summary.setActiveContracts(rs.getInt("activeContracts"));
         }
 
-        // ---- Lấy tổng khách hàng ----
         String sqlCustomers = "SELECT COUNT(*) AS totalCustomers FROM Customers";
         PreparedStatement ps2 = conn.prepareStatement(sqlCustomers);
         ResultSet rs2 = ps2.executeQuery();
@@ -37,10 +36,10 @@ public class ReportDao {
             summary.setTotalCustomers(rs2.getInt("totalCustomers"));
         }
 
-        return summary; // trả về dù giá trị 0
+        return summary; 
     } catch (SQLException e) {
         e.printStackTrace();
-        return summary; // KHÔNG return null
+        return summary; 
     }
 }
 
