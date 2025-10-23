@@ -27,14 +27,10 @@
             padding: 30px 40px;
             border-radius: 12px;
             box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-            width: 400px;
-            text-align: center;
+            width: 400px;          
         }
 
-        h2 {
-            color: #2c3e50;
-            margin-bottom: 15px;
-        }
+        h2 {color: #2cd02d;}
 
         p { color: #555; margin: 8px 0; font-size: 15px; }
 
@@ -57,38 +53,38 @@
             cursor: pointer;
         }
 
+        .welcome-text {text-align: center; margin-bottom: 25px;}
+        .btn-group {text-align: center; margin-top: 15px;}
         .btn-change-pass { background-color: #3498db; }
         .btn-logout { background-color: #e74c3c; }
         .btn-update { background-color: #2ecc71; }
         .btn-save { background-color: #27ae60; }
         .btn-cancel { background-color: #95a5a6; }
-        .btn:hover { opacity: 0.9; }
-
-        .message { margin-bottom: 10px; color: green; font-weight: bold; }
+        .btn:hover { opacity: 0.9; }       
         .error { color: red; }
     </style>
 </head>
 <body>
     
     <div class="profile-card">
-        <h2>Welcome, <%= user.getUsername() %>!</h2>
+        <h2 class="welcome-text">Welcome, <%= user.getUsername() %>!</h2>
          <% if (message != null) { %>
-            <div class="message"><%= message %></div>
+            <div><%= message %></div>
         <% } %>
 
-        <!-- Chế độ xem -->
         <div id="view-mode">
             <p><strong>Full Name:</strong> <%= user.getFullName() %></p>
             <p><strong>Email:</strong> <%= user.getEmail() %></p>
             <p><strong>Phone Number:</strong> <%= user.getPhoneNumber() %></p>
             <p><strong>Role ID:</strong> <%= user.getRoleId() %></p>
             <p><strong>Status:</strong> <%= user.getStatus() %></p>
-
-            <a href="ChangePassword" class="btn btn-change-pass">Change Password</a>
-            <button class="btn btn-update" onclick="switchToEdit()">Update Profile</button>
+            
+            <div class="btn-group">
+                <a href="ChangePassword" class="btn btn-change-pass">Change Password</a>
+                <button class="btn btn-update" onclick="switchToEdit()">Update Profile</button>
+            </div>
         </div>
 
-        <!-- Chế độ chỉnh sửa -->
         <form id="edit-mode" action="UpdateProfileServlet" method="post" style="display:none;">
             <input type="hidden" name="userId" value="<%= user.getUserId() %>">
 
@@ -123,6 +119,5 @@
             document.getElementById("view-mode").style.display = "block";
         }
     </script>
-
 </body>
 </html>
