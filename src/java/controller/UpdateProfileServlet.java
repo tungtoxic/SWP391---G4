@@ -13,7 +13,6 @@ public class UpdateProfileServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // Lấy user hiện tại trong session
         HttpSession session = request.getSession();
         User currentUser = (User) session.getAttribute("user");
 
@@ -22,12 +21,10 @@ public class UpdateProfileServlet extends HttpServlet {
             return;
         }
 
-        // Lấy dữ liệu mới từ form
         String fullName = request.getParameter("fullName");
         String email = request.getParameter("email");
         String phone = request.getParameter("phoneNumber");
 
-        // Cập nhật thông tin trong đối tượng user
         currentUser.setFullName(fullName);
         currentUser.setEmail(email);
         currentUser.setPhoneNumber(phone);
@@ -41,7 +38,6 @@ public class UpdateProfileServlet extends HttpServlet {
             e.printStackTrace();
         }
 
-        // Lưu lại user vào session (dù có DB hay không)
         session.setAttribute("user", currentUser);
 
         if (updateSuccess) {
