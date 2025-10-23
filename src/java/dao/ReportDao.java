@@ -7,46 +7,41 @@ import utility.DBConnector;
 
 public class ReportDao {
 
-    public ReportSummary getOverallPerformance() throws SQLException {
-        ReportSummary report = new ReportSummary();
-        try (Connection conn = DBConnector.makeConnection()) {
-
-            // 1. Tổng hợp hợp đồng
-            String sqlContracts = "SELECT COUNT(*) total_contracts, SUM(premium_amount) total_revenue,"
-                                + " SUM(CASE WHEN status='Active' THEN 1 ELSE 0 END) active_contracts,"
-                                + " SUM(CASE WHEN status='Pending' THEN 1 ELSE 0 END) pending_contracts,"
-                                + " SUM(CASE WHEN status='Expired' THEN 1 ELSE 0 END) expired_contracts"
-                                + " FROM Contracts";
-            try (PreparedStatement ps = conn.prepareStatement(sqlContracts);
-                 ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    report.setTotalContracts(rs.getInt("total_contracts"));
-                    report.setTotalRevenue(rs.getDouble("total_revenue"));
-                    report.setActiveContracts(rs.getInt("active_contracts"));
-                    report.setPendingContracts(rs.getInt("pending_contracts"));
-                    report.setExpiredContracts(rs.getInt("expired_contracts"));
-                }
-            }
-
-            // 2. Tổng khách hàng
-            try (PreparedStatement ps = conn.prepareStatement("SELECT COUNT(*) AS total_customers FROM Customers");
-                 ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) report.setTotalCustomers(rs.getInt("total_customers"));
-            }
-
-            // 3. Hoa hồng
-            String sqlCommissions = "SELECT "
-                    + "SUM(CASE WHEN status='Paid' THEN amount ELSE 0 END) AS paid,"
-                    + "SUM(CASE WHEN status='Pending' THEN amount ELSE 0 END) AS pending "
-                    + "FROM Commissions";
-            try (PreparedStatement ps = conn.prepareStatement(sqlCommissions);
-                 ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    report.setPaidCommission(rs.getDouble("paid"));
-                    report.setPendingCommission(rs.getDouble("pending"));
-                }
-            }
+    public ReportSummary getOverallPerformance() {
+    ReportSummary summary = new ReportSummary(); // luôn khởi tạo
+    try (Connection conn = DBConnector.makeConnection()) {
+        if (conn == null) {
+            System.out.println("⚠️ Connection is null");
+            return summary; // trả về object rỗng, không null
         }
-        return report;
+
+        // ---- Ví dụ query tổng hợp ----
+        String sqlContracts = "SELECT COUNT(*) AS totalContracts, " +
+                      "SUM(premium_amount) AS totalRevenue, " +
+                      "SUM(CASE WHEN status='Active' THEN 1 ELSE 0 END) AS activeContracts " +
+                      "FROM Contracts";
+
+        PreparedStatement ps = conn.prepareStatement(sqlContracts);
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            summary.setTotalContracts(rs.getInt("totalContracts"));
+            summary.setTotalRevenue(rs.getDouble("totalRevenue"));
+            summary.setActiveContracts(rs.getInt("activeContracts"));
+        }
+
+        // ---- Lấy tổng khách hàng ----
+        String sqlCustomers = "SELECT COUNT(*) AS totalCustomers FROM Customers";
+        PreparedStatement ps2 = conn.prepareStatement(sqlCustomers);
+        ResultSet rs2 = ps2.executeQuery();
+        if (rs2.next()) {
+            summary.setTotalCustomers(rs2.getInt("totalCustomers"));
+        }
+
+        return summary; // trả về dù giá trị 0
+    } catch (SQLException e) {
+        e.printStackTrace();
+        return summary; // KHÔNG return null
     }
+}
+
 }

@@ -1,8 +1,3 @@
-<%--
-    Document   : AdminDashboard
-    Created on : Oct 13, 2025
-    Author     : Nguyễn Tùng
---%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <% String ctx = request.getContextPath(); %>
 <!DOCTYPE html>
@@ -54,7 +49,7 @@
             <a class="nav-link text-white active py-2" href="#"><i class="fas fa-desktop me-2"></i> Admin Dashboard</a>
             <a class="nav-link text-white py-2" href="usermanagement.jsp"><i class="fas fa-users-cog me-2"></i> User Management</a>
             <a class="nav-link text-white py-2" href="#"><i class="fas fa-tools me-2"></i> Commission Management</a>
-            <a class="nav-link text-white py-2" href="#"><i class="fas fa-file-export me-2"></i> Report</a>
+            <a class="nav-link text-white py-2" href="ReportServlet"><i class="fas fa-file-export me-2"></i> Performance Report</a>
             <div class="mt-3 px-2">
                 <a class="btn btn-danger w-100" href="<%=ctx%>/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
             </div>
