@@ -71,7 +71,6 @@ CREATE TABLE `Product_Categories` (
 CREATE TABLE `Products` (
     `product_id` INT AUTO_INCREMENT PRIMARY KEY,
     `product_name` VARCHAR(100) NOT NULL,
-    `description` TEXT,
     `category_id` INT,
     FOREIGN KEY (`category_id`) REFERENCES `Product_Categories`(`category_id`)
 );
@@ -273,6 +272,39 @@ CREATE TABLE Tasks (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES Users(user_id),
     FOREIGN KEY (customer_id) REFERENCES Customers(customer_id)
+);
+CREATE TABLE Insurance_Product_Details (
+    product_id INT PRIMARY KEY, -- 🔑 Khóa chính trùng với sản phẩm
+    category_id INT NOT NULL,
+    product_type ENUM('life', 'health', 'car') NOT NULL,
+    
+    -- Dùng chung
+    coverage_amount DECIMAL(12,2),
+    duration_years INT,
+    
+    -- Bảo hiểm nhân thọ
+    beneficiaries TEXT,
+    maturity_benefit TEXT,
+    maturity_amount DECIMAL(15,2),
+    
+    -- Bảo hiểm sức khỏe
+    hospitalization_limit DECIMAL(12,2),
+    surgery_limit DECIMAL(12,2),
+    maternity_limit DECIMAL(12,2), -- 🍼 Giới hạn sinh đẻ
+    min_age INT DEFAULT 0,         -- 🔹 Tuổi tối thiểu được bảo hiểm
+    max_age INT DEFAULT 100,
+    waiting_period INT,
+    
+    -- Bảo hiểm ô tô
+    vehicle_type VARCHAR(100),
+    vehicle_value DECIMAL(12,2),
+    coverage_type VARCHAR(255),
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (product_id) REFERENCES Products(product_id) ON DELETE CASCADE,
+    FOREIGN KEY (category_id) REFERENCES Product_Categories(category_id)
 );
 -- 1. TẠO MỘT LỊCH HẸN "FOLLOW-UP" CHO HÔM NAY
 -- (Giả sử agent1 (user_id=1) hẹn gặp khách hàng customer_id=1)
