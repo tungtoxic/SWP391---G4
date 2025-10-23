@@ -145,7 +145,6 @@ public class UserManagementServlet extends HttpServlet {
             return;
         }
 
-        // Kiểm tra trùng email, phone (ngoại trừ user hiện tại)
         if (!user.getEmail().equals(email) && userDao.checkEmailExists(email)) {
             request.setAttribute("error", "Email đã tồn tại.");
             request.getRequestDispatcher("/editUser.jsp").forward(request, response);
