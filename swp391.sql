@@ -248,3 +248,48 @@ INSERT INTO `Contracts` (customer_id, agent_id, product_id, start_date, status, 
 INSERT INTO `Commissions` (contract_id, agent_id, policy_id, amount, status) VALUES (LAST_INSERT_ID(), 1, 1, 350000, 'Pending');
 INSERT INTO `Contracts` (customer_id, agent_id, product_id, start_date, status, premium_amount) VALUES (10, 1, 1, '2025-10-10', 'Active', 12000000);
 INSERT INTO `Commissions` (contract_id, agent_id, policy_id, amount, status) VALUES (LAST_INSERT_ID(), 1, 1, 600000, 'Pending');
+
+
+
+ALTER TABLE Products
+ADD COLUMN base_price DECIMAL(12, 2) NOT NULL DEFAULT 0;
+
+ALTER TABLE Products
+ADD COLUMN created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+ALTER TABLE Products
+ADD COLUMN updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
+
+ALTER TABLE Customers
+ADD COLUMN customer_type ENUM('Lead', 'Client') NOT NULL DEFAULT 'Lead';
+
+CREATE TABLE Tasks (
+    task_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,          -- ĐÃ SỬA: Ai sở hữu task này
+    customer_id INT NULL,          -- Có thể NULL, nếu NULL thì là To-do cá nhân
+    title VARCHAR(255) NOT NULL,
+    due_date DATE,
+    is_completed BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES Users(user_id),
+    FOREIGN KEY (customer_id) REFERENCES Customers(customer_id)
+);
+-- 1. TẠO MỘT LỊCH HẸN "FOLLOW-UP" CHO HÔM NAY
+-- (Giả sử agent1 (user_id=1) hẹn gặp khách hàng customer_id=1)
+INSERT INTO Tasks (user_id, customer_id, title, due_date, is_completed)
+VALUES (1, 1, 'Gọi điện xác nhận gói Sức khỏe Vàng', CURDATE(), false);
+
+-- 2. TẠO MỘT GHI CHÚ "TO-DO" CÁ NHÂN
+INSERT INTO Tasks (user_id, customer_id, title, is_completed)
+VALUES (1, NULL, 'Gửi báo cáo tuần cho manager', false);
+INSERT INTO Tasks (user_id, customer_id, title, is_completed)
+VALUES (1, NULL, 'Hen voi anh a', false);
+
+-- 3. TẠO MỘT HỢP ĐỒNG SẮP HẾT HẠN (để kiểm tra Renewal Alerts)
+-- (Giả sử hợp đồng contract_id=1 sẽ hết hạn sau 30 ngày nữa)
+UPDATE Contracts
+SET end_date = DATE_ADD(CURDATE(), INTERVAL 30 DAY), status = 'Active'
+WHERE contract_id = 1;
+UPDATE Contracts
+SET end_date = DATE_ADD(CURDATE(), INTERVAL 5 DAY), status = 'Active'
+WHERE contract_id = 1;
