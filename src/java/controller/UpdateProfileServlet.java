@@ -35,7 +35,6 @@ public class UpdateProfileServlet extends HttpServlet {
         boolean updateSuccess = false;
 
         try {
-            // Nếu bạn có lớp UserDAO, dùng nó để cập nhật DB
             UserDao userDAO = new UserDao();
             updateSuccess = userDAO.updateUser(currentUser);
         } catch (Exception e) {
@@ -45,14 +44,12 @@ public class UpdateProfileServlet extends HttpServlet {
         // Lưu lại user vào session (dù có DB hay không)
         session.setAttribute("user", currentUser);
 
-        // Gửi thông báo
         if (updateSuccess) {
             request.setAttribute("message", "Profile updated successfully!");
         } else {
             request.setAttribute("message", "Update failed. Please try again.");
         }
 
-        // Quay lại trang profile
         RequestDispatcher rd = request.getRequestDispatcher("profile.jsp");
         rd.forward(request, response);
     }

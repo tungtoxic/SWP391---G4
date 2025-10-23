@@ -436,4 +436,27 @@ public class UserDao {
     }
     return allAgents;
 }
+    public List<User> getUsersByStatus(String status) throws SQLException {
+    List<User> list = new ArrayList<>();
+    String sql = "SELECT u.*, r.role_name FROM Users u "
+               + "JOIN Roles r ON u.role_id = r.role_id "
+               + "WHERE u.status = ?";
+    try (Connection con = DBConnector.makeConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+        ps.setString(1, status);
+        ResultSet rs = ps.executeQuery();
+        while (rs.next()) {
+            User user = new User();
+            user.setUserId(rs.getInt("user_id"));
+            user.setFullName(rs.getString("full_name"));
+            user.setEmail(rs.getString("email"));
+            user.setPhoneNumber(rs.getString("phone_number"));
+            user.setUsername(rs.getString("username"));
+            user.setStatus(rs.getString("status"));
+            user.setRoleId(rs.getInt("role_id"));
+            user.setRoleName(rs.getString("role_name"));
+            list.add(user);
+        }
+    }
+    return list;
+}
 }

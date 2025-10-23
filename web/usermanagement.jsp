@@ -3,11 +3,19 @@
 <%
     UserDao userDao = new UserDao();
     List<User> userList = new ArrayList<>();
+    String filter = request.getParameter("filter");
+
     try {
-        userList = userDao.getAllUsers();
+        if ("active".equalsIgnoreCase(filter)) {
+            userList = userDao.getUsersByStatus("Active");
+        } else if ("inactive".equalsIgnoreCase(filter)) {
+            userList = userDao.getUsersByStatus("Inactive");
+        } else {
+            userList = userDao.getAllUsers();
+        }
     } catch (Exception e) {
         e.printStackTrace();
-    }
+}
 %>
 <!DOCTYPE html>
 <html>
@@ -42,6 +50,8 @@
             margin-bottom: 20px;
         }
 
+        .filter-buttons a {text-decoration: none;}
+        
         .filter-buttons button, .btn-add {
             border: none;
             border-radius: 6px;
@@ -140,6 +150,7 @@
 
         .action-btn:hover {
             opacity: 0.9;
+            text-decoration: none;
         }
 
         .footer-link {
@@ -155,7 +166,12 @@
 
         .footer-link a:hover {
             color: #e74c3c;
-        }
+        }        
+        td a {text-decoration: none;}
+        
+        #btn-sortActive {background-color: #28a745}
+        #btn-sortInactive {background-color: #dc3545}
+        #btn-sortAll {background-color: #f1c40f}
     </style>
 </head>
 <body>
@@ -164,10 +180,17 @@
 
         <div class="top-bar">
             <div class="filter-buttons">
-                <button>Active Users</button>
-                <button>Inactive Users</button>
-                <button>All Users</button>
+                <a href="usermanagement.jsp?filter=active">
+                    <button id="btn-sortActive" type="button">Active Users</button>
+                </a>
+                <a href="usermanagement.jsp?filter=inactive">
+                    <button id="btn-sortInactive" type="button">Inactive Users</button>
+                </a>
+                <a href="usermanagement.jsp?filter=all">
+                    <button id="btn-sortAll" type="button">All Users</button>
+                </a>
             </div>
+
             <a href="addUser.jsp" class="btn-add">+ Add User</a>
         </div>
 

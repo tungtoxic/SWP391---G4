@@ -41,7 +41,6 @@
     </nav>
 
     <aside class="sidebar bg-primary text-white">
-        <%-- ... (Phần Sidebar Navigation của Manager sẽ tương tự Agent nhưng có thể thêm mục Admin nếu có) ... --%>
         <div class="sidebar-top p-3">
             <div class="d-flex align-items-center mb-3">
                 <div class="avatar rounded-circle bg-white me-2" style="width:36px;height:36px;"></div>
