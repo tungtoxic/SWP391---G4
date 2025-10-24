@@ -2,14 +2,12 @@
     Document   : AgentDashboard
     Created on : Oct 6, 2025, 4:49:19 PM
     Author     : Nguyễn Tùng
-   
 --%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@page import="java.util.*, entity.*, java.math.BigDecimal, java.text.DecimalFormat, java.time.temporal.ChronoUnit, java.time.LocalDate"%>
 <%
     String ctx = request.getContextPath();
-    User currentUser = (User) session.getAttribute("user");
-    
+    User currentUser = (User) session.getAttribute("user"); 
     // --- 1. Lấy dữ liệu (ĐÃ THÊM NULL CHECKS ĐỂ SỬA LỖI) ---
     BigDecimal pendingCommission = (BigDecimal) request.getAttribute("pendingCommission");
     Integer leadCount = (Integer) request.getAttribute("leadCount");
