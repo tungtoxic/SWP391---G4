@@ -5,64 +5,90 @@
    
 --%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<% String ctx = request.getContextPath(); %>
+<%@page import="java.util.*, entity.*, java.math.BigDecimal, java.text.DecimalFormat, java.time.temporal.ChronoUnit, java.time.LocalDate"%>
+<%
+    String ctx = request.getContextPath();
+    User currentUser = (User) session.getAttribute("user");
+    
+    // --- 1. Lấy dữ liệu (ĐÃ THÊM NULL CHECKS ĐỂ SỬA LỖI) ---
+    BigDecimal pendingCommission = (BigDecimal) request.getAttribute("pendingCommission");
+    Integer leadCount = (Integer) request.getAttribute("leadCount");
+    Integer clientCount = (Integer) request.getAttribute("clientCount");
+    List<ContractDTO> expiringContracts = (List<ContractDTO>) request.getAttribute("expiringContracts");
+    List<Task> followUps = (List<Task>) request.getAttribute("followUps");
+    List<Task> personalTasks = (List<Task>) request.getAttribute("personalTasks");
+    List<AgentPerformanceDTO> topAgents = (List<AgentPerformanceDTO>) request.getAttribute("topAgents");
+    List<String> salesChartLabels = (List<String>) request.getAttribute("salesChartLabels");
+    List<Double> salesChartValues = (List<Double>) request.getAttribute("salesChartValues");
+
+    // --- 2. Xử lý an toàn (Nếu dữ liệu là null, dùng giá trị mặc định) ---
+    if (pendingCommission == null) pendingCommission = BigDecimal.ZERO;
+    if (leadCount == null) leadCount = 0;
+    if (clientCount == null) clientCount = 0;
+    if (expiringContracts == null) expiringContracts = new ArrayList<>();
+    if (followUps == null) followUps = new ArrayList<>();
+    if (personalTasks == null) personalTasks = new ArrayList<>();
+    if (topAgents == null) topAgents = new ArrayList<>();
+    if (salesChartLabels == null) salesChartLabels = new ArrayList<>();
+    if (salesChartValues == null) salesChartValues = new ArrayList<>();
+
+    // --- 3. Định dạng & Tính toán ---
+    DecimalFormat currencyFormat = new DecimalFormat("###,###,##0 'VND'");
+    double conversionRate = 0.0;
+    if (leadCount + clientCount > 0) {
+        conversionRate = ((double) clientCount / (clientCount + leadCount)) * 100;
+    }
+%>
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Agent Dashboard</title>
-
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" crossorigin="anonymous">
-
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
-
     <link rel="stylesheet" href="<%=ctx%>/css/layout.css" />
-
-    <link rel="stylesheet" href="<%=ctx%>/css/agent-dashboard.css" />
     <style>
-        /* Tùy chỉnh nhỏ để các KPI card trông đẹp hơn */
-        .kpi-card-icon {
-            font-size: 2.5rem;
-            opacity: 0.5;
-        }
-        .list-group-item-action:hover {
-            cursor: pointer;
-            background-color: #f8f9fa;
-        }
+        .kpi-card-icon { font-size: 2.5rem; opacity: 0.3; }
+        .list-group-item-action:hover { cursor: pointer; background-color: #f8f9fa; }
+        .list-group-item { border-left: 0; border-right: 0; }
+        .card-body .list-group-item:first-child { border-top: 0; }
+        .card-body .list-group-item:last-child { border-bottom: 0; }
     </style>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom fixed-top">
         <div class="container-fluid">
             <a class="navbar-brand fw-bold" href="<%=ctx%>/home.jsp">Company</a>
-            <div>
-                <ul class="navbar-nav d-flex flex-row align-items-center">
-                    <li class="nav-item me-3"><a class="nav-link" href="<%=ctx%>/home.jsp">Home</a></li>
-                </ul>
-            </div>
+            <ul class="navbar-nav d-flex flex-row align-items-center">
+                <li class="nav-item me-3"><a class="nav-link" href="<%=ctx%>/home.jsp">Home</a></li>
+                <a class="nav-link" href="#">
+                        <i class="fas fa-bell"></i>
+                        <span class="badge rounded-pill badge-notification bg-danger">1</span>
+                    </a>
+            </ul>
         </div>
     </nav>
 
-    <%-- ... (Phần Sidebar không đổi) ... --%>
     <aside class="sidebar bg-primary text-white">
         <div class="sidebar-top p-3">
             <div class="d-flex align-items-center mb-3">
                 <div class="avatar rounded-circle bg-white me-2" style="width:36px;height:36px;"></div>
                 <div>
-                    <div class="fw-bold">Agent TAm</div>
+                    <div class="fw-bold"><%= currentUser != null ? currentUser.getFullName() : "Agent" %></div>
                     <div style="font-size:.85rem;opacity:.9">Sales Agent</div>
                 </div>
             </div>
         </div>
-
         <nav class="nav flex-column px-2">
-            <a class="nav-link text-white active py-2" href="<%=ctx%>/AgentDashboard.jsp"><i class="fas fa-chart-line me-2"></i> Dashboard</a>
+            <%-- ĐÃ SỬA LỖI ĐIỀU HƯỚNG --%>
+            <a class="nav-link text-white active py-2" href="<%=ctx%>/agent/dashboard"><i class="fas fa-chart-line me-2"></i> Dashboard</a>
             <a class="nav-link text-white py-2" href="<%=ctx%>/profile.jsp"><i class="fas fa-user me-2"></i> Profile</a>
-            <a class="nav-link text-white py-2" href="#"><i class="fas fa-trophy me-2"></i> Leader Board</a>
-            <a class="nav-link text-white py-2" href="<%=ctx%>/commission_report.jsp"><i class="fas fa-percent me-2"></i> Commission Report</a>
+            <a class="nav-link text-white py-2" href="<%=ctx%>/agents/leaderboard"><i class="fas fa-trophy me-2"></i> Leaderboard</a>
+            <a class="nav-link text-white py-2" href="<%=ctx%>/agent/commission-report"><i class="fas fa-percent me-2"></i> Commission Report</a>
             <a class="nav-link text-white py-2" href="#"><i class="fas fa-box me-2"></i> Product</a>
-            <a class="nav-link text-white py-2" href="<%=ctx%>/customerManagerment.jsp"><i class="fas fa-users me-2"></i> Customer</a>
+            <a class="nav-link text-white py-2" href="<%=ctx%>/agent/contracts"><i class="fas fa-file-signature me-2"></i> Contract</a>
+            <a class="nav-link text-white py-2" href="<%=ctx%>/agent/customers"><i class="fas fa-users me-2"></i> Customer</a>
             <a class="nav-link text-white py-2" href="#"><i class="fas fa-file-alt me-2"></i> Policies</a>
             <div class="mt-3 px-2">
                 <a class="btn btn-danger w-100" href="<%=ctx%>/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
@@ -74,18 +100,21 @@
         <div class="container-fluid">
             <h1 class="mb-4">Agent Dashboard</h1>
             
+            <%-- ================== ROW 1: KPIs ================== --%>
             <div class="row">
                 <div class="col-lg-3 col-md-6 mb-4">
                     <div class="card bg-success text-white">
                         <div class="card-body d-flex justify-content-between align-items-center">
                             <div>
-                                <h6 class="text-uppercase mb-0">Hoa hồng Dự kiến (T.Này)</h6>
-                                <h3 class="display-6 fw-bold mb-0">32.5 Triệu</h3>
-                                <small>Đã đạt: 100% / Target: 30 Triệu</small>
+                                <h6 class="text-uppercase mb-0">Pending Commission</h6>
+                                <h3 class="display-6 fw-bold mb-0"><%= currencyFormat.format(pendingCommission) %></h3>
+                                <small>From "Pending" contracts</small>
                             </div>
                             <i class="fas fa-wallet kpi-card-icon"></i>
                         </div>
-                        <div class="card-footer bg-success border-0 text-white-50"><a href="#" class="text-white">Xem chi tiết <i class="fas fa-arrow-circle-right"></i></a></div>
+                        <div class="card-footer bg-success border-0 text-white-50">
+                            <a href="<%=ctx%>/agent/commission-report" class="text-white">View Details <i class="fas fa-arrow-circle-right"></i></a>
+                        </div>
                     </div>
                 </div>
                 
@@ -93,170 +122,211 @@
                     <div class="card bg-primary text-white">
                         <div class="card-body d-flex justify-content-between align-items-center">
                             <div>
-                                <h6 class="text-uppercase mb-0">Khách hàng (Active)</h6>
-                                <h3 class="display-6 fw-bold mb-0">156</h3>
-                                <small>Mới: +5 Clients T.Này</small>
+                                <h6 class="text-uppercase mb-0">Active Clients</h6>
+                                <h3 class="display-6 fw-bold mb-0"><%= clientCount %></h3>
+                                <small>Customers with contracts</small>
                             </div>
                             <i class="fas fa-users kpi-card-icon"></i>
                         </div>
-                        <div class="card-footer bg-primary border-0 text-white-50"><a href="#" class="text-white">Quản lý khách hàng <i class="fas fa-arrow-circle-right"></i></a></div>
+                        <div class="card-footer bg-primary border-0 text-white-50">
+                            <a href="<%=ctx%>/agent/customers" class="text-white">Manage Clients <i class="fas fa-arrow-circle-right"></i></a>
+                        </div>
                     </div>
                 </div>
                 
                 <div class="col-lg-3 col-md-6 mb-4">
-                    <div class="card bg-info text-white">
+                    <div class="card bg-info text-dark">
                         <div class="card-body d-flex justify-content-between align-items-center">
                             <div>
-                                <h6 class="text-uppercase mb-0">Leads (Negotiation)</h6>
-                                <h3 class="display-6 fw-bold mb-0">8</h3>
-                                <small>Tỷ lệ chuyển đổi: 15%</small>
+                                <h6 class="text-uppercase mb-0">Active Leads</h6>
+                                <h3 class="display-6 fw-bold mb-0"><%= leadCount %></h3>
+                                <small>Leads in progress</small>
                             </div>
                             <i class="fas fa-funnel-dollar kpi-card-icon"></i>
                         </div>
-                        <div class="card-footer bg-info border-0 text-white-50"><a href="#" class="text-white">Quản lý Leads <i class="fas fa-arrow-circle-right"></i></a></div>
+                        <div class="card-footer bg-info border-0 text-dark-50">
+                            <a href="<%=ctx%>/agent/customers?type=Lead" class="text-dark">Manage Leads <i class="fas fa-arrow-circle-right"></i></a>
+                        </div>
                     </div>
                 </div>
                 
                 <div class="col-lg-3 col-md-6 mb-4">
-                    <div class="card bg-warning text-white">
+                    <div class="card bg-warning text-dark">
                         <div class="card-body d-flex justify-content-between align-items-center">
                             <div>
-                                <h6 class="text-uppercase mb-0">Tỷ lệ Chốt HĐ</h6>
-                                <h3 class="display-6 fw-bold mb-0">18%</h3>
-                                <small>Mục tiêu: 20%</small>
+                                <h6 class="text-uppercase mb-0">Conversion Rate</h6>
+                                <h3 class="display-6 fw-bold mb-0"><%= String.format("%.1f", conversionRate) %>%</h3>
+                                <small>(Clients / (Leads + Clients))</small>
                             </div>
                             <i class="fas fa-chart-pie kpi-card-icon"></i>
                         </div>
-                        <div class="card-footer bg-warning border-0 text-white-50"><a href="#" class="text-white">Xem báo cáo <i class="fas fa-arrow-circle-right"></i></a></div>
+                        <div class="card-footer bg-warning border-0 text-dark-50">
+                            <a href="#" class="text-dark">View Report <i class="fas fa-arrow-circle-right"></i></a>
+                        </div>
                     </div>
                 </div>
             </div>
             
+            <%-- ================== ROW 2: CHARTS & LEADERBOARD ================== --%>
             <div class="row">
-                <div class="col-lg-6 mb-4">
-                    <div class="card">
-                        <div class="card-header bg-danger text-white"><h5 class="mb-0"><i class="fas fa-calendar-alt me-2"></i> RENEWAL ALERTS (Hợp đồng Sắp Hết hạn)</h5></div>
-                        <div class="card-body p-0">
-                            <ul class="list-group list-group-flush">
-                                <%-- Dữ liệu giả lập, cần thay bằng JSP loop --%>
-                                <li class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                                    <span class="text-danger fw-bold"><i class="fas fa-exclamation-triangle me-2"></i> Hợp đồng #12345 (Nguyễn Văn A)</span>
-                                    <span class="badge bg-danger">Hạn: 5 Ngày Nữa</span>
-                                </li>
-                                <li class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                                    <span><i class="fas fa-clock me-2"></i> Hợp đồng #67890 (Trần Thị B)</span>
-                                    <span class="badge bg-warning text-dark">Hạn: 25 Ngày Nữa</span>
-                                </li>
-                                <li class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                                    <span><i class="fas fa-clock me-2"></i> Hợp đồng #11223 (Phạm Duy C)</span>
-                                    <span class="badge bg-secondary">Hạn: 45 Ngày Nữa</span>
-                                </li>
-                                <li class="list-group-item list-group-item-action text-center">
-                                    <a href="#"><i class="fas fa-search me-1"></i> Xem tất cả 12 cảnh báo</a>
-                                </li>
-                                <%-- End Dữ liệu giả lập --%>
-                            </ul>
+                <div class="col-lg-7 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i> Sales Performance</h5>
+                        </div>
+                        <div class="card-body p-3 chart-250">
+                            <canvas id="salesChart"></canvas>
                         </div>
                     </div>
                 </div>
-
-                <div class="col-lg-6 mb-4">
-                    <div class="card">
-                        <div class="card-header bg-primary text-white"><h5 class="mb-0"><i class="fas fa-phone me-2"></i> TODAY'S FOLLOW-UPS (Hôm nay cần liên hệ)</h5></div>
+                
+                <div class="col-lg-5 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-trophy me-2"></i> Leaderboard (Top 5)</h5>
+                        </div>
                         <div class="card-body p-0">
                             <ul class="list-group list-group-flush">
-                                <%-- Dữ liệu giả lập, cần thay bằng JSP loop --%>
-                                <li class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                                    <span class="fw-bold"><i class="fas fa-user-tag me-2"></i> Lead: Lê Văn D (Thái độ: Rất Quan Tâm)</span>
-                                    <span class="badge bg-success">Hẹn: 10:00 AM</span>
+                                <% if (topAgents != null && !topAgents.isEmpty()) {
+                                    int rank = 0;
+                                    for (AgentPerformanceDTO agent : topAgents) {
+                                        rank++;
+                                        boolean isCurrentUser = (currentUser != null && agent.getAgentId() == currentUser.getUserId());
+                                %>
+                                <li class="list-group-item d-flex justify-content-between align-items-center <%= isCurrentUser ? "list-group-item-primary" : "" %>">
+                                    <span class="fw-bold">
+                                        <% if(rank == 1) { %>1<% } else if(rank == 2) { %>2<% } else if(rank == 3) { %>3<% } else { %>#<%= rank %><% } %>
+                                        <%= agent.getAgentName() %>
+                                    </span>
+                                    <span class="badge bg-success"><%= currencyFormat.format(agent.getTotalPremium()) %></span>
                                 </li>
-                                <li class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                                    <span><i class="fas fa-user me-2"></i> Client: Nguyễn Thu E (Cần giải thích thêm)</span>
-                                    <span class="badge bg-primary">Hẹn: 2:30 PM</span>
-                                </li>
-                                <li class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                                    <span><i class="fas fa-user me-2"></i> Lead: Hoàng Thị F (Tạo báo giá mới)</span>
-                                    <span class="badge bg-secondary">Hẹn: 4:00 PM</span>
-                                </li>
+                                <% } } else { %>
+                                    <li class="list-group-item text-muted text-center">No leaderboard data.</li>
+                                <% } %>
                                 <li class="list-group-item list-group-item-action text-center">
-                                    <a href="#"><i class="fas fa-search me-1"></i> Xem toàn bộ lịch hẹn</a>
+                                    <a href="<%=ctx%>/agents/leaderboard" class="text-primary fw-bold">View Full Leaderboard <i class="fa fa-arrow-right"></i></a>
                                 </li>
-                                <%-- End Dữ liệu giả lập --%>
                             </ul>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="row mt-1">
-                <div class="col-md-7">
-                    <div class="card mb-4">
-                        <div class="card-header">
-                            <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i> Sales Performance (6 Tháng)</h5>
-                            <small class="text-muted">So sánh doanh thu bán hàng theo tháng (triệu VNĐ)</small>
-                        </div>
-                        <div class="card-body p-3 chart-250">
-                            <canvas id="salesChart"></canvas>
-                            <div class="mt-2 text-center">
-                                <span class="badge bg-success">Tăng 25% so với tháng trước</span>
-                            </div>
+            <%-- ================== ROW 3: ACTION ITEMS ================== --%>
+            <div class="row">
+                <div class="col-lg-6 mb-4">
+                    <div class="card">
+                        <div class="card-header bg-danger text-white"><h5 class="mb-0"><i class="fas fa-calendar-alt me-2"></i> Renewal Alerts</h5></div>
+                        <div class="card-body p-0">
+                            <ul class="list-group list-group-flush">
+                                <% if (expiringContracts != null && !expiringContracts.isEmpty()) {
+                                    for (ContractDTO contract : expiringContracts) {
+                                        long daysLeft = ChronoUnit.DAYS.between(LocalDate.now(), contract.getEndDate().toLocalDate());
+                                %>
+                                <li class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                    <a href="<%=ctx%>/agent/contracts?action=view&id=<%= contract.getContractId() %>" class="text-decoration-none text-dark">
+                                        <span class="<%= daysLeft <= 7 ? "text-danger fw-bold" : "" %>"><i class="fas fa-exclamation-triangle me-2"></i> HĐ #<%= contract.getContractId() %> (<%= contract.getCustomerName() %>)</span>
+                                        <div><small><%= contract.getProductName() %></small></div>
+                                    </a>
+                                    <span class="badge <%= daysLeft <= 7 ? "bg-danger" : "bg-warning text-dark" %>"><%= daysLeft <= 0 ? "Expired" : "In " + daysLeft + " days" %></span>
+                                </li>
+                                <% } } else { %>
+                                    <li class="list-group-item text-muted text-center">No contracts are expiring soon.</li>
+                                <% } %>
+                            </ul>
                         </div>
                     </div>
                 </div>
 
-                <div class="col-md-5">
-                    <div class="card mb-4">
+                <div class="col-lg-6 mb-4">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white"><h5 class="mb-0"><i class="fas fa-phone me-2"></i> Today's Follow-ups</h5></div>
+                        <div class="card-body p-0">
+                            <ul class="list-group list-group-flush">
+                                <% if (followUps != null && !followUps.isEmpty()) {
+                                    for (Task task : followUps) { %>
+                                <li class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <span class="fw-bold"><i class="fas fa-user-tag me-2"></i> <%= task.getTitle() %></span>
+                                        <div><small class="text-muted"><%= task.getCustomerName() %></small></div>
+                                    </div>
+                                    <%-- Thêm nút hoàn thành task sau --%>
+                                </li>
+                                <% } } else { %>
+                                    <li class="list-group-item text-muted text-center">No follow-ups scheduled for today.</li>
+                                <% } %>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <%-- ================== ROW 4: TO-DO LIST & GOAL ================== --%>
+<div class="row">
+                <div class="col-lg-7 mb-4">
+                    <div class="card h-100">
                         <div class="card-header">
-                            <h5 class="mb-0"><i class="fas fa-bullseye me-2"></i> Monthly Goal</h5>
-                            <small class="text-muted">Mục tiêu doanh thu: **200 triệu VNĐ**</small>
+                            <h5 class="mb-0"><i class="fa fa-list-check me-2"></i> Personal To-Do List</h5>
+                        </div>
+                        <div class="card-body p-0">
+                             <ul class="list-group list-group-flush">
+                                <% if (personalTasks != null && !personalTasks.isEmpty()) {
+                                    for (Task task : personalTasks) { %>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <%-- Form để Cập nhật Trạng thái (Checkbox) --%>
+                                    <%-- THÊM: method="POST" --%>
+                                    <form action="<%=ctx%>/tasks" method="POST" class="d-flex align-items-center flex-grow-1 task-item-form">
+                                        <input type="hidden" name="action" value="completeTask">
+                                        <input type="hidden" name="taskId" value="<%= task.getTaskId() %>">
+                                        <input type="checkbox" name="isCompleted" class="form-check-input me-2" onchange="this.form.submit()"
+                                               <%= task.isCompleted() ? "checked" : "" %> value="on"> <%-- Thêm value="on" --%>
+                                        <span class="<%= task.isCompleted() ? "task-title-completed" : "" %>">
+                                            <%= task.getTitle() %>
+                                        </span>
+                                    </form>
+                                    
+                                    <%-- Form để Xóa Task --%>
+                                    <%-- THÊM: method="POST" --%>
+                                    <form action="<%=ctx%>/tasks" method="POST" class="task-item-form">
+                                        <input type="hidden" name="action" value="deleteTask">
+                                        <input type="hidden" name="taskId" value="<%= task.getTaskId() %>">
+                                        <button type="submit" class="btn btn-sm btn-link text-danger" title="Delete Task"
+                                                onclick="return confirm('Delete this task?')">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </li>
+                                <% } } else { %>
+                                    <li class="list-group-item text-muted text-center">No personal tasks.</li>
+                                <% } %>
+                             </ul>
+                        </div>
+                        <div class="card-footer">
+                            <%-- Form để Thêm Task mới (Đã đúng method="POST") --%>
+                            <form action="<%=ctx%>/tasks" method="POST" class="d-flex gap-2">
+                                <input type="hidden" name="action" value="addPersonalTask">
+                                <input type="text" class="form-control" name="taskTitle" placeholder="Add a new to-do..." required>
+                                <button type="submit" class="btn btn-primary flex-shrink-0">Add</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-5 mb-4">
+                     <div class="card h-100">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-bullseye me-2"></i> Monthly Goal (Demo)</h5>
                         </div>
                         <div class="card-body p-3 position-relative chart-250">
                             <canvas id="goalChart"></canvas>
                             <div class="position-absolute top-50 start-50 translate-middle text-center">
                                 <h3 class="mb-0 text-success">65%</h3>
-                                <small>Đã đạt</small>
-                            </div>
-                            <div class="mt-2 text-center">
-                                <span class="badge bg-info"><i class="fas fa-check-circle me-1"></i> Đã đạt: 130 triệu / Còn lại: 70 triệu</span>
-                                <span class="badge bg-warning mt-1"><i class="fas fa-clock me-1"></i> Thời gian còn lại: 3 tháng</span>
+                                <small>Achieved</small>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
             
-            <div class="row mt-1">
-                <div class="col-md-12">
-                     <div class="card">
-                        <div class="card-header"><h5 class="mb-0"><i class="fas fa-trophy me-2"></i> Leader Board (Top 5 T.Này)</h5></div>
-                        <div class="card-body">
-                            <ul class="list-group list-group-flush list-group-horizontal-md">
-                                <li class="list-group-item d-flex justify-content-between align-items-center col-md-3">
-                                    <span><i class="fas fa-trophy text-warning me-2"></i> 1. Agent One</span>
-                                    <span class="badge bg-warning text-dark">20 sales / 150M</span>
-                                </li>
-                                <li class="list-group-item d-flex justify-content-between align-items-center col-md-3">
-                                    <span><i class="fas fa-trophy text-warning me-2"></i> 2. Agent Two</span>
-                                    <span class="badge bg-warning text-dark">15 sales / 120M</span>
-                                </li>
-                                <li class="list-group-item d-flex justify-content-between align-items-center col-md-3">
-                                    <span><i class="fas fa-trophy text-warning me-2"></i> 3. Agent TAM (You)</span>
-                                    <span class="badge bg-success">12 sales / 90M</span>
-                                </li>
-                                <li class="list-group-item d-flex justify-content-between align-items-center col-md-3">
-                                    <span><i class="fas fa-trophy text-warning me-2"></i> 4. Agent Four</span>
-                                    <span class="badge bg-warning text-dark">8 sales / 75M</span>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-
-            <div class="mt-4">
-                <small class="text-muted">Agent Dashboard Version 1.0</small>
-            </div>
         </div>
     </main>
     
@@ -269,72 +339,68 @@
         </div>
     </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <%-- <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script> --%>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            Chart.register(ChartDataLabels);
+            
+            // SỬA LỖI NULLPOINTER: Dữ liệu được lấy từ biến Java đã được kiểm tra null ở trên
+            const salesLabels = <%= salesChartLabels %>;
+            const salesValues = <%= salesChartValues %>;
 
             // Sales bar chart
             const ctxSales = document.getElementById('salesChart').getContext('2d');
             new Chart(ctxSales, {
                 type: 'bar',
                 data: {
-                    labels: ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6'],
+                    labels: salesLabels.length > 0 ? salesLabels : ['No Data'],
                     datasets: [{
-                        label: 'Doanh thu',
-                        data: [40, 35, 45, 30, 50, 65], // Dữ liệu 6 tháng
-                        backgroundColor: 'rgba(60,141,188,0.8)',
+                        label: 'Revenue (VND)',
+                        data: salesValues.length > 0 ? salesValues : [0],
+                        backgroundColor: 'rgba(0, 123, 255, 0.8)'
                     }]
                 },
                 options: {
                     maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: true },
+                    plugins: { 
+                        legend: { display: false },
                         tooltip: {
                             callbacks: {
                                 label: function(context) {
-                                    return context.dataset.label + ': ' + context.raw + ' triệu VNĐ';
+                                    return context.dataset.label + ': ' + new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(context.raw);
                                 }
                             }
-                        },
-                        datalabels: {
-                            display: true,
-                            color: '#fff',
-                            anchor: 'end',
-                            align: 'top',
-                            formatter: function(value) { return value + 'tr'; }
                         }
                     },
                     scales: {
-                        y: { beginAtZero: true, title: { display: true, text: 'Doanh thu (triệu VNĐ)' } },
+                        y: { beginAtZero: true, ticks: { callback: function(value) { return value / 1000000 + ' Tr'; } } },
                         x: { grid: { display: false } }
                     }
                 }
             });
 
-            // Goal doughnut chart
+            // Goal doughnut chart (Dữ liệu này vẫn đang là giả lập)
             const ctxGoal = document.getElementById('goalChart').getContext('2d');
             new Chart(ctxGoal, {
                 type: 'doughnut',
                 data: {
-                    labels: ['Đã đạt', 'Còn lại'],
+                    labels: ['Achieved', 'Remaining'],
                     datasets: [{
-                        data: [130, 70],
+                        data: [130, 70], // Giả lập 130tr / 200tr
                         backgroundColor: ['#28a745', '#e0e0e0']
                     }]
                 },
                 options: {
                     maintainAspectRatio: false,
                     cutout: '70%',
-                    plugins: {
-                        legend: { display: true, position: 'bottom' },
+                    plugins: { 
+                        legend: { display: false },
                         tooltip: {
                             callbacks: {
                                 label: function(context) {
-                                    return context.label + ': ' + context.raw + ' triệu VNĐ';
+                                    return context.label + ': ' + context.raw + ' Triệu VNĐ';
                                 }
                             }
                         }

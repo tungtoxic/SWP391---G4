@@ -5,7 +5,6 @@ import java.sql.Timestamp;
 public class Product {
     private int productId;
     private String productName;
-    private String description;
     private double basePrice;
     private int categoryId;
     private Timestamp createdAt;
@@ -13,11 +12,10 @@ public class Product {
 
     public Product() {}
 
-    public Product(int productId, String productName, String description,
+    public Product(int productId, String productName, 
                    double basePrice, int categoryId) {
         this.productId = productId;
         this.productName = productName;
-        this.description = description;
         this.basePrice = basePrice;
         this.categoryId = categoryId;
     }
@@ -28,9 +26,6 @@ public class Product {
 
     public String getProductName() { return productName; }
     public void setProductName(String productName) { this.productName = productName; }
-
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
 
     public double getBasePrice() { return basePrice; }
     public void setBasePrice(double basePrice) { this.basePrice = basePrice; }
