@@ -20,7 +20,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
     <link rel="stylesheet" href="<%=ctx%>/css/layout.css" />
-    <link rel="stylesheet" href="<%=ctx%>/css/manager-dashboard.css" />
+    <link rel="stylesheet" href="<%=ctx%>/css/manager-dashboard.css" /> <%-- Giữ lại CSS riêng nếu có --%>
     <style>
         /* Tùy chỉnh nhỏ để các KPI card trông đẹp hơn */
         .kpi-card-icon { font-size: 2.5rem; opacity: 0.5; }
@@ -34,220 +34,119 @@
     </style>
 </head>
 <body>
-<nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom fixed-top">
-        <div class="container-fluid">
-            <a class="navbar-brand fw-bold" href="#">Manager Portal</a>
-            <ul class="navbar-nav d-flex flex-row align-items-center">
-                <li class="nav-item me-3"><a class="nav-link" href="#">Dashboard</a></li>
-                
-            </ul>
-        </div>
-    </nav>
 
-    <aside class="sidebar bg-primary text-white">
-        <div class="sidebar-top p-3">
-             <%-- Hiển thị thông tin Manager --%>
-             <div class="d-flex align-items-center mb-3">
-                <div class="avatar rounded-circle bg-white me-2" style="width:36px;height:36px;"></div>
-                <div>
-                    <div class="fw-bold"><%= currentUser != null ? currentUser.getFullName() : "Manager" %></div>
-                    <div style="font-size:.85rem;opacity:.9">Manager</div>
-                </div>
-            </div>
-        </div>
+    <%-- Include Navbar --%>
+    <%@ include file="manager_navbar.jsp" %>
 
-        <nav class="nav flex-column px-2">
-            <%-- Logic active dựa trên biến activePage --%>
-            <a class="nav-link text-white py-2 <%= "dashboard".equals(activePage) ? "active" : "" %>" href="<%= ctx %>/ManagerDashboard.jsp"><i class="fas fa-chart-line me-2"></i> Dashboard</a>
-            <a class="nav-link text-white py-2 <%= "profile".equals(activePage) ? "active" : "" %>" href="<%=ctx%>/profile.jsp"><i class="fas fa-user me-2"></i> Profile</a>
-            <a class="nav-link text-white py-2 <%= "performance".equals(activePage) ? "active" : "" %>" href="<%=ctx%>/manager/performance"><i class="fas fa-users-cog me-2"></i> Team Performance</a>
-            <a class="nav-link text-white py-2 <%= "agentMgmt".equals(activePage) ? "active" : "" %>" href="<%=ctx%>/agentmanagement.jsp"><i class="fas fa-users-cog me-2"></i> Agent Management</a>
-            <a class="nav-link text-white py-2 <%= "leaderboard".equals(activePage) ? "active" : "" %>" href="<%=ctx%>/managers/leaderboard"><i class="fas fa-trophy me-2"></i> Leader Board</a>
-            <a class="nav-link text-white py-2 <%= "commPolicies".equals(activePage) ? "active" : "" %>" href="#"><i class="fas fa-file-invoice-dollar me-2"></i> Commission Policies</a>
-            <a class="nav-link text-white py-2 <%= "productMgmt".equals(activePage) ? "active" : "" %>" href="<%=ctx%>/productmanagement.jsp"><i class="fas fa-box me-2"></i> Product</a>
+    <%-- Include Sidebar --%>
+    <%@ include file="manager_sidebar.jsp" %>
 
-            <%-- ===== Menu Contract xổ xuống ===== --%>
-            <a class="nav-link text-white py-2 d-flex justify-content-between align-items-center"
-               data-bs-toggle="collapse" href="#contractSubmenu" role="button" aria-expanded="false" aria-controls="contractSubmenu">
-                <span><i class="fas fa-file-signature me-2"></i> Contract</span>
-                <i class="fas fa-chevron-right small"></i> <%-- Icon mũi tên ban đầu --%>
-            </a>
-            <div class="collapse ps-3" id="contractSubmenu"> <%-- Nội dung ẩn/hiện --%>
-                <%-- Link đến trang All Contracts (listAll) --%>
-                <a class="nav-link text-white py-1" href="<%=ctx%>/manager/contracts?action=listAll">
-                     <i class="fas fa-list me-2 small"></i> All Contracts
-                </a>
-                <%-- Link đến trang Approval (listPending) --%>
-                <a class="nav-link text-white py-1" href="<%=ctx%>/manager/contracts?action=listPending">
-                     <i class="fas fa-check-double me-2 small"></i> Approval List
-                </a>
-            </div>
-            <%-- ===== Hết Menu Contract ===== --%>
-
-            <a class="nav-link text-white py-2 <%= "policies".equals(activePage) ? "active" : "" %>" href="#"><i class="fas fa-file-alt me-2"></i> Policies</a>
-            <div class="mt-3 px-2">
-                <a class="btn btn-danger w-100" href="<%=ctx%>/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
-            </div>
-        </nav>
-    </aside>
+    <%-- Phần nội dung chính của trang Dashboard --%>
     <main class="main-content">
         <div class="container-fluid">
-            <h1 class="mb-4">Manager Dashboard: Sales Team A</h1>
-            
+            <h1 class="mb-4">Manager Dashboard: Sales Team A</h1> <%-- Ví dụ tên Team --%>
+
+            <%-- Hàng chứa các KPI Cards --%>
             <div class="row">
                 <div class="col-lg-4 col-md-6 mb-4">
                     <div class="card bg-info text-white">
                         <div class="card-body d-flex justify-content-between align-items-center">
                             <div>
-                                <h6 class="text-uppercase mb-0">Team Premium (Tháng Này)</h6>
-                                <h3 class="display-6 fw-bold mb-0">520 Triệu</h3>
-                                <small>Mục tiêu: 800 Triệu / Đạt **65%**</small>
+                                <h6 class="text-uppercase mb-0">Team Premium (This Month)</h6>
+                                <h3 class="display-6 fw-bold mb-0">520 Mil</h3> <%-- Dữ liệu động --%>
+                                <small>Target: 800 Mil / **65%** Achieved</small>
                             </div>
                             <i class="fas fa-dollar-sign kpi-card-icon"></i>
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="col-lg-4 col-md-6 mb-4">
                     <div class="card bg-success text-white">
-                        <div class="card-body d-flex justify-content-between align-items-center">
+                         <div class="card-body d-flex justify-content-between align-items-center">
                             <div>
                                 <h6 class="text-uppercase mb-0">Team Conversion Rate</h6>
-                                <h3 class="display-6 fw-bold mb-0">12.5%</h3>
-                                <small>Số HĐ Mới: 35 / Tổng Leads: 280</small>
+                                <h3 class="display-6 fw-bold mb-0">12.5%</h3> <%-- Dữ liệu động --%>
+                                <small>New Contracts: 35 / Total Leads: 280</small>
                             </div>
                             <i class="fas fa-chart-bar kpi-card-icon"></i>
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="col-lg-4 col-md-12 mb-4">
-                    <div class="card bg-danger text-white">
-                        <div class="card-body d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="text-uppercase mb-0">HĐ Cần Tái Tục (90 ngày)</h6>
-                                <h3 class="display-6 fw-bold mb-0">18</h3>
-                                <small>Cần xử lý gấp: 5 HĐ (Trong 30 ngày)</small>
+                     <div class="card bg-danger text-white">
+                         <div class="card-body d-flex justify-content-between align-items-center">
+                             <div>
+                                <h6 class="text-uppercase mb-0">Renewals Due (90d)</h6>
+                                <h3 class="display-6 fw-bold mb-0">18</h3> <%-- Dữ liệu động --%>
+                                <small>Urgent (30d): 5 Contracts</small>
                             </div>
                             <i class="fas fa-bell kpi-card-icon"></i>
                         </div>
                     </div>
                 </div>
             </div>
-            
+
+            <%-- Hàng chứa Bảng Performance và Biểu đồ --%>
             <div class="row">
                 <div class="col-lg-8 mb-4">
                     <div class="card">
-                        <div class="card-header"><h5 class="mb-0"><i class="fas fa-users-line me-2"></i> Agent Performance Matrix (Tháng Này)</h5></div>
-                        <div class="card-body p-0">
+                        <%-- ... Code bảng Agent Performance Matrix ... --%>
+                         <div class="card-header"><h5 class="mb-0"><i class="fas fa-users-line me-2"></i> Agent Performance Matrix (This Month)</h5></div>
+                         <div class="card-body p-0">
                             <div class="table-responsive">
                                 <table class="table table-striped table-hover mb-0">
-                                    <thead class="bg-light">
+                                     <%-- ... thead và tbody của bảng ... --%>
+                                     <thead class="bg-light">
                                         <tr>
                                             <th>#</th>
                                             <th>Agent Name</th>
-                                            <th>Premium (Kết quả)</th>
-                                            <th>Interactions (Quá trình)</th>
+                                            <th>Premium</th>
+                                            <th>Interactions</th>
                                             <th>Conversion Rate</th>
                                             <th>Target Progress</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <%-- Dữ liệu giả lập, cần thay bằng JSP loop --%>
-                                        <tr>
-                                            <td>1</td>
-                                            <td class="fw-bold text-success">Nguyễn Tùng</td>
-                                            <td>90 Triệu</td>
-                                            <td>45</td>
-                                            <td>18%</td>
-                                            <td>
-                                                <div class="performance-gauge bg-success" style="width: 100%;">
-                                                    <div class="bg-success h-100" style="width: 100%;"></div>
-                                                </div>
-                                                <small>100%</small>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>2</td>
-                                            <td>Trần Văn A</td>
-                                            <td>70 Triệu</td>
-                                            <td>60</td>
-                                            <td>10%</td>
-                                            <td>
-                                                <div class="performance-gauge">
-                                                    <div class="bg-primary h-100" style="width: 70%;"></div>
-                                                </div>
-                                                <small>70%</small>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>3</td>
-                                            <td class="text-danger">Lê Thị B</td>
-                                            <td>25 Triệu</td>
-                                            <td>15</td>
-                                            <td>15%</td>
-                                            <td>
-                                                <div class="performance-gauge">
-                                                    <div class="bg-danger h-100" style="width: 25%;"></div>
-                                                </div>
-                                                <small>25%</small>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>4</td>
-                                            <td>Hoàng Văn C</td>
-                                            <td>55 Triệu</td>
-                                            <td>40</td>
-                                            <td>14%</td>
-                                            <td>
-                                                <div class="performance-gauge">
-                                                    <div class="bg-primary h-100" style="width: 55%;"></div>
-                                                </div>
-                                                <small>55%</small>
-                                            </td>
-                                        </tr>
-                                        <%-- End Dữ liệu giả lập --%>
+                                        <%-- Dữ liệu động sẽ được load ở đây --%>
+                                        <tr><td>1</td><td class="fw-bold text-success">Agent One (Tùng)</td><td>90 Mil</td><td>45</td><td>18%</td><td>...</td></tr>
+                                        <tr><td>2</td><td>Agent Two</td><td>70 Mil</td><td>60</td><td>10%</td><td>...</td></tr>
+                                        <%-- ... more rows ... --%>
                                     </tbody>
                                 </table>
                             </div>
                         </div>
                         <div class="card-footer text-center">
-                             <a href="#"><i class="fas fa-file-export me-1"></i> Export Full Team Report</a>
+                            <a href="<%= ctx %>/manager/performance"><i class="fas fa-external-link-alt me-1"></i> View Full Team Performance</a> <%-- Link đến trang chi tiết --%>
                         </div>
+
                     </div>
                 </div>
 
                 <div class="col-lg-4 mb-4">
-                    <div class="card mb-4">
-                        <div class="card-header"><h5 class="mb-0"><i class="fas fa-trophy me-2"></i> Team Leaderboard (Top Premium)</h5></div>
-                        <div class="card-body">
-                            <%-- Giữ nguyên Leaderboard list-group như Agent Dashboard, chỉ thay đổi dữ liệu --%>
-                            <ul class="list-group list-group-flush">
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    <span><i class="fas fa-star me-2 text-warning"></i> 1. Nguyễn Tùng (You)</span>
-                                    <span class="badge bg-success">90.000.000 VNĐ</span>
-                                </li>
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    <span><i class="fas fa-medal me-2"></i> 2. Trần Văn A</span>
-                                    <span class="badge bg-secondary">70.000.000 VNĐ</span>
-                                </li>
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    <span><i class="fas fa-medal me-2"></i> 3. Hoàng Văn C</span>
-                                    <span class="badge bg-secondary">55.000.000 VNĐ</span>
-                                </li>
-                                <li class="list-group-item text-center">
-                                    <a href="#">Xem toàn bộ bảng xếp hạng</a>
-                                </li>
-                            </ul>
-                        </div>
+                     <div class="card mb-4">
+                         <%-- ... Code widget Leaderboard ... --%>
+                          <div class="card-header"><h5 class="mb-0"><i class="fas fa-trophy me-2"></i> Team Leaderboard (Top Premium)</h5></div>
+                            <div class="card-body">
+                                <ul class="list-group list-group-flush">
+                                     <%-- Dữ liệu động sẽ được load ở đây --%>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center"><span><i class="fas fa-star me-2 text-warning"></i> 1. Agent One (Tùng)</span><span class="badge bg-success">90,000,000 VNĐ</span></li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center"><span><i class="fas fa-medal me-2"></i> 2. Agent Two</span><span class="badge bg-secondary">70,000,000 VNĐ</span></li>
+                                    <%-- ... more items ... --%>
+                                    <li class="list-group-item text-center"><a href="<%= ctx %>/managers/leaderboard">View Full Leaderboard</a></li>
+                                </ul>
+                            </div>
+
                     </div>
-                    
+
                     <div class="card">
-                        <div class="card-header"><h5 class="mb-0"><i class="fas fa-chart-area me-2"></i> Product Distribution</h5></div>
-                        <div class="card-body p-3 chart-250">
-                             <%-- Canvas cho biểu đồ Phân phối Sản phẩm (Doughnut Chart) --%>
-                            <canvas id="productDistributionChart"></canvas>
-                        </div>
+                         <%-- ... Code biểu đồ Product Distribution ... --%>
+                          <div class="card-header"><h5 class="mb-0"><i class="fas fa-chart-pie me-2"></i> Product Distribution</h5></div>
+                            <div class="card-body p-3 chart-250">
+                                <canvas id="productDistributionChart"></canvas>
+                            </div>
+
                     </div>
                 </div>
             </div>
@@ -257,68 +156,51 @@
             </div>
         </div>
     </main>
-<%-- RẤT QUAN TRỌNG: Phải có link đến file JS của Bootstrap 5 --%>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-    <%-- Script đổi icon mũi tên (tùy chọn) --%>
-    <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        var contractCollapse = document.getElementById('contractSubmenu');
-        // Tìm thẻ a điều khiển collapse dựa vào href hoặc data-bs-target
-        var contractLink = document.querySelector('a[href="#contractSubmenu"]');
-        if (contractLink) { // Kiểm tra xem có tìm thấy link không
-            var arrowIcon = contractLink.querySelector('.fas.small'); // Tìm icon mũi tên bên trong link đó
-
-            if (contractCollapse && arrowIcon) { // Kiểm tra cả collapse và icon
-                contractCollapse.addEventListener('show.bs.collapse', function () {
-                    arrowIcon.classList.remove('fa-chevron-right');
-                    arrowIcon.classList.add('fa-chevron-down'); // Đổi thành mũi tên xuống
-                });
-
-                contractCollapse.addEventListener('hide.bs.collapse', function () {
-                    arrowIcon.classList.remove('fa-chevron-down');
-                    arrowIcon.classList.add('fa-chevron-right'); // Đổi lại thành mũi tên sang
-                });
-            }
-        }
-    });
-    </script>
+    <%-- Footer (Nếu muốn dùng chung, cũng có thể tách ra file include) --%>
     <footer class="main-footer text-muted">
-        <div class="container-fluid">
-            <div class="d-flex justify-content-between py-2">
-                <div>© Your Company</div>
-                <div><b>Version</b> 1.0</div>
-            </div>
-        </div>
+         <div class="container-fluid">
+            <div class="d-flex justify-content-between py-2">
+                <div>© Your Company 2025</div>
+                <div><b>Version</b> 1.0</div>
+            </div>
+        </div>
     </footer>
 
+    <%-- Include Bootstrap JS (chỉ cần 1 lần) --%>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+    <%-- Include Chart.js --%>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <%-- Script vẽ biểu đồ cho trang Dashboard --%>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Product Distribution Doughnut Chart
+            // Product Distribution Doughnut Chart (Dữ liệu này cần được lấy động từ Servlet)
+            const productLabels = ['Life Protect', 'Health Care Plus', 'Car Safe']; // Lấy từ request.getAttribute
+            const productData = [45, 35, 20]; // Lấy từ request.getAttribute
+
             const ctxProduct = document.getElementById('productDistributionChart').getContext('2d');
             new Chart(ctxProduct, {
                 type: 'doughnut',
                 data: {
-                    labels: ['Life Protect', 'Health Care Plus', 'Car Safe', 'Home Secure'],
+                    labels: productLabels,
                     datasets: [{
-                        data: [45, 25, 18, 12], // Phần trăm doanh số theo sản phẩm
-                        backgroundColor: ['#0d6efd', '#198754', '#ffc107', '#dc3545'],
+                        data: productData,
+                        backgroundColor: ['#0d6efd', '#198754', '#ffc107'], // Màu sắc tương ứng
                     }]
                 },
-                options: {
-                    maintainAspectRatio: false,
-                    responsive: true,
-                    plugins: {
-                        legend: { position: 'bottom' },
-                        title: { display: true, text: 'Phân phối Premium theo Sản phẩm' }
-                    }
-                }
+                options: { /* ... options ... */
+                     maintainAspectRatio: false,
+                     responsive: true,
+                     plugins: {
+                         legend: { position: 'bottom' },
+                         // title: { display: true, text: 'Product Premium Distribution' } // Bỏ title nếu đã có ở card-header
+                     }
+                 }
             });
 
-            // Note: Các biểu đồ khác (ví dụ: Team Sales Over Time) có thể thêm tương tự.
+            // Có thể thêm code vẽ các biểu đồ khác ở đây
         });
     </script>
+
 </body>
 </html>
