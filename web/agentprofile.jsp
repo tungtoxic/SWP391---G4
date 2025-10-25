@@ -131,12 +131,7 @@
                 <td>${agent.fullName}</td>
                 <td>${agent.email}</td>
                 <td>${agent.phoneNumber}</td>
-                <td>
-                    <span class="badge 
-                        ${agent.status == 'Active' ? 'bg-success' : 'bg-secondary'}">
-                        ${agent.status}
-                    </span>
-                </td>
+                <td>${agent.status}</td>
                 <td>${agent.createdAt}</td>
                 <td>
                     <a href="AgentManagementServlet?action=edit&id=${agent.userId}" class="btn btn-warning btn-sm">Edit</a>

@@ -192,35 +192,7 @@
                                         <c:otherwise>
                                             <td>${agent.username}</td>
                                             <td>${agent.password}</td>
-                                            <td>
-                                                <c:choose>
-                                                    <c:when test="${agent.status == 'Active'}">
-                                                        <a href="AgentManagementServlet?action=deactivate&id=${agent.userId}" 
-                                                           class="btn btn-danger btn-sm" 
-                                                           onclick="return confirm('Deactivate this agent?')">
-                                                            <i class="fas fa-ban"></i> Deactivate
-                                                        </a>
-                                                    </c:when>
-                                                    <c:otherwise>
-                                                        <a href="AgentManagementServlet?action=activate&id=${agent.userId}" 
-                                                           class="btn btn-success btn-sm"
-                                                           onclick="return confirm('Activate this agent?')">
-                                                            <i class="fas fa-play"></i> Activate
-                                                        </a>
-                                                    </c:otherwise>
-                                                </c:choose>
-
-                                                <a href="AgentManagementServlet?action=delete&id=${agent.userId}" 
-                                                   class="btn btn-danger btn-sm"
-                                                   onclick="return confirm('Delete this agent?')">
-                                                    <i class="fas fa-trash"></i>
-                                                </a>
-
-                                                <a href="AgentManagementServlet?action=edit&id=${agent.userId}" 
-                                                   class="btn btn-warning btn-sm">
-                                                    <i class="fas fa-pen"></i>
-                                                </a>
-                                            </td>
+                                            <td>${agent.status}</td>
                                         </c:otherwise>
                                     </c:choose>
                                     </tr>

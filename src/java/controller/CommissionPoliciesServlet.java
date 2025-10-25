@@ -2,11 +2,12 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
-
 package controller;
 
-import dao.UserDao;
-import entity.User;
+import dao.ProductDao;
+import entity.Product;
+import entity.ProductCategory;
+import jakarta.servlet.RequestDispatcher;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -14,15 +15,14 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
-import java.sql.SQLException;
+import java.util.List;
 
 /**
  *
  * @author Helios 16
  */
-@WebServlet(name = "LogoutController", urlPatterns = {"/logout"})
-public class LogoutController extends HttpServlet {
+@WebServlet(name = "CommissionPoliciesServlet", urlPatterns = {"/CommissionPoliciesServlet"})
+public class CommissionPoliciesServlet extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -41,10 +41,10 @@ public class LogoutController extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet LogoutController</title>");
+            out.println("<title>Servlet CommissionPoliciesServlet</title>");
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet LogoutController at " + request.getContextPath() + "</h1>");
+            out.println("<h1>Servlet CommissionPoliciesServlet at " + request.getContextPath() + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
@@ -62,17 +62,17 @@ public class LogoutController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        HttpSession session = request.getSession();
-        UserDao userDao = new UserDao();
-        User user = (User) session.getAttribute("user");
         try {
-            boolean activated = userDao.deactivateUserById(user.getUserId());
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        session.invalidate();
+            ProductDao productDao = new ProductDao();
+            List<Product> productList = productDao.getAllProducts();
+            request.setAttribute("productList", productList);
+            request.getRequestDispatcher("commissionPolicies.jsp").forward(request, response);
 
-        response.sendRedirect("home.jsp");
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("error", "Error loading commission policies: " + e.getMessage());
+            request.getRequestDispatcher("/error.jsp").forward(request, response);
+        }
     }
 
     /**
