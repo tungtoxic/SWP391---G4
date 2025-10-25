@@ -33,40 +33,39 @@
 <body>
     <%-- Navbar & Sidebar for Manager (Make sure this includes currentUser) --%>
     <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom fixed-top">
-         <div class="container-fluid">
-            <a class="navbar-brand fw-bold" href="#">Manager Portal</a>
-            <ul class="navbar-nav d-flex flex-row align-items-center">
-                <li class="nav-item me-3"><a class="nav-link" href="<%= ctx %>/ManagerDashboard.jsp">Dashboard</a></li> <%-- Link to Manager Dashboard --%>
-                 <li class="nav-item"><a class="nav-link" href="<%=ctx%>/logout"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
-            </ul>
-        </div>
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="#">Manager Portal</a>
+            <ul class="navbar-nav d-flex flex-row align-items-center">
+                <li class="nav-item me-3"><a class="nav-link" href="#">Dashboard</a></li>
+                
+            </ul>
+        </div>
     </nav>
 
-     <aside class="sidebar bg-primary text-white">
+
+<aside class="sidebar bg-primary text-white">
         <div class="sidebar-top p-3">
-             <div class="d-flex align-items-center mb-3">
-                  <div class="avatar rounded-circle bg-white me-2" style="width:36px;height:36px;"></div>
-                  <div>
-                      <div class="fw-bold"><%= currentUser != null ? currentUser.getFullName() : "Manager" %></div>
-                      <div style="font-size:.85rem;opacity:.9">Manager</div>
-                  </div>
-              </div>
-        </div>
+              <div class="d-flex align-items-center mb-3">
+                  <div class="avatar rounded-circle bg-white me-2" style="width:36px;height:36px;"></div>
+                  <div>
+                      <div class="fw-bold"><%= currentUser != null ? currentUser.getFullName() : "Manager" %></div>
+                      <div style="font-size:.85rem;opacity:.9">Manager</div>
+                  </div>
+              </div>
+        </div>
         <nav class="nav flex-column px-2">
-            <a class="nav-link text-white py-2" href="<%= ctx %>/ManagerDashboard.jsp"><i class="fas fa-chart-line me-2"></i> Dashboard</a> <%-- Link to Manager Dashboard --%>
+            <a class="nav-link text-white active py-2" href="#"><i class="fas fa-chart-line me-2"></i> Dashboard</a>
             <a class="nav-link text-white py-2" href="<%=ctx%>/profile.jsp"><i class="fas fa-user me-2"></i> Profile</a>
             <a class="nav-link text-white py-2" href="<%=ctx%>/manager/performance"><i class="fas fa-users-cog me-2"></i> Team Performance</a>
-             <a class="nav-link text-white py-2" href="<%=ctx%>/agentmanagement.jsp"><i class="fas fa-users-cog me-2"></i> Agent Management</a> <%-- Assuming this exists --%>
-             <a class="nav-link text-white py-2" href="<%=ctx%>/managers/leaderboard"><i class="fas fa-trophy me-2"></i> Leader Board</a> <%-- Assuming this exists --%>
+            <a class="nav-link text-white py-2" href="<%=ctx%>/agentmanagement.jsp"><i class="fas fa-users-cog me-2"></i> Agent Management</a>
+            <a class="nav-link text-white py-2" href="<%=ctx%>/managers/leaderboard"><i class="fas fa-trophy me-2"></i> Leader Board</a>
             <a class="nav-link text-white py-2" href="#"><i class="fas fa-file-invoice-dollar me-2"></i> Commission Policies</a>
-             <a class="nav-link text-white py-2" href="<%=ctx%>/productmanagement.jsp"><i class="fas fa-box me-2"></i> Product</a> <%-- Assuming this exists --%>
-             <%-- Make Contract link active based on context --%>
-            <a class="nav-link text-white active py-2" href="<%=ctx%>/manager/contracts"><i class="fas fa-file-signature me-2"></i> Contract Approval</a>
-             <a class="nav-link text-white py-2" href="<%=ctx%>/manager/contracts?action=listAll"><i class="fas fa-list me-2"></i> All Contracts</a> <%-- Link to view all --%>
+            <a class="nav-link text-white py-2" href="<%=ctx%>/productmanagement.jsp"><i class="fas fa-box me-2"></i> Product</a>
+            <a class="nav-link text-white py-2" href="<%=ctx%>/manager/contracts"><i class="fas fa-file-signature me-2"></i> Contract</a>
             <a class="nav-link text-white py-2" href="#"><i class="fas fa-file-alt me-2"></i> Policies</a>
             <div class="mt-3 px-2">
-                <a class="btn btn-danger w-100" href="<%=ctx%>/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
-            </div>
+                <a class="btn btn-danger w-100" href="<%=ctx%>/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
         </nav>
     </aside>
 
