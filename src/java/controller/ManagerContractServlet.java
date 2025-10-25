@@ -43,7 +43,7 @@ public class ManagerContractServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/login.jsp");
             return;
         }
-
+        request.setAttribute("currentUser", currentUser);
         String action = request.getParameter("action");
         if (action == null) {
             action = "listPending";
@@ -57,7 +57,7 @@ public class ManagerContractServlet extends HttpServlet {
                     break;
             }
         } catch (Exception e) {
-            throw new ServletException(e);
+            throw new ServletException("Error processing GET request in ManagerContractServlet",e);
         }
     }
 
@@ -71,6 +71,8 @@ public class ManagerContractServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/login.jsp");
             return;
         }
+        request.setAttribute("currentUser", currentUser);
+        request.setCharacterEncoding("UTF-8");
         
         String action = request.getParameter("action");
         try {
