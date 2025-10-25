@@ -51,6 +51,9 @@ public class ManagerContractServlet extends HttpServlet {
 
         try {
             switch (action) {
+                case "listAll": // <-- ADD THIS CASE
+                    listAllContracts(request, response, currentUser);
+                    break;
                 // Thêm các action GET khác của Manager ở đây nếu cần
                 default:
                     listPendingContracts(request, response, currentUser);
@@ -138,5 +141,14 @@ public class ManagerContractServlet extends HttpServlet {
         // Đơn giản là cập nhật trạng thái, Agent sẽ phải tạo lại
         contractDao.updateContractStatus(contractId, "Cancelled");
         response.sendRedirect(request.getContextPath() + "/manager/contracts?message=rejectSuccess");
+    }
+    private void listAllContracts(HttpServletRequest request, HttpServletResponse response, User currentUser)
+            throws Exception {
+        int managerId = currentUser.getUserId();
+        List<ContractDTO> allContractsList = contractDao.getAllContractsByManagerId(managerId);
+        request.setAttribute("contractList", allContractsList); // Use the same generic name
+        request.setAttribute("viewTitle", "All Managed Contracts"); // Different title
+        request.setAttribute("isPendingView", false); // Flag for the JSP
+        request.getRequestDispatcher("/manager_contract_list.jsp").forward(request, response); // Forward to the NEW JSP
     }
 }
