@@ -3,8 +3,13 @@
     Created on : Oct 13, 2025
     Author     : Nguyễn Tùng
 --%>
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
-<% String ctx = request.getContextPath(); %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="entity.User" %> <%-- Import User entity --%>
+<%
+    String ctx = request.getContextPath();
+    User currentUser = (User) session.getAttribute("user"); // Lấy currentUser từ session
+    String activePage = "dashboard"; // Trang này mặc định là dashboard
+%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -29,45 +34,62 @@
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom fixed-top">
+<nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom fixed-top">
         <div class="container-fluid">
-            <a class="navbar-brand fw-bold" href="<%=ctx%>/home.jsp">Company</a>
-            <div>
-                <ul class="navbar-nav d-flex flex-row align-items-center">
-                    <li class="nav-item me-3"><a class="nav-link" href="<%=ctx%>/home.jsp">Home</a></li>
-                </ul>
-            </div>
+            <a class="navbar-brand fw-bold" href="#">Manager Portal</a>
+            <ul class="navbar-nav d-flex flex-row align-items-center">
+                <li class="nav-item me-3"><a class="nav-link" href="#">Dashboard</a></li>
+                
+            </ul>
         </div>
     </nav>
 
     <aside class="sidebar bg-primary text-white">
-        <%-- ... (Phần Sidebar Navigation của Manager sẽ tương tự Agent nhưng có thể thêm mục Admin nếu có) ... --%>
         <div class="sidebar-top p-3">
-            <div class="d-flex align-items-center mb-3">
+             <%-- Hiển thị thông tin Manager --%>
+             <div class="d-flex align-items-center mb-3">
                 <div class="avatar rounded-circle bg-white me-2" style="width:36px;height:36px;"></div>
                 <div>
-                    <div class="fw-bold">Manager Name</div>
-                    <div style="font-size:.85rem;opacity:.9">Sales Manager</div>
+                    <div class="fw-bold"><%= currentUser != null ? currentUser.getFullName() : "Manager" %></div>
+                    <div style="font-size:.85rem;opacity:.9">Manager</div>
                 </div>
             </div>
         </div>
 
         <nav class="nav flex-column px-2">
-            <a class="nav-link text-white active py-2" href="#"><i class="fas fa-chart-line me-2"></i> Dashboard</a>
-            <a class="nav-link text-white py-2" href="<%=ctx%>/profile.jsp"><i class="fas fa-user me-2"></i> Profile</a>
-            <a class="nav-link text-white py-2" href="<%=ctx%>/manager/performance"><i class="fas fa-users-cog me-2"></i> Team Performance</a>
-            <a class="nav-link text-white py-2" href="<%=ctx%>/agentmanagement.jsp"><i class="fas fa-users-cog me-2"></i> Agent Management</a>
-            <a class="nav-link text-white py-2" href="<%=ctx%>/managers/leaderboard"><i class="fas fa-trophy me-2"></i> Leader Board</a>
-            <a class="nav-link text-white py-2" href="#"><i class="fas fa-file-invoice-dollar me-2"></i> Commission Policies</a>
-            <a class="nav-link text-white py-2" href="<%=ctx%>/productmanagement.jsp"><i class="fas fa-box me-2"></i> Product</a>
-            <a class="nav-link text-white py-2" href="<%=ctx%>/manager/contracts"><i class="fas fa-file-signature me-2"></i> Contract</a>
-            <a class="nav-link text-white py-2" href="#"><i class="fas fa-file-alt me-2"></i> Policies</a>
+            <%-- Logic active dựa trên biến activePage --%>
+            <a class="nav-link text-white py-2 <%= "dashboard".equals(activePage) ? "active" : "" %>" href="<%= ctx %>/ManagerDashboard.jsp"><i class="fas fa-chart-line me-2"></i> Dashboard</a>
+            <a class="nav-link text-white py-2 <%= "profile".equals(activePage) ? "active" : "" %>" href="<%=ctx%>/profile.jsp"><i class="fas fa-user me-2"></i> Profile</a>
+            <a class="nav-link text-white py-2 <%= "performance".equals(activePage) ? "active" : "" %>" href="<%=ctx%>/manager/performance"><i class="fas fa-users-cog me-2"></i> Team Performance</a>
+            <a class="nav-link text-white py-2 <%= "agentMgmt".equals(activePage) ? "active" : "" %>" href="<%=ctx%>/agentmanagement.jsp"><i class="fas fa-users-cog me-2"></i> Agent Management</a>
+            <a class="nav-link text-white py-2 <%= "leaderboard".equals(activePage) ? "active" : "" %>" href="<%=ctx%>/managers/leaderboard"><i class="fas fa-trophy me-2"></i> Leader Board</a>
+            <a class="nav-link text-white py-2 <%= "commPolicies".equals(activePage) ? "active" : "" %>" href="#"><i class="fas fa-file-invoice-dollar me-2"></i> Commission Policies</a>
+            <a class="nav-link text-white py-2 <%= "productMgmt".equals(activePage) ? "active" : "" %>" href="<%=ctx%>/productmanagement.jsp"><i class="fas fa-box me-2"></i> Product</a>
+
+            <%-- ===== Menu Contract xổ xuống ===== --%>
+            <a class="nav-link text-white py-2 d-flex justify-content-between align-items-center"
+               data-bs-toggle="collapse" href="#contractSubmenu" role="button" aria-expanded="false" aria-controls="contractSubmenu">
+                <span><i class="fas fa-file-signature me-2"></i> Contract</span>
+                <i class="fas fa-chevron-right small"></i> <%-- Icon mũi tên ban đầu --%>
+            </a>
+            <div class="collapse ps-3" id="contractSubmenu"> <%-- Nội dung ẩn/hiện --%>
+                <%-- Link đến trang All Contracts (listAll) --%>
+                <a class="nav-link text-white py-1" href="<%=ctx%>/manager/contracts?action=listAll">
+                     <i class="fas fa-list me-2 small"></i> All Contracts
+                </a>
+                <%-- Link đến trang Approval (listPending) --%>
+                <a class="nav-link text-white py-1" href="<%=ctx%>/manager/contracts?action=listPending">
+                     <i class="fas fa-check-double me-2 small"></i> Approval List
+                </a>
+            </div>
+            <%-- ===== Hết Menu Contract ===== --%>
+
+            <a class="nav-link text-white py-2 <%= "policies".equals(activePage) ? "active" : "" %>" href="#"><i class="fas fa-file-alt me-2"></i> Policies</a>
             <div class="mt-3 px-2">
                 <a class="btn btn-danger w-100" href="<%=ctx%>/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
             </div>
         </nav>
     </aside>
-
     <main class="main-content">
         <div class="container-fluid">
             <h1 class="mb-4">Manager Dashboard: Sales Team A</h1>
@@ -235,7 +257,32 @@
             </div>
         </div>
     </main>
+<%-- RẤT QUAN TRỌNG: Phải có link đến file JS của Bootstrap 5 --%>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
+    <%-- Script đổi icon mũi tên (tùy chọn) --%>
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var contractCollapse = document.getElementById('contractSubmenu');
+        // Tìm thẻ a điều khiển collapse dựa vào href hoặc data-bs-target
+        var contractLink = document.querySelector('a[href="#contractSubmenu"]');
+        if (contractLink) { // Kiểm tra xem có tìm thấy link không
+            var arrowIcon = contractLink.querySelector('.fas.small'); // Tìm icon mũi tên bên trong link đó
+
+            if (contractCollapse && arrowIcon) { // Kiểm tra cả collapse và icon
+                contractCollapse.addEventListener('show.bs.collapse', function () {
+                    arrowIcon.classList.remove('fa-chevron-right');
+                    arrowIcon.classList.add('fa-chevron-down'); // Đổi thành mũi tên xuống
+                });
+
+                contractCollapse.addEventListener('hide.bs.collapse', function () {
+                    arrowIcon.classList.remove('fa-chevron-down');
+                    arrowIcon.classList.add('fa-chevron-right'); // Đổi lại thành mũi tên sang
+                });
+            }
+        }
+    });
+    </script>
     <footer class="main-footer text-muted">
         <div class="container-fluid">
             <div class="d-flex justify-content-between py-2">
