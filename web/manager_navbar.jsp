@@ -5,7 +5,6 @@
 --%>
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<% String ctx = request.getContextPath(); %> <%-- Đảm bảo có ctx --%>
 
 <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom fixed-top">
     <div class="container-fluid">
