@@ -14,16 +14,14 @@ public class Customer {
     private String phoneNumber;
     private String email;
     private String address;
-    private int createdBy;          // ID của Agent tạo khách hàng
+    private int createdBy;
     private Timestamp createdAt;
-    private Timestamp updatedAt;
+    private String customerType;
 
     public Customer() {
     }
 
-    public Customer(int customerId, String fullName, Date dateOfBirth, String phoneNumber,
-                    String email, String address, int createdBy,
-                    Timestamp createdAt, Timestamp updatedAt) {
+    public Customer(int customerId, String fullName, Date dateOfBirth, String phoneNumber, String email, String address, int createdBy, Timestamp createdAt, String customerType) {
         this.customerId = customerId;
         this.fullName = fullName;
         this.dateOfBirth = dateOfBirth;
@@ -32,10 +30,9 @@ public class Customer {
         this.address = address;
         this.createdBy = createdBy;
         this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
+        this.customerType = customerType;
     }
 
-    // ===== Getter & Setter =====
     public int getCustomerId() {
         return customerId;
     }
@@ -100,27 +97,13 @@ public class Customer {
         this.createdAt = createdAt;
     }
 
-    public Timestamp getUpdatedAt() {
-        return updatedAt;
+    public String getCustomerType() {
+        return customerType;
     }
 
-    public void setUpdatedAt(Timestamp updatedAt) {
-        this.updatedAt = updatedAt;
+    public void setCustomerType(String customerType) {
+        this.customerType = customerType;
     }
-
-    @Override
-    public String toString() {
-        return "Customer{" +
-                "customerId=" + customerId +
-                ", fullName='" + fullName + '\'' +
-                ", dateOfBirth=" + dateOfBirth +
-                ", phoneNumber='" + phoneNumber + '\'' +
-                ", email='" + email + '\'' +
-                ", address='" + address + '\'' +
-                ", createdBy=" + createdBy +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
-                '}';
-    }
+    
+    
 }
-

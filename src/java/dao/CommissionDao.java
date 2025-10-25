@@ -5,6 +5,8 @@
 package dao;
 
 import entity.CommissionReportDTO;
+import entity.ContractDTO;
+import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -77,4 +79,51 @@ public class CommissionDao {
         }
         return reportList;
     }
+    
+    // Thêm phương thức này vào file dao/CommissionDao.java của bạn
+
+    /**
+     * Tạo một bản ghi hoa hồng mới khi một hợp đồng được duyệt.
+     *
+     * @param contract Đối tượng hợp đồng đã được duyệt.
+     * @param amount Số tiền hoa hồng đã được tính.
+     * @return true nếu tạo thành công, false nếu thất bại.
+     */
+    public boolean createCommissionForContract(ContractDTO contract, double amount) {
+        String sql = "INSERT INTO Commissions (contract_id, agent_id, policy_id, amount, status) VALUES (?, ?, ?, ?, ?)";
+
+        try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, contract.getContractId());
+            ps.setInt(2, contract.getAgentId());
+            ps.setInt(3, 1); // Giả định policy_id mặc định là 1, bạn có thể thay đổi logic này
+            ps.setDouble(4, amount);
+            ps.setString(5, "Pending"); // Hoa hồng mới luôn ở trạng thái Pending
+
+            return ps.executeUpdate() > 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    
+    public BigDecimal getPendingCommissionTotal(int agentId) {
+    String sql = "SELECT IFNULL(SUM(amount), 0) FROM Commissions WHERE agent_id = ? AND status = 'Pending'";
+    BigDecimal total = BigDecimal.ZERO;
+
+    try (Connection conn = DBConnector.makeConnection();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+        
+        ps.setInt(1, agentId);
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                total = rs.getBigDecimal(1);
+            }
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    return total;
+}
 }
