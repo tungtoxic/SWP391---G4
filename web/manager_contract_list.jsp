@@ -108,11 +108,11 @@
                                                     </button>
                                                 </form>
                                                  <%-- Add View Detail Button --%>
-                                                 <a href="#" class="btn btn-info btn-sm" title="View Details"><i class="fa fa-eye"></i></a>
+                                                 <a href="<%=ctx%>/manager/contracts?action=viewDetail&id=<%= c.getContractId() %>" class="btn btn-info btn-sm" title="View Details"><i class="fa fa-eye"></i></a>
                                             </div>
                                         <% } else { %>
                                             <%-- Show only View Detail button in All Contracts view --%>
-                                            <a href="#" class="btn btn-info btn-sm" title="View Details"><i class="fa fa-eye"></i></a>
+                                            <a href="<%=ctx%>/manager/contracts?action=viewDetail&id=<%= c.getContractId() %>" class="btn btn-info btn-sm" title="View Details"><i class="fa fa-eye"></i></a>
                                              <%-- Maybe add other actions later, like manually cancelling an Active contract --%>
                                         <% } %>
                                     </td>
