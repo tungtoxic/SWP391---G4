@@ -24,7 +24,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
     <link rel="stylesheet" href="<%= ctx %>/css/layout.css" />
 </head>
-<body>\
+<body>
         <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom fixed-top">
         <div class="container-fluid">
             <a class="navbar-brand fw-bold" href="<%=ctx%>/home.jsp">Company</a>
