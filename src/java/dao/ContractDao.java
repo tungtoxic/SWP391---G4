@@ -312,4 +312,52 @@ public Map<String, Double> getMonthlySalesData(int agentId) {
     }
     return salesData;
 }
+/**
+ * Lấy TẤT CẢ hợp đồng chi tiết (đã JOIN) của các agent
+ * do một manager cụ thể quản lý. Sắp xếp theo ngày tạo mới nhất.
+ * @param managerId ID của Manager.
+ * @return Danh sách các đối tượng ContractDTO.
+ */
+public List<ContractDTO> getAllContractsByManagerId(int managerId) {
+    List<ContractDTO> list = new ArrayList<>();
+    // Câu SQL tương tự getPending..., nhưng bỏ điều kiện WHERE c.status = 'Pending'
+    // và sắp xếp theo ngày tạo mới nhất (hoặc ngày bắt đầu tùy bạn)
+    String sql = "SELECT c.*, cust.full_name as customer_name, u.full_name as agent_name, p.product_name " +
+                 "FROM Contracts c " +
+                 "JOIN Users u ON c.agent_id = u.user_id " +
+                 "JOIN Manager_Agent ma ON u.user_id = ma.agent_id " + // JOIN để lọc theo manager
+                 "JOIN Customers cust ON c.customer_id = cust.customer_id " +
+                 "JOIN Products p ON c.product_id = p.product_id " +
+                 "WHERE ma.manager_id = ? " + // Chỉ lấy agent của manager này
+                 "ORDER BY c.created_at DESC"; // Sắp xếp theo ngày tạo mới nhất
+
+    try (Connection con = DBConnector.makeConnection();
+         PreparedStatement ps = con.prepareStatement(sql)) {
+
+        ps.setInt(1, managerId);
+        try (ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                // Mapping dữ liệu ResultSet sang ContractDTO (giống hệt các hàm khác)
+                ContractDTO dto = new ContractDTO();
+                dto.setContractId(rs.getInt("contract_id"));
+                // ... (copy mapping fields from getPendingContractsByManagerId) ...
+                dto.setCustomerId(rs.getInt("customer_id"));
+                dto.setAgentId(rs.getInt("agent_id"));
+                dto.setProductId(rs.getInt("product_id"));
+                dto.setStartDate(rs.getDate("start_date"));
+                dto.setEndDate(rs.getDate("end_date"));
+                dto.setStatus(rs.getString("status"));
+                dto.setPremiumAmount(rs.getBigDecimal("premium_amount"));
+                dto.setCreatedAt(rs.getTimestamp("created_at"));
+                dto.setCustomerName(rs.getString("customer_name"));
+                dto.setAgentName(rs.getString("agent_name")); // Lấy tên Agent tạo HĐ
+                dto.setProductName(rs.getString("product_name"));
+                list.add(dto);
+            }
+        }
+    } catch (Exception e) {
+        e.printStackTrace(); // In lỗi ra console để debug
+    }
+    return list;
+}
 }
