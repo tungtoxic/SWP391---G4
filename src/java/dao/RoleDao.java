@@ -12,7 +12,6 @@ import entity.Role;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import utility.DBConnector;
 public class RoleDao {
     
 

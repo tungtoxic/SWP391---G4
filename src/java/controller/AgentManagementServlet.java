@@ -46,8 +46,8 @@ public class AgentManagementServlet extends HttpServlet {
 
     private void listAgents(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
-        String statusFilter = request.getParameter("status"); // Active / Inactive / null
-        List<User> agentList = userDAO.getUsersByRoleId(1); // 3 = Agent
+        String statusFilter = request.getParameter("status"); 
+        List<User> agentList = userDAO.getUsersByRoleId(1); 
         if (statusFilter != null) {
             agentList = agentList.stream()
                     .filter(u -> u.getStatus().equals(statusFilter))
@@ -61,21 +61,21 @@ public class AgentManagementServlet extends HttpServlet {
     private void activateAgent(HttpServletRequest request, HttpServletResponse response)
             throws SQLException, IOException {
         int id = Integer.parseInt(request.getParameter("id"));
-        userDAO.activateUserById(id); // sửa DAO theo id
+        userDAO.activateUserById(id); 
         response.sendRedirect("AgentManagementServlet?message=Agent activated successfully!");
     }
 
     private void deactivateAgent(HttpServletRequest request, HttpServletResponse response)
             throws SQLException, IOException {
         int id = Integer.parseInt(request.getParameter("id"));
-        userDAO.deactivateUserById(id); // sửa DAO theo id
+        userDAO.deactivateUserById(id); 
         response.sendRedirect("AgentManagementServlet?message=Agent deactivated successfully!");
     }
 
     private void deleteAgent(HttpServletRequest request, HttpServletResponse response)
             throws SQLException, IOException {
         int id = Integer.parseInt(request.getParameter("id"));
-        userDAO.deleteUser(id); // sửa DAO theo id
+        userDAO.deleteUser(id); 
         response.sendRedirect("AgentManagementServlet?message=Agent delete successfully!");
     }
 
@@ -87,15 +87,15 @@ public class AgentManagementServlet extends HttpServlet {
         String email = request.getParameter("email");
         String phone = request.getParameter("phoneNumber");
 
-        String tempPassword = UserDao.generateTempPassword(8); // mk tạm thời
+        String tempPassword = UserDao.generateTempPassword(8); 
         User newAgent = new User();
         newAgent.setUsername(username);
-        newAgent.setPasswordHash(tempPassword); // hash nếu cần
+        newAgent.setPasswordHash(tempPassword); 
         newAgent.setFullName(fullName);
         newAgent.setEmail(email);
         newAgent.setPhoneNumber(phone);
         newAgent.setStatus("Active");
-        newAgent.setRoleId(1); // Agent
+        newAgent.setRoleId(1); 
         newAgent.setIsFirstLogin(true);
         if (userDAO.checkUsernameExists(username)) {
             request.setAttribute("message", "Username already exists!");
@@ -111,7 +111,6 @@ public class AgentManagementServlet extends HttpServlet {
 
         boolean success = userDAO.createUser(newAgent);
         if (success) {
-            // Gửi email
             EmailUtil.sendTempPassword(email, username, tempPassword);
             response.sendRedirect("AgentManagementServlet?message=Agent created & email sent!");
         } else {
@@ -132,7 +131,7 @@ public class AgentManagementServlet extends HttpServlet {
         agent.setEmail(email);
         agent.setPhoneNumber(phone);
 
-        boolean success = userDAO.updateUser(agent);
+        boolean success = userDAO.updateAgent(agent);
         if (success) {
             response.sendRedirect("AgentManagementServlet?message=Agent updated successfully!");
         } else {
@@ -160,7 +159,7 @@ public class AgentManagementServlet extends HttpServlet {
         try {
             if ("approve".equals(action)) {
                 approveAgent(request, response);
-                return; // stop sau approve
+                return; 
 
             } else if ("create".equals(action)) {
                 createAgent(request, response);
@@ -171,7 +170,7 @@ public class AgentManagementServlet extends HttpServlet {
                 return;
             }
 
-            // các action khác...
+  
         } catch (Exception e) {
             e.printStackTrace();
             request.setAttribute("message", "Error: " + e.getMessage());
@@ -193,7 +192,7 @@ public class AgentManagementServlet extends HttpServlet {
         agent.setPasswordHash(password); 
         agent.setStatus("Active");
 
-        boolean success = userDAO.updateUser(agent); // update DB
+        boolean success = userDAO.updateUser(agent); 
         if (success) {
             EmailUtil.sendEmail(agent.getEmail(),
                     "Thông tin tài khoản",

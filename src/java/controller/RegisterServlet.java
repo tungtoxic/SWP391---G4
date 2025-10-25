@@ -44,8 +44,8 @@ public class RegisterServlet extends HttpServlet {
                     user.setRoleId(2);
                 }
 
-                // Agent
-                user.setStatus("Pending"); // Pending
+        
+                user.setStatus("Pending"); 
                 user.setIsFirstLogin(true);
 
                 boolean success = userDAO.registerUser(user);

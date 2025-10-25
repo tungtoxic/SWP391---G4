@@ -57,17 +57,10 @@ public class ContractManagementServlet extends HttpServlet {
 
         try {
             if ("renew".equalsIgnoreCase(action)) {
-                int contractId = Integer.parseInt(request.getParameter("contractId"));
-
-                // ✅ Lấy số năm gia hạn từ form
+                int contractId = Integer.parseInt(request.getParameter("contractId")); 
                 int renewYears = Integer.parseInt(request.getParameter("renewYears"));
-
-                // --- Xử lý logic gia hạn ở đây ---
-                // Ví dụ: gọi DAO để cập nhật ngày hết hạn
                 ContractDao dao = new ContractDao();
                 dao.renewContract(contractId, renewYears);
-
-                // Quay lại trang quản lý
                 response.sendRedirect(request.getContextPath() + "/ContractManagementServlet?action=list");
             } else {
                 updateContract(request, response, action);
@@ -100,8 +93,6 @@ public class ContractManagementServlet extends HttpServlet {
         request.setAttribute("contractList", contractList);
         request.setAttribute("customerList", customerList);
         request.setAttribute("productList", productList);
-
-        // Hiển thị trang quản lý hợp đồng
         request.getRequestDispatcher("/contractmanagement.jsp").forward(request, response);
     }
 

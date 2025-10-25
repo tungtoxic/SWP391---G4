@@ -94,7 +94,7 @@ public class AddNewUserServlet extends HttpServlet {
         }
     }
 
-    // Tạo password ngẫu nhiên
+   
     private String generateRandomPassword(int length) {
         SecureRandom random = new SecureRandom();
         StringBuilder sb = new StringBuilder(length);
@@ -114,7 +114,7 @@ public class AddNewUserServlet extends HttpServlet {
         int roleId = Integer.parseInt(request.getParameter("role_id"));
         String status = request.getParameter("status");
 
-        // Kiểm tra trùng username, email, phone
+       
         if (userDao.isUsernameExists(username)) {
             request.setAttribute("error", "Username đã tồn tại.");
             request.getRequestDispatcher("/addUser.jsp").forward(request, response);
@@ -133,13 +133,13 @@ public class AddNewUserServlet extends HttpServlet {
             return;
         }
 
-        // Tạo password ngẫu nhiên 8 ký tự
+       
         String password = generateRandomPassword(8);
 
-        // Tạo đối tượng user
+ 
         User newUser = new User();
         newUser.setUsername(username);
-        newUser.setPasswordHash(password); // lưu hash vào DB
+        newUser.setPasswordHash(password); 
         newUser.setFullName(fullName);
         newUser.setEmail(email);
         newUser.setPhoneNumber(phone);
@@ -150,7 +150,7 @@ public class AddNewUserServlet extends HttpServlet {
         boolean inserted = userDao.insertUser(newUser);
 
         if (inserted) {
-            // Gửi mail với password
+        
             String subject = "Thông tin tài khoản của bạn";
             String content = "<p>Chào " + fullName + ",</p>"
                     + "<p>Tài khoản của bạn đã được tạo thành công.</p>"

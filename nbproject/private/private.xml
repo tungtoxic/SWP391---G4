@@ -8,17 +8,23 @@
             <file>file:/C:/Users/Helios%2016/Documents/NetBeansProjects/swp391/SWP391---G4/web/agentmanagement.jsp</file>
             <file>file:/C:/Users/Helios%2016/Documents/NetBeansProjects/swp391/SWP391---G4/src/java/utility/DBConnector.java</file>
             <file>file:/C:/Users/Helios%2016/Documents/NetBeansProjects/swp391/SWP391---G4/web/ManagerDashboard.jsp</file>
-            <file>file:/C:/Users/Helios%2016/Documents/NetBeansProjects/swp391/SWP391---G4/src/java/entity/Permission.java</file>
+            <file>file:/C:/Users/Helios%2016/Documents/NetBeansProjects/swp391/SWP391---G4/src/java/controller/Home.java</file>
+            <file>file:/C:/Users/Helios%2016/Documents/NetBeansProjects/swp391/SWP391---G4/src/java/entity/Product.java</file>
             <file>file:/C:/Users/Helios%2016/Documents/NetBeansProjects/swp391/SWP391---G4/src/java/controller/RegisterServlet.java</file>
             <file>file:/C:/Users/Helios%2016/Documents/NetBeansProjects/swp391/SWP391---G4/src/java/dao/ProductDao.java</file>
+            <file>file:/C:/Users/Helios%2016/Documents/NetBeansProjects/swp391/SWP391---G4/nbproject/build-impl.xml</file>
             <file>file:/C:/Users/Helios%2016/Documents/NetBeansProjects/swp391/SWP391---G4/web/contractmanagement.jsp</file>
             <file>file:/C:/Users/Helios%2016/Documents/NetBeansProjects/swp391/SWP391---G4/web/editUser.jsp</file>
+            <file>file:/C:/Users/Helios%2016/Documents/NetBeansProjects/swp391/SWP391---G4/src/java/controller/VerifyServlet.java</file>
             <file>file:/C:/Users/Helios%2016/Documents/NetBeansProjects/swp391/SWP391---G4/src/java/controller/ContractManagementServlet.java</file>
             <file>file:/C:/Users/Helios%2016/Documents/NetBeansProjects/swp391/SWP391---G4/src/java/dao/ContractDao.java</file>
-            <file>file:/C:/Users/Helios%2016/Documents/NetBeansProjects/swp391/SWP391---G4/src/java/dao/ProductCategoryDao.java</file>
-            <file>file:/C:/Users/Helios%2016/Documents/NetBeansProjects/swp391/SWP391---G4/src/java/controller/ContractAgentServlet.java</file>
+            <file>file:/C:/Users/Helios%2016/Documents/NetBeansProjects/swp391/SWP391---G4/src/java/entity/ProductCategory.java</file>
+            <file>file:/C:/Users/Helios%2016/Documents/NetBeansProjects/swp391/SWP391---G4/src/java/entity/Role.java</file>
+            <file>file:/C:/Users/Helios%2016/Documents/NetBeansProjects/swp391/SWP391---G4/src/java/entity/InsuranceProductDetails.java</file>
             <file>file:/C:/Users/Helios%2016/Documents/NetBeansProjects/swp391/SWP391---G4/src/java/entity/User.java</file>
+            <file>file:/C:/Users/Helios%2016/Documents/NetBeansProjects/swp391/SWP391---G4/src/java/controller/ContractAgentServlet.java</file>
             <file>file:/C:/Users/Helios%2016/Documents/NetBeansProjects/swp391/SWP391---G4/web/createAgent.jsp</file>
+            <file>file:/C:/Users/Helios%2016/Documents/NetBeansProjects/swp391/SWP391---G4/src/java/dao/RoleDao.java</file>
             <file>file:/C:/Users/Helios%2016/Documents/NetBeansProjects/swp391/SWP391---G4/src/java/controller/ChangePasswordServlet.java</file>
             <file>file:/C:/Users/Helios%2016/Documents/NetBeansProjects/swp391/SWP391---G4/web/editproduct.jsp</file>
             <file>file:/C:/Users/Helios%2016/Documents/NetBeansProjects/swp391/SWP391---G4/src/java/utility/EmailUtil.java</file>
@@ -33,6 +39,7 @@
             <file>file:/C:/Users/Helios%2016/Documents/NetBeansProjects/swp391/SWP391---G4/src/java/controller/AgentManagementServlet.java</file>
             <file>file:/C:/Users/Helios%2016/Documents/NetBeansProjects/swp391/SWP391---G4/src/java/entity/Contract.java</file>
             <file>file:/C:/Users/Helios%2016/Documents/NetBeansProjects/swp391/SWP391---G4/web/agentprofile.jsp</file>
+            <file>file:/C:/Users/Helios%2016/Documents/NetBeansProjects/swp391/SWP391---G4/src/java/controller/LoginServlet.java</file>
             <file>file:/C:/Users/Helios%2016/Documents/NetBeansProjects/swp391/SWP391---G4/src/java/dao/UserDao.java</file>
             <file>file:/C:/Users/Helios%2016/Documents/NetBeansProjects/swp391/SWP391---G4/src/java/controller/ProductManagementServlet.java</file>
             <file>file:/C:/Users/Helios%2016/Documents/NetBeansProjects/swp391/SWP391---G4/web/addCategoryProduct.jsp</file>

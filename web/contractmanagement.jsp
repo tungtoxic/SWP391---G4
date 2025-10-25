@@ -154,14 +154,12 @@
                                     <th>ID</th>
                                     <th>Khách hàng</th>
                                     <th>Tên Agent</th>
-                                    <th>Thụ hưởng</th>
-                                    <th>Sản phẩm</th>
-                                    <th>Loại Sản Phẩm</th>                                                                      
+                                    <th>Sản phẩm</th>                                                                   
                                     <th>Trạng thái</th>
                                     <th>Phí bảo hiểm</th>
                                     <th>Bắt đầu</th>
                                     <th>Kết thúc</th>
-                                    <th>Ngày tạo</th>
+                                    <th>Ngày có hiệu lực</th>
                                     <th>Hành động</th>
                                 </tr>
                             </thead>
@@ -183,16 +181,14 @@
                                 <tr data-type="<%=categoryType%>">
                                     <td><%=c.getContractId()%></td>
 
-                                    <td><%=c.getBeneficiaries() != null ? c.getBeneficiaries() : "-" %></td>
                                     <td><%=c.getAgentName()%></td>
                                     <td><%=customerMap.getOrDefault(c.getCustomerId(),"N/A")%></td>
-                                    <td><%=p != null ? p.getProductName() : "N/A"%></td>
-                                    <td><%=categoryType%></td>                                                                    
+                                    <td><%=p != null ? p.getProductName() : "N/A"%></td>                                                                  
                                     <td><%=c.getStatus()%></td>
                                     <td><%=c.getPremiumAmount()%></td>
                                     <td><%=c.getStartDate()%></td>
-                                    <td><%=c.getEndDate() != null ? c.getEndDate() : "-" %></td>
-                                    <td><%=c.getCreatedAt()%></td>
+                                    <td><%=c.getEndDate()%></td>
+                                    <td><%=c.getEffectiveDate()%></td>
                                     <td>
                                         <% if ("Pending".equalsIgnoreCase(c.getStatus())) { %>
                                         <form action="ContractManagementServlet" method="post" style="display:inline;">
@@ -228,6 +224,7 @@
                                         <% } else { %>
                                         <span class="text-secondary">Đã hủy</span>
                                         <% } %>
+                                        <a href="ContractManagementServlet?action=viewdetail&id=${c.getContractId()}" class="btn btn-primary">View Details</a>
                                     </td>
                                 </tr>
                                 <% } } else { %>

@@ -8,7 +8,6 @@ public class Product {
     private double basePrice;
     private int categoryId;
     private Timestamp createdAt;
-    private Timestamp updatedAt;
 
     public Product() {}
 
@@ -36,6 +35,4 @@ public class Product {
     public Timestamp getCreatedAt() { return createdAt; }
     public void setCreatedAt(Timestamp createdAt) { this.createdAt = createdAt; }
 
-    public Timestamp getUpdatedAt() { return updatedAt; }
-    public void setUpdatedAt(Timestamp updatedAt) { this.updatedAt = updatedAt; }
 }
