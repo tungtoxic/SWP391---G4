@@ -36,3 +36,4 @@ nb-configuration.xml
 /nbproject
 web/src/conf/META-INF/context.xml
 /build
+/nbproject
