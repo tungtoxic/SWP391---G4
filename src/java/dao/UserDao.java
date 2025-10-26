@@ -543,4 +543,44 @@ public List<User> getAllUsers(String roleIdFilter) throws SQLException {
         }
         return leaderboard;
     }
+    /**
+     * Lấy danh sách các User là Agent được quản lý bởi một Manager cụ thể.
+     * @param managerId ID của Manager.
+     * @return Danh sách các đối tượng User (Agent), hoặc danh sách rỗng nếu không có Agent nào hoặc có lỗi.
+     */
+    public List<User> getAgentsByManagerId(int managerId) {
+        List<User> agentList = new ArrayList<>();
+        // JOIN bảng Users (u) với Manager_Agent (ma) để tìm agent theo manager_id
+        // Chỉ lấy những user có role_id = 1 (Agent) để đảm bảo tính chính xác
+        String sql = "SELECT u.user_id, u.username, u.full_name, u.email, u.phone_number, u.status, u.role_id " +
+                     "FROM Users u " +
+                     "JOIN Manager_Agent ma ON u.user_id = ma.agent_id " +
+                     "WHERE ma.manager_id = ? AND u.role_id = 1"; // Lọc theo manager_id và role_id = 1 (Agent)
+
+        try (Connection conn = DBConnector.makeConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, managerId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    User agent = new User();
+                    agent.setUserId(rs.getInt("user_id"));
+                    agent.setUsername(rs.getString("username")); // Lấy username
+                    agent.setFullName(rs.getString("full_name"));
+                    agent.setEmail(rs.getString("email"));         // Lấy email
+                    agent.setPhoneNumber(rs.getString("phone_number")); // Lấy SĐT
+                    agent.setStatus(rs.getString("status"));       // Lấy status
+                    agent.setRoleId(rs.getInt("role_id"));       // Lấy role_id (luôn là 1)
+                    // Không lấy password_hash vì không cần thiết
+
+                    agentList.add(agent);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Lỗi khi lấy danh sách Agent theo Manager ID: " + managerId);
+            e.printStackTrace(); // In lỗi ra để debug
+        }
+        return agentList;
+    }
 }
