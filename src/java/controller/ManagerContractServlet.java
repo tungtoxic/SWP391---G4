@@ -12,16 +12,19 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-
+import dao.CustomerDao; // <<< THÊM import CustomerDao
+import entity.Customer; // <<< THÊM import Customer
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
+import java.sql.SQLException;
 
 @WebServlet(name = "ManagerContractServlet", urlPatterns = {"/manager/contracts"})
 public class ManagerContractServlet extends HttpServlet {
 
     private ContractDao contractDao;
     private UserDao userDao;
+    private CustomerDao customerDao; // <<< THÊM biến CustomerDao
     private CommissionDao commissionDao;
     private CommissionPolicyDao policyDao;
     private static final int ROLE_MANAGER = 2;
@@ -32,6 +35,7 @@ public class ManagerContractServlet extends HttpServlet {
         commissionDao = new CommissionDao();
         policyDao = new CommissionPolicyDao();
         userDao = new UserDao();
+        customerDao = new CustomerDao();
     }
 
     @Override
@@ -176,9 +180,13 @@ public class ManagerContractServlet extends HttpServlet {
              response.sendRedirect(request.getContextPath() + "/manager/contracts?message=AuthError");
              return;
         }
-
+        Customer customerDetail = null;
+        if (contract != null) { // Chỉ lấy KH nếu HĐ tồn tại
+            customerDetail = customerDao.getCustomerById(contract.getCustomerId()); // Không cần chặn ở đây, JSP sẽ xử lý nếu customerDetail là null
+        }
         // Đặt attribute cho trang chi tiết
         request.setAttribute("contractDetail", contract);
+        request.setAttribute("customerDetail", customerDetail);
         // Đặt activePage là "detail" hoặc giữ nguyên trang list ("all"/"pending")? Tạm dùng "detail".
         request.setAttribute("activePage", "detail");
         // currentUser đã được set ở doGet

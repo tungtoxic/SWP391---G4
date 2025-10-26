@@ -10,6 +10,7 @@
     String ctx = request.getContextPath();
     User currentUser = (User) request.getAttribute("currentUser"); // Lấy user
     ContractDTO contract = (ContractDTO) request.getAttribute("contractDetail"); // Lấy chi tiết HĐ
+    Customer customerDetail = (Customer) request.getAttribute("customerDetail");
     // Xác định activePage cho sidebar (có thể là "all", "pending", hoặc "detail")
     // Tạm để là "detail", bạn có thể truyền giá trị từ trang list qua nếu muốn highlight đúng mục
     String activePage = "detail";
@@ -23,6 +24,10 @@
     if (contract == null) {
         response.sendRedirect(ctx + "/manager/contracts?message=notFound");
         return;
+    }
+    if (customerDetail == null) {
+        customerDetail = new Customer();
+        customerDetail.setFullName(contract.getCustomerName() + " (Details not found)"); // Ghi chú tạm
     }
 %>
 <!DOCTYPE html>
@@ -58,19 +63,37 @@
                 <div class="card-body">
                     <div class="row">
                         <%-- Cột 1: Thông tin Khách hàng & Agent --%>
-                        <div class="col-md-4 border-end">
+<div class="col-md-4 border-end">
                             <h5><i class="fas fa-user-tie me-2 text-primary"></i>Khách hàng & Agent</h5>
                             <hr>
                             <p class="detail-label">Tên Khách hàng:</p>
-                            <p class="detail-value"><%= contract.getCustomerName() %></p>
+                            <p class="detail-value">
+                                <i class="fas fa-user me-1 text-muted"></i> <%= customerDetail.getFullName() %>
+                            </p>
+
+                            <p class="detail-label">Số điện thoại:</p>
+                            <p class="detail-value">
+                                <i class="fas fa-phone me-1 text-muted"></i> <%= customerDetail.getPhoneNumber() != null ? customerDetail.getPhoneNumber() : "N/A" %>
+                            </p>
+
+                             <p class="detail-label">Email:</p>
+                            <p class="detail-value">
+                                <i class="fas fa-envelope me-1 text-muted"></i> <%= customerDetail.getEmail() != null ? customerDetail.getEmail() : "N/A" %>
+                            </p>
+
+                             <p class="detail-label">Địa chỉ:</p>
+                            <p class="detail-value">
+                                <i class="fas fa-map-marker-alt me-1 text-muted"></i> <%= customerDetail.getAddress() != null ? customerDetail.getAddress() : "N/A" %>
+                            </p>
+
+                            <hr style="margin-top: 1.5rem; margin-bottom: 1rem;"> <%-- Ngăn cách KH và Agent --%>
 
                             <p class="detail-label">Agent phụ trách:</p>
-                            <p class="detail-value"><%= contract.getAgentName() %></p>
-                             <%-- Thêm link nếu cần --%>
-                             <%-- <p><a href="<%= ctx %>/manager/customers?id=<%= contract.getCustomerId() %>">Xem hồ sơ KH</a></p> --%>
-                             <%-- <p><a href="<%= ctx %>/manager/agents?id=<%= contract.getAgentId() %>">Xem hồ sơ Agent</a></p> --%>
+                            <p class="detail-value">
+                                <i class="fas fa-user-shield me-1 text-muted"></i> <%= contract.getAgentName() %>
+                            </p>
+                             <%-- Có thể thêm SĐT/Email Agent nếu cần --%>
                         </div>
-
                         <%-- Cột 2: Thông tin Hợp đồng & Sản phẩm --%>
                         <div class="col-md-4 border-end">
                             <h5><i class="fas fa-file-contract me-2 text-primary"></i>Hợp đồng & Sản phẩm</h5>
