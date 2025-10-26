@@ -37,3 +37,4 @@ nb-configuration.xml
 web/src/conf/META-INF/context.xml
 /build
 /nbproject
+*.sql
