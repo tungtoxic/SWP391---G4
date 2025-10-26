@@ -117,7 +117,7 @@ public class UserManagementServlet extends HttpServlet {
 
         try {
           if ("edit".equals(action)) {
-               
+                handleUpdateUser(request, response);
             } else {
                 response.sendRedirect(request.getContextPath() + "/usermanagement.jsp");
             }
@@ -127,9 +127,6 @@ public class UserManagementServlet extends HttpServlet {
     }
 
     
-<<<<<<<< HEAD:src/java/controller/AdminManagementServlet.java
-    
-========
     private void handleUpdateUser(HttpServletRequest request, HttpServletResponse response)
             throws Exception {
 
@@ -176,7 +173,6 @@ public class UserManagementServlet extends HttpServlet {
         }
 
     }
->>>>>>>> origin/VuTT:src/java/controller/UserManagementServlet.java
 
     /**
      * Returns a short description of the servlet.
