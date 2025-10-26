@@ -36,7 +36,8 @@ public class CustomerServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/login.jsp");
             return;
         }
-
+        request.setAttribute("currentUser", currentUser);
+        request.setAttribute("activePage", "customers");
         String action = request.getParameter("action");
     if (action == null) {
         action = "list";
@@ -79,7 +80,8 @@ public class CustomerServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/login.jsp");
             return;
         }
-
+        request.setAttribute("currentUser", currentUser);
+        request.setAttribute("activePage", "customers");
         String action = request.getParameter("action");
         try {
             switch (action) {

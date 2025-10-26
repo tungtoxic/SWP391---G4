@@ -3,7 +3,6 @@
     Created on : Oct 26, 2025, 3:19:50 PM
     Author     : Nguyễn Tùng
 --%>
-
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="entity.User" %>
 <%-- Các biến ctx, currentUser, activePage sẽ được lấy từ trang cha gọi include --%>
@@ -20,31 +19,40 @@
         </div>
     </div>
 
+    <%-- ===== SỬA LẠI TOÀN BỘ NAV THEO THỨ TỰ MỚI ===== --%>
     <nav class="nav flex-column px-2">
         <%-- Dùng biến activePage được truyền từ trang cha để tô sáng --%>
+        
         <a class="nav-link text-white py-2 <%= "dashboard".equals(activePage) ? "active" : "" %>" href="<%= ctx %>/agent/dashboard">
             <i class="fas fa-chart-line me-2"></i> Dashboard
         </a>
+        
         <a class="nav-link text-white py-2 <%= "profile".equals(activePage) ? "active" : "" %>" href="<%=ctx%>/profile.jsp">
             <i class="fas fa-user me-2"></i> Profile
         </a>
-        <a class="nav-link text-white py-2 <%= "customers".equals(activePage) ? "active" : "" %>" href="<%=ctx%>/agent/customers">
-            <i class="fas fa-users me-2"></i> Customer Management
+        
+        <a class="nav-link text-white py-2 <%= "leaderboard".equals(activePage) ? "active" : "" %>" href="<%=ctx%>/agents/leaderboard">
+            <i class="fas fa-trophy me-2"></i> Leaderboard
         </a>
         
-        <%-- ===== SỬA LẠI PHẦN CONTRACT ===== --%>
-        <%-- Chỉ cần 1 link duy nhất. 
-             Chúng ta sẽ dùng chung activePage="contracts" cho cả trang list, add, edit --%>
-        <a class="nav-link text-white py-2 <%= "contracts".equals(activePage) ? "active" : "" %>" href="<%=ctx%>/agent/contracts">
-            <i class="fas fa-file-signature me-2"></i> My Contracts
-        </a>
-        <%-- ===== HẾT PHẦN SỬA ===== --%>
-
         <a class="nav-link text-white py-2 <%= "commission".equals(activePage) ? "active" : "" %>" href="<%=ctx%>/agent/commission-report">
             <i class="fas fa-percent me-2"></i> Commission Report
         </a>
-        <a class="nav-link text-white py-2 <%= "leaderboard".equals(activePage) ? "active" : "" %>" href="<%=ctx%>/agents/leaderboard">
-            <i class="fas fa-trophy me-2"></i> Leaderboard
+        
+        <a class="nav-link text-white py-2 <%= "product".equals(activePage) ? "active" : "" %>" href="#"> <%-- Sửa link # sau --%>
+            <i class="fas fa-box me-2"></i> Product
+        </a>
+        
+        <a class="nav-link text-white py-2 <%= "contracts".equals(activePage) ? "active" : "" %>" href="<%=ctx%>/agent/contracts">
+            <i class="fas fa-file-signature me-2"></i> Contract
+        </a>
+        
+        <a class="nav-link text-white py-2 <%= "customers".equals(activePage) ? "active" : "" %>" href="<%=ctx%>/agent/customers">
+            <i class="fas fa-users me-2"></i> Customer
+        </a>
+        
+        <a class="nav-link text-white py-2 <%= "policies".equals(activePage) ? "active" : "" %>" href="#"> <%-- Sửa link # sau --%>
+            <i class="fas fa-file-alt me-2"></i> Policies
         </a>
         
         <div class="mt-3 px-2">
@@ -52,5 +60,3 @@
         </div>
     </nav>
 </aside>
-
-<%-- KHÔNG CẦN SCRIPT ĐỔI ICON NỮA --%>
