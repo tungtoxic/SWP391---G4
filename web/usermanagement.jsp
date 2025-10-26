@@ -11,7 +11,7 @@
         } else if ("inactive".equalsIgnoreCase(filter)) {
             userList = userDao.getUsersByStatus("Inactive");
         } else {
-            userList = userDao.getAllUsers();
+            userList = userDao.getAllUsers(null);
         }
     } catch (Exception e) {
         e.printStackTrace();
