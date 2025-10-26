@@ -14,8 +14,8 @@ import java.sql.SQLException;
 
 public class DBConnector {
     private static final String URL = "jdbc:mysql://localhost:3306/swp391"; 
-    private static final String USER = "tienvu";   // thay bằng user MySQL của bạn
-    private static final String PASSWORD = "123456";   // thay bằng password MySQL của bạn
+    private static final String USER = "root";   // thay bằng user MySQL của bạn
+    private static final String PASSWORD = "1234";   // thay bằng password MySQL của bạn
 
     public static Connection makeConnection() {
         try {
