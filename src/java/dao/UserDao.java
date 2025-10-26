@@ -718,4 +718,51 @@ public class UserDao {
         }
         return false; // Trả về false nếu có lỗi hoặc không tìm thấy
     }
+    /**
+ * Đặt/Cập nhật một mức Target chung cho TẤT CẢ Agent
+ * thuộc quyền quản lý của một Manager cho tháng/năm cụ thể.
+ * @param managerId ID của Manager
+ * @param targetAmount Số tiền target chung
+ * @param month Tháng (1-12)
+ * @param year Năm (ví dụ: 2025)
+ * @return true nếu thực thi thành công, false nếu thất bại.
+ */
+public boolean setTeamTarget(int managerId, BigDecimal targetAmount, int month, int year) {
+    // SQL này dùng INSERT ... SELECT ... ON DUPLICATE KEY UPDATE
+    // 1. SELECT: Tìm tất cả agent_id thuộc managerId
+    // 2. INSERT: Thêm (agent_id, targetAmount, month, year) cho mỗi agent tìm được
+    // 3. ON DUPLICATE KEY UPDATE: Nếu đã có target cho agent đó, nó sẽ tự động UPDATE
+    String sql = """
+        INSERT INTO Agent_Targets (agent_id, target_amount, target_month, target_year)
+        (
+            SELECT 
+                agent_id, 
+                ? AS target_amount, 
+                ? AS target_month, 
+                ? AS target_year 
+            FROM 
+                Manager_Agent 
+            WHERE 
+                manager_id = ?
+        )
+        ON DUPLICATE KEY UPDATE
+            target_amount = VALUES(target_amount);
+    """;
+    
+    try (Connection conn = DBConnector.makeConnection();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+        
+        ps.setBigDecimal(1, targetAmount); // Giá trị cho target_amount
+        ps.setInt(2, month);            // Giá trị cho target_month
+        ps.setInt(3, year);             // Giá trị cho target_year
+        ps.setInt(4, managerId);        // ID của Manager để lọc agent
+        
+        return ps.executeUpdate() > 0; // Trả về true nếu có dòng được thêm/cập nhật
+        
+    } catch (SQLException e) {
+        System.err.println("Lỗi khi set Team Target cho manager ID: " + managerId);
+        e.printStackTrace();
+        return false;
+    }
+}
 }

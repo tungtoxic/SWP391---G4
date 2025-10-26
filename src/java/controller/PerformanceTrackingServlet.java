@@ -10,8 +10,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
-import java.math.BigDecimal; // <<< THÊM IMPORT NÀY
-import java.time.LocalDate; // <<< THÊM IMPORT NÀY
+import java.math.BigDecimal; 
+import java.time.LocalDate; 
 import java.util.ArrayList;
 import java.util.List;
 
@@ -104,7 +104,6 @@ public class PerformanceTrackingServlet extends HttpServlet {
 
         if ("setTarget".equals(action)) {
             try {
-                // Lấy dữ liệu từ form submit (sẽ tạo ở Bước 5)
                 int agentId = Integer.parseInt(request.getParameter("agentId"));
                 BigDecimal targetAmount = new BigDecimal(request.getParameter("targetAmount"));
                 int targetMonth = Integer.parseInt(request.getParameter("targetMonth"));
@@ -131,7 +130,30 @@ public class PerformanceTrackingServlet extends HttpServlet {
                 e.printStackTrace();
                 session.setAttribute("message", "Error: " + e.getMessage());
             }
+        }else if ("setTeamTarget".equals(action)) {
+        try {
+            // Chỉ lấy 3 tham số từ form mới
+            BigDecimal targetAmount = new BigDecimal(request.getParameter("teamTargetAmount"));
+            int targetMonth = Integer.parseInt(request.getParameter("targetMonth"));
+            int targetYear = Integer.parseInt(request.getParameter("targetYear"));
+            
+            // Gọi hàm DAO mới, dùng ID của Manager đang đăng nhập
+            boolean success = userDao.setTeamTarget(currentUser.getUserId(), targetAmount, targetMonth, targetYear);
+            
+            if (success) {
+                session.setAttribute("message", "Đã cập nhật Target chung cho cả team thành công!");
+            } else {
+                session.setAttribute("message", "Error: Không thể cập nhật Target cho team.");
+            }
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            session.setAttribute("message", "Error: Định dạng số tiền Target không hợp lệ.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            session.setAttribute("message", "Error: " + e.getMessage());
         }
+    // =============================
+    }
         
         // Quay lại trang performance (doGet sẽ chạy lại và lấy dữ liệu mới)
         response.sendRedirect(request.getContextPath() + "/manager/performance");

@@ -62,7 +62,7 @@
     <main class="main-content">
         <div class="container-fluid">
             <h1 class="mb-4">Agent Performance Matrix (Tháng <%= currentMonth %>/<%= currentYear %>)</h1>
-
+            
             <%-- Hiển thị thông báo (nếu có) --%>
             <% if (message != null && !message.isEmpty()) { %>
                 <div class="alert <%= message.startsWith("Error:") ? "alert-danger" : "alert-success" %> alert-dismissible fade show" role="alert">
@@ -72,16 +72,24 @@
             <% } %>
 
             <%-- ===== BỘ LỌC (FILTER) ===== --%>
-            <div class="mb-3">
-                <a href="<%= ctx %>/manager/performance" class="btn <%= "all".equals(currentFilter) ? "btn-primary" : "btn-outline-primary" %>">
-                    <i class="fas fa-users me-1"></i> All Agents
-                </a>
-                <a href="<%= ctx %>/manager/performance?filter=completed" class="btn <%= "completed".equals(currentFilter) ? "btn-success" : "btn-outline-success" %>">
-                    <i class="fas fa-check-circle me-1"></i> Completed Target
-                </a>
-                <a href="<%= ctx %>/manager/performance?filter=below" class="btn <%= "below".equals(currentFilter) ? "btn-warning" : "btn-outline-warning" %>">
-                    <i class="fas fa-exclamation-triangle me-1"></i> Below Target
-                </a>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <%-- Nhóm nút Filter (bên trái) --%>
+                <div class="btn-group">
+                    <a href="<%= ctx %>/manager/performance" class="btn <%= "all".equals(currentFilter) ? "btn-primary" : "btn-outline-primary" %>">
+                        <i class="fas fa-users me-1"></i> All Agents
+                    </a>
+                    <a href="<%= ctx %>/manager/performance?filter=completed" class="btn <%= "completed".equals(currentFilter) ? "btn-success" : "btn-outline-success" %>">
+                        <i class="fas fa-check-circle me-1"></i> Completed Target
+                    </a>
+                    <a href="<%= ctx %>/manager/performance?filter=below" class="btn <%= "below".equals(currentFilter) ? "btn-warning" : "btn-outline-warning" %>">
+                        <i class="fas fa-exclamation-triangle me-1"></i> Below Target
+                    </a>
+                </div>
+                <div>
+                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#setTeamTargetModal">
+                        <i class="fas fa-bullseye me-1"></i> Set Team Target
+                    </button>
+                </div>
             </div>
             <%-- =================================== --%>
 
@@ -164,9 +172,46 @@
             </div>
         </div>
     </main>
-
     <%-- ================================================= --%>
-    <%-- MODAL (POPUP) ĐỂ SET TARGET (ĐẶT BÊN NGOÀI MAIN) --%>
+<%-- MODAL (POPUP) ĐỂ SET TEAM TARGET (MỚI) --%>
+<%-- ================================================= --%>
+<div class="modal fade" id="setTeamTargetModal" tabindex="-1" aria-labelledby="setTeamTargetModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="setTeamTargetModalLabel">Set Team Target (Tháng <%= currentMonth %>/<%= currentYear %>)</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="<%= ctx %>/manager/performance" method="POST">
+                <div class="modal-body">
+                    <input type="hidden" name="action" value="setTeamTarget">
+                    
+                    <div class="mb-3">
+                        <label for="teamTargetAmount" class="form-label">
+                            Nhập Target chung cho **TẤT CẢ** Agent trong team:
+                        </label>
+                        <input type="number" class="form-control" id="teamTargetAmount" name="teamTargetAmount" placeholder="Ví dụ: 50000000" required>
+                        <div class="form-text">
+                           Lưu ý: Hành động này sẽ ghi đè Target tháng <%= currentMonth %>/<%= currentYear %> của tất cả agent trong team.
+                        </div>
+                    </div>
+                    
+                    <%-- Gửi đi tháng/năm hiện tại (ẩn) --%>
+                    <input type="hidden" name="targetMonth" value="<%= currentMonth %>">
+                    <input type="hidden" name="targetYear" value="<%= currentYear %>">
+                    
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-danger">Apply to All</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>                        
+                            
+    <%-- ================================================= --%>
+    <%-- MODAL (POPUP) ĐỂ SET TARGET CA NHAN --%>
     <%-- ================================================= --%>
     <div class="modal fade" id="setTargetModal" tabindex="-1" aria-labelledby="setTargetModalLabel" aria-hidden="true">
         <div class="modal-dialog">
