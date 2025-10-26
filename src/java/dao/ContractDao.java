@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import utility.DBConnector;
 import entity.ContractDTO; // Đảm bảo đã import
+import java.math.BigDecimal;
 import java.util.Map; // Đảm bảo đã import
 import java.util.LinkedHashMap; // Đảm bảo đã import
 
@@ -229,14 +230,14 @@ public List<ContractDTO> getPendingContractsByManagerId(int managerId) {
 
     /**
      * Xóa một hợp đồng theo ID.
+     *
      * @param contractId ID của hợp đồng cần xóa.
      * @return true nếu xóa thành công, false nếu thất bại.
      */
     public boolean deleteContract(int contractId) {
         String sql = "DELETE FROM Contracts WHERE contract_id = ?";
-        try (Connection con = DBConnector.makeConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
-            
+        try (Connection con = DBConnector.makeConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+
             ps.setInt(1, contractId);
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
@@ -248,116 +249,201 @@ public List<ContractDTO> getPendingContractsByManagerId(int managerId) {
     }
     // Thêm 2 phương thức này vào file dao/ContractDao.java
 
+    /**
+     * Lấy các hợp đồng Active sắp hết hạn trong vòng 90 ngày tới.
+     */
+    public List<ContractDTO> getExpiringContracts(int agentId) {
+        List<ContractDTO> list = new ArrayList<>();
+        // Lấy các hợp đồng hết hạn trong 90 ngày tới VÀ vẫn đang Active
+        String sql = "SELECT c.*, cust.full_name as customer_name, p.product_name "
+                + "FROM Contracts c "
+                + "JOIN Customers cust ON c.customer_id = cust.customer_id "
+                + "JOIN Products p ON c.product_id = p.product_id "
+                + "WHERE c.agent_id = ? AND c.status = 'Active' "
+                + "AND c.end_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 90 DAY) "
+                + "ORDER BY c.end_date ASC"; // Ưu tiên cái hết hạn sớm nhất
 
-/**
- * Lấy các hợp đồng Active sắp hết hạn trong vòng 90 ngày tới.
- */
-public List<ContractDTO> getExpiringContracts(int agentId) {
-    List<ContractDTO> list = new ArrayList<>();
-    // Lấy các hợp đồng hết hạn trong 90 ngày tới VÀ vẫn đang Active
-    String sql = "SELECT c.*, cust.full_name as customer_name, p.product_name " +
-                 "FROM Contracts c " +
-                 "JOIN Customers cust ON c.customer_id = cust.customer_id " +
-                 "JOIN Products p ON c.product_id = p.product_id " +
-                 "WHERE c.agent_id = ? AND c.status = 'Active' " +
-                 "AND c.end_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 90 DAY) " +
-                 "ORDER BY c.end_date ASC"; // Ưu tiên cái hết hạn sớm nhất
+        try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
-    try (Connection conn = DBConnector.makeConnection();
-         PreparedStatement ps = conn.prepareStatement(sql)) {
-        
-        ps.setInt(1, agentId);
-        try (ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                ContractDTO dto = new ContractDTO();
-                dto.setContractId(rs.getInt("contract_id"));
-                dto.setCustomerName(rs.getString("customer_name"));
-                dto.setProductName(rs.getString("product_name"));
-                dto.setEndDate(rs.getDate("end_date"));
-                list.add(dto);
+            ps.setInt(1, agentId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    ContractDTO dto = new ContractDTO();
+                    dto.setContractId(rs.getInt("contract_id"));
+                    dto.setCustomerName(rs.getString("customer_name"));
+                    dto.setProductName(rs.getString("product_name"));
+                    dto.setEndDate(rs.getDate("end_date"));
+                    list.add(dto);
+                }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-    } catch (Exception e) {
-        e.printStackTrace();
+        return list;
     }
-    return list;
-}
 
-/**
- * Lấy dữ liệu doanh thu 6 tháng gần nhất cho biểu đồ.
- * Trả về một Map<String, Double> với Key là "YYYY-MM" (ví dụ: "2025-10")
- * và Value là tổng doanh thu của tháng đó.
- */
-public Map<String, Double> getMonthlySalesData(int agentId) {
-    // Dùng LinkedHashMap để giữ đúng thứ tự các tháng
-    Map<String, Double> salesData = new LinkedHashMap<>();
-    String sql = "SELECT DATE_FORMAT(start_date, '%Y-%m') as month, SUM(premium_amount) as monthly_total " +
-                 "FROM Contracts " +
-                 "WHERE agent_id = ? AND status = 'Active' " +
-                 "AND start_date >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH) " +
-                 "GROUP BY month " +
-                 "ORDER BY month ASC";
+    /**
+     * Lấy dữ liệu doanh thu 6 tháng gần nhất cho biểu đồ. Trả về một
+     * Map<String, Double> với Key là "YYYY-MM" (ví dụ: "2025-10") và Value là
+     * tổng doanh thu của tháng đó.
+     */
+    public Map<String, Double> getMonthlySalesData(int agentId) {
+        // Dùng LinkedHashMap để giữ đúng thứ tự các tháng
+        Map<String, Double> salesData = new LinkedHashMap<>();
+        String sql = "SELECT DATE_FORMAT(start_date, '%Y-%m') as month, SUM(premium_amount) as monthly_total "
+                + "FROM Contracts "
+                + "WHERE agent_id = ? AND status = 'Active' "
+                + "AND start_date >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH) "
+                + "GROUP BY month "
+                + "ORDER BY month ASC";
 
-    try (Connection conn = DBConnector.makeConnection();
-         PreparedStatement ps = conn.prepareStatement(sql)) {
-        
-        ps.setInt(1, agentId);
-        try (ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                salesData.put(rs.getString("month"), rs.getDouble("monthly_total"));
+        try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, agentId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    salesData.put(rs.getString("month"), rs.getDouble("monthly_total"));
+                }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-    } catch (Exception e) {
-        e.printStackTrace();
+        return salesData;
     }
-    return salesData;
-}
-/**
- * Lấy TẤT CẢ hợp đồng chi tiết (đã JOIN) của các agent
- * do một manager cụ thể quản lý. Sắp xếp theo ngày tạo mới nhất.
- * @param managerId ID của Manager.
- * @return Danh sách các đối tượng ContractDTO.
- */
-public List<ContractDTO> getAllContractsByManagerId(int managerId) {
-    List<ContractDTO> list = new ArrayList<>();
-    // Câu SQL tương tự getPending..., nhưng bỏ điều kiện WHERE c.status = 'Pending'
-    // và sắp xếp theo ngày tạo mới nhất (hoặc ngày bắt đầu tùy bạn)
-    String sql = "SELECT c.*, cust.full_name as customer_name, u.full_name as agent_name, p.product_name " +
-                 "FROM Contracts c " +
-                 "JOIN Users u ON c.agent_id = u.user_id " +
-                 "JOIN Manager_Agent ma ON u.user_id = ma.agent_id " + // JOIN để lọc theo manager
-                 "JOIN Customers cust ON c.customer_id = cust.customer_id " +
-                 "JOIN Products p ON c.product_id = p.product_id " +
-                 "WHERE ma.manager_id = ? " + // Chỉ lấy agent của manager này
-                 "ORDER BY c.created_at DESC"; // Sắp xếp theo ngày tạo mới nhất
 
-    try (Connection con = DBConnector.makeConnection();
-         PreparedStatement ps = con.prepareStatement(sql)) {
+    /**
+     * Lấy TẤT CẢ hợp đồng chi tiết (đã JOIN) của các agent do một manager cụ
+     * thể quản lý. Sắp xếp theo ngày tạo mới nhất.
+     *
+     * @param managerId ID của Manager.
+     * @return Danh sách các đối tượng ContractDTO.
+     */
+    public List<ContractDTO> getAllContractsByManagerId(int managerId) {
+        List<ContractDTO> list = new ArrayList<>();
+        // Câu SQL tương tự getPending..., nhưng bỏ điều kiện WHERE c.status = 'Pending'
+        // và sắp xếp theo ngày tạo mới nhất (hoặc ngày bắt đầu tùy bạn)
+        String sql = "SELECT c.*, cust.full_name as customer_name, u.full_name as agent_name, p.product_name "
+                + "FROM Contracts c "
+                + "JOIN Users u ON c.agent_id = u.user_id "
+                + "JOIN Manager_Agent ma ON u.user_id = ma.agent_id "
+                + // JOIN để lọc theo manager
+                "JOIN Customers cust ON c.customer_id = cust.customer_id "
+                + "JOIN Products p ON c.product_id = p.product_id "
+                + "WHERE ma.manager_id = ? "
+                + // Chỉ lấy agent của manager này
+                "ORDER BY c.created_at DESC"; // Sắp xếp theo ngày tạo mới nhất
 
-        ps.setInt(1, managerId);
-        try (ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                // Mapping dữ liệu ResultSet sang ContractDTO (giống hệt các hàm khác)
-                ContractDTO dto = new ContractDTO();
-                dto.setContractId(rs.getInt("contract_id"));
-                // ... (copy mapping fields from getPendingContractsByManagerId) ...
-                dto.setCustomerId(rs.getInt("customer_id"));
-                dto.setAgentId(rs.getInt("agent_id"));
-                dto.setProductId(rs.getInt("product_id"));
-                dto.setStartDate(rs.getDate("start_date"));
-                dto.setEndDate(rs.getDate("end_date"));
-                dto.setStatus(rs.getString("status"));
-                dto.setPremiumAmount(rs.getBigDecimal("premium_amount"));
-                dto.setCreatedAt(rs.getTimestamp("created_at"));
-                dto.setCustomerName(rs.getString("customer_name"));
-                dto.setAgentName(rs.getString("agent_name")); // Lấy tên Agent tạo HĐ
-                dto.setProductName(rs.getString("product_name"));
-                list.add(dto);
+        try (Connection con = DBConnector.makeConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, managerId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    // Mapping dữ liệu ResultSet sang ContractDTO (giống hệt các hàm khác)
+                    ContractDTO dto = new ContractDTO();
+                    dto.setContractId(rs.getInt("contract_id"));
+                    // ... (copy mapping fields from getPendingContractsByManagerId) ...
+                    dto.setCustomerId(rs.getInt("customer_id"));
+                    dto.setAgentId(rs.getInt("agent_id"));
+                    dto.setProductId(rs.getInt("product_id"));
+                    dto.setStartDate(rs.getDate("start_date"));
+                    dto.setEndDate(rs.getDate("end_date"));
+                    dto.setStatus(rs.getString("status"));
+                    dto.setPremiumAmount(rs.getBigDecimal("premium_amount"));
+                    dto.setCreatedAt(rs.getTimestamp("created_at"));
+                    dto.setCustomerName(rs.getString("customer_name"));
+                    dto.setAgentName(rs.getString("agent_name")); // Lấy tên Agent tạo HĐ
+                    dto.setProductName(rs.getString("product_name"));
+                    list.add(dto);
+                }
             }
+        } catch (Exception e) {
+            e.printStackTrace(); // In lỗi ra console để debug
         }
-    } catch (Exception e) {
-        e.printStackTrace(); // In lỗi ra console để debug
+        return list;
     }
-    return list;
-}
+
+    /**
+     * Đếm số hợp đồng đang ở trạng thái 'Pending' của tất cả agent do một
+     * manager cụ thể quản lý.
+     *
+     * @param managerId ID của Manager.
+     * @return Số lượng hợp đồng Pending.
+     */
+    public int countPendingContractsByManagerId(int managerId) {
+        String sql = "SELECT COUNT(c.contract_id) "
+                + "FROM Contracts c "
+                + "JOIN Manager_Agent ma ON c.agent_id = ma.agent_id "
+                + "WHERE ma.manager_id = ? AND c.status = 'Pending'";
+
+        try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, managerId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0; // Trả về 0 nếu có lỗi
+    }
+
+    /**
+     * Tính tổng premium của các hợp đồng 'Active' của team (theo managerId)
+     * được tạo trong tháng hiện tại.
+     *
+     * @param managerId ID của Manager.
+     * @return Tổng premium (BigDecimal).
+     */
+    public BigDecimal getTeamPremiumThisMonth(int managerId) {
+        String sql = "SELECT IFNULL(SUM(c.premium_amount), 0.00) "
+                + "FROM Contracts c "
+                + "JOIN Manager_Agent ma ON c.agent_id = ma.agent_id "
+                + "WHERE ma.manager_id = ? AND c.status = 'Active' "
+                + "AND YEAR(c.start_date) = YEAR(CURDATE()) "
+                + // Cùng năm
+                "AND MONTH(c.start_date) = MONTH(CURDATE())"; // Cùng tháng
+
+        try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, managerId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getBigDecimal(1);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return BigDecimal.ZERO; // Trả về 0 nếu có lỗi
+    }
+
+    /**
+     * Đếm số hợp đồng 'Active' của team (theo managerId) sắp hết hạn trong vòng
+     * 90 ngày tới (Renewal Alerts).
+     *
+     * @param managerId ID của Manager.
+     * @return Số lượng hợp đồng sắp hết hạn.
+     */
+    public int countExpiringContractsByManagerId(int managerId) {
+        String sql = "SELECT COUNT(c.contract_id) "
+                + "FROM Contracts c "
+                + "JOIN Manager_Agent ma ON c.agent_id = ma.agent_id "
+                + "WHERE ma.manager_id = ? AND c.status = 'Active' "
+                + "AND c.end_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 90 DAY)";
+
+        try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, managerId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
 }
