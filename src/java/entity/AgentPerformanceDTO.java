@@ -6,7 +6,10 @@ public class AgentPerformanceDTO {
     private double totalPremium;
     private int contractsCount;
     private double conversionRate; 
-    private double targetProgress; 
+    private double targetProgress;
+    private double revenuePercentage;
+    private double targetAmount;
+    
     
     // Constructor đơn giản để mapping từ DB
     public AgentPerformanceDTO(int agentId, String agentName, double totalPremium, int contractsCount) {
@@ -16,6 +19,8 @@ public class AgentPerformanceDTO {
         this.contractsCount = contractsCount;
         this.conversionRate = 0.0; // Sẽ tính sau
         this.targetProgress = 0.0; // Sẽ tính sau
+        this.revenuePercentage = 0.0;
+        this.targetAmount = 0.0;
     }
 
     // Constructor đầy đủ
@@ -26,24 +31,72 @@ public class AgentPerformanceDTO {
         this.contractsCount = contractsCount;
         this.conversionRate = conversionRate;
         this.targetProgress = targetProgress;
+        this.targetAmount = 0.0;
     }
 
     // ===== Getters và Setters =====
-    public int getAgentId() { return agentId; }
-    public void setAgentId(int agentId) { this.agentId = agentId; }
+    public int getAgentId() {
+        return agentId;
+    }
+
+    public void setAgentId(int agentId) {
+        this.agentId = agentId;
+    }
+
+    public String getAgentName() {
+        return agentName;
+    }
+
+    public void setAgentName(String agentName) {
+        this.agentName = agentName;
+    }
+
+    public double getTotalPremium() {
+        return totalPremium;
+    }
+
+    public void setTotalPremium(double totalPremium) {
+        this.totalPremium = totalPremium;
+    }
+
+    public int getContractsCount() {
+        return contractsCount;
+    }
+
+    public void setContractsCount(int contractsCount) {
+        this.contractsCount = contractsCount;
+    }
+
+    public double getConversionRate() {
+        return conversionRate;
+    }
+
+    public void setConversionRate(double conversionRate) {
+        this.conversionRate = conversionRate;
+    }
+
+    public double getTargetProgress() {
+        return targetProgress;
+    }
+
+    public void setTargetProgress(double targetProgress) {
+        this.targetProgress = targetProgress;
+    }
+
+    public double getRevenuePercentage() {
+        return revenuePercentage;
+    }
+
+    public void setRevenuePercentage(double revenuePercentage) {
+        this.revenuePercentage = revenuePercentage;
+    }
+
+    public double getTargetAmount() {
+        return targetAmount;
+    }
+
+    public void setTargetAmount(double targetAmount) {
+        this.targetAmount = targetAmount;
+    }
     
-    public String getAgentName() { return agentName; }
-    public void setAgentName(String agentName) { this.agentName = agentName; }
-
-    public double getTotalPremium() { return totalPremium; }
-    public void setTotalPremium(double totalPremium) { this.totalPremium = totalPremium; }
-
-    public int getContractsCount() { return contractsCount; }
-    public void setContractsCount(int contractsCount) { this.contractsCount = contractsCount; }
-    
-    public double getConversionRate() { return conversionRate; }
-    public void setConversionRate(double conversionRate) { this.conversionRate = conversionRate; }
-
-    public double getTargetProgress() { return targetProgress; }
-    public void setTargetProgress(double targetProgress) { this.targetProgress = targetProgress; }
 }

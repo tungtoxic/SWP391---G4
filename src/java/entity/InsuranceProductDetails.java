@@ -11,32 +11,23 @@ public class InsuranceProductDetails {
     private int productId;
     private int categoryId;
     private String productType;
-
-    // Chung
     private Double coverageAmount;
     private Integer durationYears;
-
-    // Life
     private String beneficiaries;
     private String maturityBenefit;
     private Double maturityAmount;
-       
-    // Health
     private Double hospitalizationLimit;
     private Double surgeryLimit;
     private Double maternityLimit;
     private Integer waitingPeriod;
     private Integer minAge;
     private Integer maxAge;
-
-    // Car
     private String vehicleType;
     private Double vehicleValue;
     private String coverageType;
-
     private Timestamp createdAt;
     private Timestamp updatedAt;
-
+    
     public int getProductId() {
         return productId;
     }

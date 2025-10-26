@@ -100,3 +100,49 @@ body {
 @media (max-width: 991.98px) {
   /* if you ever need mobile, you can add styles here */
 }
+/* layout.css */
+
+/* ... (Toàn bộ code CSS cũ của bạn giữ nguyên) ... */
+
+/* ===== FIX LỖI KÉO GIÃN SIDEBAR TOP ===== */
+
+/* layout.css */
+
+/* ... (Code CSS cũ của bạn) ... */
+
+/* ===== FIX LỖI KÉO GIÃN SIDEBAR TOP (V2) ===== */
+
+/* Reset chiều cao của container bao ngoài thông tin user */
+.sidebar .sidebar-top {
+    height: auto !important; /* Quan trọng: Ép chiều cao tự động theo nội dung */
+    min-height: initial !important; /* Bỏ min-height nếu có */
+    padding-top: 0.5rem !important; /* Giảm padding trên nếu cần */
+    padding-bottom: 0.5rem !important; /* Giảm padding dưới nếu cần */
+}
+
+/* Reset chiều cao của container flex chứa avatar và text */
+.sidebar .sidebar-top .d-flex {
+    height: auto !important; /* Ép chiều cao tự động */
+    min-height: initial !important;
+}
+
+/* Đảm bảo avatar giữ đúng kích thước */
+.sidebar .sidebar-top .avatar {
+    flex-shrink: 0;
+    width: 36px !important;
+    height: 36px !important;
+}
+
+/* Reset line-height cho text (đề phòng) */
+.sidebar .sidebar-top div div {
+    line-height: 1.4; /* Khoảng cách dòng bình thường */
+}
+.sidebar .sidebar-top .fw-bold {
+    line-height: 1.4;
+    margin-bottom: 0; /* Bỏ margin dưới nếu làm giãn cách */
+}
+.sidebar .sidebar-top div[style*="font-size:.85rem"] {
+    line-height: 1.2;
+}
+
+/* ===== HẾT PHẦN FIX ===== */

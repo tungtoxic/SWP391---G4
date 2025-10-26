@@ -8,9 +8,16 @@
 <%@ page import="java.util.*, entity.*" %>
 <%
     String ctx = request.getContextPath();
-    User currentUser = (User) session.getAttribute("user");
+    User currentUser = (User) request.getAttribute("currentUser"); // Lấy từ Servlet
+    String activePage = (String) request.getAttribute("activePage");
     List<Customer> customerList = (List<Customer>) request.getAttribute("customerList");
     List<Product> productList = (List<Product>) request.getAttribute("productList");
+    if (currentUser == null) {
+        response.sendRedirect(ctx + "/login.jsp");
+        return;
+    }
+    if (customerList == null) customerList = new ArrayList<>();
+    if (productList == null) productList = new ArrayList<>();
 %>
 <!DOCTYPE html>
 <html>
@@ -20,43 +27,8 @@
     <link rel="stylesheet" href="<%= ctx %>/css/layout.css" />
 </head>
 <body>
-    <%-- (Copy Navbar & Sidebar của Agent từ các trang khác vào đây) --%>
-    <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom fixed-top">
-        <div class="container-fluid">
-            <a class="navbar-brand fw-bold" href="<%=ctx%>/home.jsp">Company</a>
-            <ul class="navbar-nav d-flex flex-row align-items-center">
-                <li class="nav-item me-3"><a class="nav-link" href="<%=ctx%>/home.jsp">Home</a></li>
-                <li class="nav-item"><a class="nav-link" href="<%=ctx%>/logout"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
-            </ul>
-        </div>
-    </nav>
-
-    <aside class="sidebar bg-primary text-white">
-        <div class="sidebar-top p-3">
-            <div class="d-flex align-items-center mb-3">
-                <div class="avatar rounded-circle bg-white me-2" style="width:36px;height:36px;"></div>
-                <div>
-                    <div class="fw-bold"><%= currentUser != null ? currentUser.getFullName() : "Agent" %></div>
-                    <div style="font-size:.85rem;opacity:.9">Sales Agent</div>
-                </div>
-            </div>
-        </div>
-        <nav class="nav flex-column px-2">
-            <%-- ĐÃ SỬA LỖI ĐIỀU HƯỚNG --%>
-            <a class="nav-link text-white active py-2" href="<%=ctx%>/agent/dashboard"><i class="fas fa-chart-line me-2"></i> Dashboard</a>
-            <a class="nav-link text-white py-2" href="<%=ctx%>/profile.jsp"><i class="fas fa-user me-2"></i> Profile</a>
-            <a class="nav-link text-white py-2" href="<%=ctx%>/agents/leaderboard"><i class="fas fa-trophy me-2"></i> Leaderboard</a>
-            <a class="nav-link text-white py-2" href="<%=ctx%>/agent/commission-report"><i class="fas fa-percent me-2"></i> Commission Report</a>
-            <a class="nav-link text-white py-2" href="#"><i class="fas fa-box me-2"></i> Product</a>
-            <a class="nav-link text-white py-2" href="<%=ctx%>/agent/contracts"><i class="fas fa-file-signature me-2"></i> Contract</a>
-            <a class="nav-link text-white py-2" href="<%=ctx%>/agent/customers"><i class="fas fa-users me-2"></i> Customer</a>
-            <a class="nav-link text-white py-2" href="#"><i class="fas fa-file-alt me-2"></i> Policies</a>
-            <div class="mt-3 px-2">
-                <a class="btn btn-danger w-100" href="<%=ctx%>/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
-            </div>
-        </nav>
-    </aside>
-
+   <%@ include file="agent_navbar.jsp" %>
+    <%@ include file="agent_sidebar.jsp" %>
     <main class="main-content">
         <div class="container-fluid">
             <h1 class="mb-4">Tạo Hợp đồng mới</h1>

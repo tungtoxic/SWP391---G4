@@ -247,6 +247,7 @@ INSERT INTO `Contracts` (customer_id, agent_id, product_id, start_date, status, 
 INSERT INTO `Commissions` (contract_id, agent_id, policy_id, amount, status) VALUES (LAST_INSERT_ID(), 1, 1, 350000, 'Pending');
 INSERT INTO `Contracts` (customer_id, agent_id, product_id, start_date, status, premium_amount) VALUES (10, 1, 1, '2025-10-10', 'Active', 12000000);
 INSERT INTO `Commissions` (contract_id, agent_id, policy_id, amount, status) VALUES (LAST_INSERT_ID(), 1, 1, 600000, 'Pending');
+<<<<<<< HEAD
 
 
 
@@ -325,3 +326,5 @@ WHERE contract_id = 1;
 UPDATE Contracts
 SET end_date = DATE_ADD(CURDATE(), INTERVAL 5 DAY), status = 'Active'
 WHERE contract_id = 1;
+=======
+>>>>>>> develop
