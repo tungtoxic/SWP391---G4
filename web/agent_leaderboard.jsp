@@ -102,8 +102,22 @@
     </style>
 </head>
 <body>
-    <%@ include file="agent_navbar.jsp" %>
-    <%@ include file="agent_sidebar.jsp" %>
+<%-- ===== THÊM LOGIC CHỌN LAYOUT DỰA TRÊN VAI TRÒ ===== --%>
+<%
+    if (currentUser.getRoleId() == 1) { // ROLE_AGENT
+%>
+        <%@ include file="agent_navbar.jsp" %>
+        <%@ include file="agent_sidebar.jsp" %>
+<%
+    } else if (currentUser.getRoleId() == 2) { // ROLE_MANAGER
+%>
+        <%@ include file="manager_navbar.jsp" %>
+        <%@ include file="manager_sidebar.jsp" %>
+<%
+    } else {
+        // (Thêm layout cho Admin hoặc layout mặc định nếu cần)
+    }
+%>
     <%-- ================== MAIN CONTENT (NỘI DUNG CHÍNH CỦA TRANG) ================== --%>
     <main class="main-content">
         <div class="container-fluid">

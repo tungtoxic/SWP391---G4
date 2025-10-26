@@ -38,10 +38,8 @@ public class AgentLeaderboardServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
-   
         HttpSession session = request.getSession(false);
         User currentUser = (session != null) ? (User) session.getAttribute("user") : null;
-
         if (currentUser == null) { // Chỉ cần kiểm tra currentUser
             response.sendRedirect(request.getContextPath() + "/login.jsp");
             return;
@@ -49,9 +47,6 @@ public class AgentLeaderboardServlet extends HttpServlet {
         try {
             /// 1. Lấy danh sách đã sắp xếp từ DAO
             List<AgentPerformanceDTO> leaderboardList = userDao.getAgentLeaderboard();
-
-            // ===== BẮT ĐẦU LOGIC MỚI (TÍNH TOÁN %) =====
-            
             // 2. Tính tổng doanh thu toàn bộ Agent
             double grandTotalRevenue = 0.0;
             for (AgentPerformanceDTO agent : leaderboardList) {
@@ -65,11 +60,6 @@ public class AgentLeaderboardServlet extends HttpServlet {
                     agent.setRevenuePercentage(percentage); // Set % vào DTO
                 }
             }
-            // ===== KẾT THÚC LOGIC MỚI =====
-
-
-            // 4. Tách Top 3 và phần còn lại
-            // (Thêm các biến rỗng để tránh lỗi NullPointerException trên JSP)
             AgentPerformanceDTO top1Agent = null;
             AgentPerformanceDTO top2Agent = null;
             AgentPerformanceDTO top3Agent = null;
@@ -91,34 +81,18 @@ public class AgentLeaderboardServlet extends HttpServlet {
                 // Trường hợp chỉ có 2 agent, không có hạng 3
                 // remainingAgents vẫn là list rỗng
             }
-            // (Trường hợp chỉ có 1 agent, top2, top3, remaining đều rỗng)
-
-            // 5. Gửi TẤT CẢ dữ liệu sang JSP
             request.setAttribute("currentUser", currentUser);
-            
-            // Đặt activePage dựa trên vai trò
             if (currentUser.getRoleId() == ROLE_AGENT) {
                  request.setAttribute("activePage", "leaderboard");
             } else if (currentUser.getRoleId() == ROLE_MANAGER) {
-                 // Đặt tên này để khớp với sidebar của Manager
                  request.setAttribute("activePage", "agentLeaderboard"); 
             }
-            
-            request.setAttribute("agentLeaderboard", leaderboardList); // Gửi cả danh sách đầy đủ (dự phòng)
-            
-            // Gửi Top 3
+            request.setAttribute("agentLeaderboard", leaderboardList);
             request.setAttribute("top1Agent", top1Agent);
             request.setAttribute("top2Agent", top2Agent);
             request.setAttribute("top3Agent", top3Agent);
-            
-            // Gửi phần còn lại
             request.setAttribute("remainingAgents", remainingAgents);
-            
-            // Gửi tổng doanh thu (nếu JSP cần hiển thị)
             request.setAttribute("grandTotalRevenue", grandTotalRevenue);
-
-
-            // 6. Chuyển tiếp đến file JSP 
             request.getRequestDispatcher("/agent_leaderboard.jsp").forward(request, response);
 
         } catch (Exception e) {
