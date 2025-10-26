@@ -71,6 +71,7 @@ CREATE TABLE `Product_Categories` (
 CREATE TABLE `Products` (
     `product_id` INT AUTO_INCREMENT PRIMARY KEY,
     `product_name` VARCHAR(100) NOT NULL,
+    `description` TEXT,
     `category_id` INT,
     FOREIGN KEY (`category_id`) REFERENCES `Product_Categories`(`category_id`)
 );
@@ -247,7 +248,6 @@ INSERT INTO `Contracts` (customer_id, agent_id, product_id, start_date, status, 
 INSERT INTO `Commissions` (contract_id, agent_id, policy_id, amount, status) VALUES (LAST_INSERT_ID(), 1, 1, 350000, 'Pending');
 INSERT INTO `Contracts` (customer_id, agent_id, product_id, start_date, status, premium_amount) VALUES (10, 1, 1, '2025-10-10', 'Active', 12000000);
 INSERT INTO `Commissions` (contract_id, agent_id, policy_id, amount, status) VALUES (LAST_INSERT_ID(), 1, 1, 600000, 'Pending');
-<<<<<<< HEAD
 
 
 
@@ -274,39 +274,6 @@ CREATE TABLE Tasks (
     FOREIGN KEY (user_id) REFERENCES Users(user_id),
     FOREIGN KEY (customer_id) REFERENCES Customers(customer_id)
 );
-CREATE TABLE Insurance_Product_Details (
-    product_id INT PRIMARY KEY, -- 🔑 Khóa chính trùng với sản phẩm
-    category_id INT NOT NULL,
-    product_type ENUM('life', 'health', 'car') NOT NULL,
-    
-    -- Dùng chung
-    coverage_amount DECIMAL(12,2),
-    duration_years INT,
-    
-    -- Bảo hiểm nhân thọ
-    beneficiaries TEXT,
-    maturity_benefit TEXT,
-    maturity_amount DECIMAL(15,2),
-    
-    -- Bảo hiểm sức khỏe
-    hospitalization_limit DECIMAL(12,2),
-    surgery_limit DECIMAL(12,2),
-    maternity_limit DECIMAL(12,2), -- 🍼 Giới hạn sinh đẻ
-    min_age INT DEFAULT 0,         -- 🔹 Tuổi tối thiểu được bảo hiểm
-    max_age INT DEFAULT 100,
-    waiting_period INT,
-    
-    -- Bảo hiểm ô tô
-    vehicle_type VARCHAR(100),
-    vehicle_value DECIMAL(12,2),
-    coverage_type VARCHAR(255),
-
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-
-    FOREIGN KEY (product_id) REFERENCES Products(product_id) ON DELETE CASCADE,
-    FOREIGN KEY (category_id) REFERENCES Product_Categories(category_id)
-);
 -- 1. TẠO MỘT LỊCH HẸN "FOLLOW-UP" CHO HÔM NAY
 -- (Giả sử agent1 (user_id=1) hẹn gặp khách hàng customer_id=1)
 INSERT INTO Tasks (user_id, customer_id, title, due_date, is_completed)
@@ -326,5 +293,126 @@ WHERE contract_id = 1;
 UPDATE Contracts
 SET end_date = DATE_ADD(CURDATE(), INTERVAL 5 DAY), status = 'Active'
 WHERE contract_id = 1;
-=======
->>>>>>> develop
+
+USE `swp391`;
+
+-- =====================================================================
+-- SCRIPT CHÈN THÊM DỮ LIỆU CHO AGENT 1 VÀ AGENT 4
+-- =====================================================================
+
+-- ---------------------------------------------------------------------
+-- PHẦN 1: THÊM KHÁCH HÀNG MỚI (Customers)
+-- ---------------------------------------------------------------------
+-- (Agent 1 có user_id=1, Agent 2 (Two) có user_id=4)
+
+-- Thêm 2 khách hàng mới cho Agent 1
+INSERT INTO `Customers` (`full_name`, `date_of_birth`, `phone_number`, `email`, `address`, `created_by`, `customer_type`)
+VALUES
+('Nguyễn Văn Dũng', '1990-01-01', '0912345678', 'dungnv@mail.com', '12 Nguyễn Trãi, Hà Nội', 1, 'Client'),
+('Trần Thị Thảo', '1992-02-02', '0912345679', 'thaott@mail.com', '24 Tôn Đức Thắng, Hà Nội', 1, 'Lead');
+
+-- Thêm 2 khách hàng mới cho Agent 4
+INSERT INTO `Customers` (`full_name`, `date_of_birth`, `phone_number`, `email`, `address`, `created_by`, `customer_type`)
+VALUES
+('Lê Văn Hùng', '1985-03-03', '0987654321', 'hunglv@mail.com', '33 Lê Lợi, Đà Nẵng', 4, 'Client'),
+('Phạm Thị Mai', '1995-04-04', '0987654320', 'maipt@mail.com', '45 Hùng Vương, Đà Nẵng', 4, 'Lead');
+
+
+-- ---------------------------------------------------------------------
+-- PHẦN 2: THÊM HỢP ĐỒNG (Contracts) VÀ HOA HỒNG (Commissions / Sales)
+-- ---------------------------------------------------------------------
+
+-- Thêm 1 hợp đồng 'Active' cho khách hàng mới của Agent 1
+INSERT INTO `Contracts` (`customer_id`, `agent_id`, `product_id`, `start_date`, `end_date`, `status`, `premium_amount`)
+VALUES
+((SELECT customer_id FROM Customers WHERE email = 'dungnv@mail.com'), 1, 1, '2025-05-15', '2026-05-15', 'Active', 18000000);
+-- Thêm hoa hồng cho hợp đồng trên
+INSERT INTO `Commissions` (`contract_id`, `agent_id`, `policy_id`, `amount`, `status`)
+VALUES
+(LAST_INSERT_ID(), 1, 1, (18000000 * 0.05), 'Pending');
+
+-- Thêm 1 hợp đồng 'Pending' cho khách hàng 'Lead' của Agent 1 (chưa có hoa hồng)
+INSERT INTO `Contracts` (`customer_id`, `agent_id`, `product_id`, `start_date`, `status`, `premium_amount`)
+VALUES
+((SELECT customer_id FROM Customers WHERE email = 'thaott@mail.com'), 1, 2, '2025-10-25', 'Pending', 9000000);
+
+-- Thêm 1 hợp đồng 'Active' cho khách hàng mới của Agent 4
+INSERT INTO `Contracts` (`customer_id`, `agent_id`, `product_id`, `start_date`, `end_date`, `status`, `premium_amount`)
+VALUES
+((SELECT customer_id FROM Customers WHERE email = 'hunglv@mail.com'), 4, 2, '2025-06-20', '2026-06-20', 'Active', 22000000);
+-- Thêm hoa hồng cho hợp đồng trên
+INSERT INTO `Commissions` (`contract_id`, `agent_id`, `policy_id`, `amount`, `status`)
+VALUES
+(LAST_INSERT_ID(), 4, 1, (22000000 * 0.05), 'Pending');
+
+
+-- ---------------------------------------------------------------------
+-- PHẦN 3: TẠO DỮ LIỆU CHO "RENEWAL ALERTS"
+-- ---------------------------------------------------------------------
+-- (Tạo các hợp đồng 'Active' sắp hết hạn trong 30 ngày tới)
+
+-- Thêm 1 hợp đồng sắp hết hạn cho Agent 1 (với khách hàng cũ id=2)
+INSERT INTO `Contracts` (`customer_id`, `agent_id`, `product_id`, `start_date`, `end_date`, `status`, `premium_amount`)
+VALUES
+(2, 1, 1, '2024-11-10', DATE_ADD(CURDATE(), INTERVAL 15 DAY), 'Active', 14500000);
+INSERT INTO `Commissions` (`contract_id`, `agent_id`, `policy_id`, `amount`, `status`)
+VALUES (LAST_INSERT_ID(), 1, 1, (14500000 * 0.05), 'Paid');
+
+
+-- Thêm 1 hợp đồng sắp hết hạn cho Agent 4 (với khách hàng cũ id=3)
+INSERT INTO `Contracts` (`customer_id`, `agent_id`, `product_id`, `start_date`, `end_date`, `status`, `premium_amount`)
+VALUES
+(3, 4, 2, '2024-11-20', DATE_ADD(CURDATE(), INTERVAL 25 DAY), 'Active', 16000000);
+INSERT INTO `Commissions` (`contract_id`, `agent_id`, `policy_id`, `amount`, `status`)
+VALUES (LAST_INSERT_ID(), 4, 1, (16000000 * 0.05), 'Paid');
+
+
+-- ---------------------------------------------------------------------
+-- PHẦN 4: TẠO DỮ LIỆU CHO "TODAY'S FOLLOW-UPS"
+-- ---------------------------------------------------------------------
+-- (Thêm Tasks có due_date = hôm nay và có customer_id)
+
+-- Thêm 1 follow-up cho Agent 1 (với khách hàng cũ id=11)
+INSERT INTO `Tasks` (`user_id`, `customer_id`, `title`, `due_date`, `is_completed`)
+VALUES
+(1, 11, 'Gặp chị Phương (11h) ký HĐ Sức khỏe Vàng', CURDATE(), false);
+
+-- Thêm 2 follow-ups cho Agent 4 (vì Agent 4 chưa có)
+INSERT INTO `Tasks` (`user_id`, `customer_id`, `title`, `due_date`, `is_completed`)
+VALUES
+(4, 12, 'Gọi anh Vinh (14h) tư vấn gói An Tâm', CURDATE(), false),
+(4, (SELECT customer_id FROM Customers WHERE email = 'maipt@mail.com'), 'Gửi báo giá cho chị Mai (Lead mới)', CURDATE(), false);
+
+
+-- ---------------------------------------------------------------------
+-- PHẦN 5: TẠO DỮ LIỆU CHO "PERSONAL TO-DO LIST"
+-- ---------------------------------------------------------------------
+-- (Thêm Tasks có customer_id = NULL)
+
+-- Thêm 1 to-do cá nhân cho Agent 1 (Agent 1 đã có 2 cái)
+INSERT INTO `Tasks` (`user_id`, `customer_id`, `title`, `is_completed`)
+VALUES
+(1, NULL, 'Hoàn thành khóa học sản phẩm mới (E-learning)', false);
+
+-- Thêm 2 to-do cá nhân cho Agent 4 (Agent 4 chưa có)
+INSERT INTO `Tasks` (`user_id`, `customer_id`, `title`, `is_completed`)
+VALUES
+(4, NULL, 'Nộp báo cáo doanh thu T10 cho Manager One', false),
+(4, NULL, 'In card visit và name tag', true);
+
+ALTER TABLE Customers
+ADD COLUMN status ENUM('Active', 'Inactive') NOT NULL DEFAULT 'Active' AFTER customer_type;
+
+CREATE TABLE `Agent_Targets` (
+  `target_id` INT AUTO_INCREMENT PRIMARY KEY,
+  `agent_id` INT NOT NULL,
+  `target_amount` DECIMAL(12, 2) NOT NULL DEFAULT 0.00,
+  `target_month` INT NOT NULL, -- Sẽ lưu tháng (1-12)
+  `target_year` INT NOT NULL, -- Sẽ lưu năm (ví dụ: 2025)
+  
+  -- Đảm bảo mỗi agent chỉ có 1 target/tháng/năm
+  UNIQUE KEY `uk_agent_month_year` (`agent_id`, `target_month`, `target_year`), 
+  
+  -- Liên kết với bảng Users
+  FOREIGN KEY (`agent_id`) REFERENCES `Users`(`user_id`) ON DELETE CASCADE
+);
