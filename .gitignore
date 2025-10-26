@@ -34,3 +34,4 @@ nb-configuration.xml
 .project
 .settings/
 /nbproject
+web/src/conf/META-INF/context.xml
