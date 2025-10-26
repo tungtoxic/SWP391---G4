@@ -8,6 +8,7 @@ public class AgentPerformanceDTO {
     private double conversionRate; 
     private double targetProgress;
     private double revenuePercentage;
+    private double targetAmount;
     
     
     // Constructor đơn giản để mapping từ DB
@@ -19,6 +20,7 @@ public class AgentPerformanceDTO {
         this.conversionRate = 0.0; // Sẽ tính sau
         this.targetProgress = 0.0; // Sẽ tính sau
         this.revenuePercentage = 0.0;
+        this.targetAmount = 0.0;
     }
 
     // Constructor đầy đủ
@@ -29,6 +31,7 @@ public class AgentPerformanceDTO {
         this.contractsCount = contractsCount;
         this.conversionRate = conversionRate;
         this.targetProgress = targetProgress;
+        this.targetAmount = 0.0;
     }
 
     // ===== Getters và Setters =====
@@ -87,4 +90,13 @@ public class AgentPerformanceDTO {
     public void setRevenuePercentage(double revenuePercentage) {
         this.revenuePercentage = revenuePercentage;
     }
+
+    public double getTargetAmount() {
+        return targetAmount;
+    }
+
+    public void setTargetAmount(double targetAmount) {
+        this.targetAmount = targetAmount;
+    }
+    
 }

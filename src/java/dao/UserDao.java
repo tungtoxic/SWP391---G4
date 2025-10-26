@@ -2,6 +2,7 @@ package dao;
 
 import entity.AgentPerformanceDTO;
 import entity.*;
+import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -435,12 +436,16 @@ public class UserDao {
                 u.user_id,
                 u.full_name,
                 IFNULL(SUM(CASE WHEN c.status = 'Active' THEN c.premium_amount ELSE 0 END), 0) AS total_premium,
-                COUNT(CASE WHEN c.status = 'Active' THEN c.contract_id ELSE NULL END) AS contracts_count
+                COUNT(CASE WHEN c.status = 'Active' THEN c.contract_id ELSE NULL END) AS contracts_count,
+                IFNULL(t.target_amount, 0.00) AS target_amount 
             FROM Users u
             JOIN Manager_Agent ma ON u.user_id = ma.agent_id
             LEFT JOIN Contracts c ON u.user_id = c.agent_id
+            LEFT JOIN Agent_Targets t ON u.user_id = t.agent_id
+                                    AND t.target_month = MONTH(CURDATE())
+                                    AND t.target_year = YEAR(CURDATE())
             WHERE ma.manager_id = ? AND u.role_id = 1
-            GROUP BY u.user_id, u.full_name
+            GROUP BY u.user_id, u.full_name, t.target_amount
             ORDER BY total_premium DESC;
         """; // Sửa lại SUM và COUNT chỉ tính HĐ 'Active'
 
@@ -454,6 +459,7 @@ public class UserDao {
                             rs.getDouble("total_premium"), // Cẩn thận với double
                             rs.getInt("contracts_count")
                     );
+                    dto.setTargetAmount(rs.getDouble("target_amount"));
                     teamPerformance.add(dto);
                 }
             }
@@ -502,12 +508,46 @@ public class UserDao {
         }
         return allAgents;
     }
+    /**
+     * Thêm mới hoặc cập nhật Target cho Agent theo tháng/năm.
+     * Sử dụng cú pháp INSERT ... ON DUPLICATE KEY UPDATE.
+     * @param agentId ID của Agent
+     * @param targetAmount Số tiền target
+     * @param month Tháng (1-12)
+     * @param year Năm (ví dụ: 2025)
+     * @return true nếu thực thi thành công, false nếu thất bại.
+     */
+    public boolean setAgentTarget(int agentId, BigDecimal targetAmount, int month, int year) {
+        // Cú pháp này sẽ tự động UPDATE nếu đã tồn tại bản ghi (agent_id, target_month, target_year)
+        // hoặc INSERT mới nếu chưa có.
+        String sql = """
+            INSERT INTO Agent_Targets (agent_id, target_amount, target_month, target_year)
+            VALUES (?, ?, ?, ?)
+            ON DUPLICATE KEY UPDATE
+                target_amount = VALUES(target_amount);
+        """;
+        
+        try (Connection conn = DBConnector.makeConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setInt(1, agentId);
+            ps.setBigDecimal(2, targetAmount);
+            ps.setInt(3, month);
+            ps.setInt(4, year);
+            
+            return ps.executeUpdate() > 0; // Trả về true nếu (1) insert thành công hoặc (2) update thành công
+            
+        } catch (SQLException e) {
+            System.err.println("Lỗi khi set target cho agent ID: " + agentId);
+            e.printStackTrace();
+            return false;
+        }
+    }
 
     /**
      * Lấy danh sách xếp hạng Agent (giống getAllAgentsPerformance).
      */
     public List<AgentPerformanceDTO> getAgentLeaderboard() {
-        // Thực chất là gọi lại hàm getAllAgentsPerformance vì logic giống hệt
         return getAllAgentsPerformance();
     }
 
@@ -638,15 +678,44 @@ public class UserDao {
         // Lấy createdAt/updatedAt nếu có trong câu SELECT
         try {
              user.setCreatedAt(rs.getTimestamp("created_at"));
-        } catch (SQLException e) { /* Bỏ qua */ }
-         try {
-             user.setUpdatedAt(rs.getTimestamp("updated_at"));
-        } catch (SQLException e) { /* Bỏ qua */ }
+        } catch (SQLException e) {
+            /* Bỏ qua */ }
+        try {
+            user.setUpdatedAt(rs.getTimestamp("updated_at"));
+        } catch (SQLException e) {
+            /* Bỏ qua */ }
         // Lấy role_name nếu có trong câu SELECT (thường là có khi JOIN)
         try {
             user.setRoleName(rs.getString("role_name"));
-        } catch (SQLException e) { /* Bỏ qua nếu câu SELECT không có */ }
+        } catch (SQLException e) {
+            /* Bỏ qua nếu câu SELECT không có */ }
         return user;
     }
 
-} // <--- Đảm bảo dấu đóng class cuối cùng
+    /**
+     * Kiểm tra xem một Agent có thuộc quyền quản lý của một Manager hay không.
+     *
+     * @param agentId ID của Agent cần kiểm tra
+     * @param managerId ID của Manager
+     * @return true nếu Agent thuộc Manager, false nếu không hoặc có lỗi.
+     */
+    public boolean isAgentManagedBy(int agentId, int managerId) {
+        String sql = "SELECT COUNT(*) FROM Manager_Agent WHERE manager_id = ? AND agent_id = ?";
+
+        try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, managerId);
+            ps.setInt(2, agentId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0; // Trả về true nếu có 1 bản ghi (có tồn tại)
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Lỗi khi kiểm tra isAgentManagedBy: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return false; // Trả về false nếu có lỗi hoặc không tìm thấy
+    }
+}
