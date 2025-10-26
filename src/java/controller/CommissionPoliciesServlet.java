@@ -6,8 +6,6 @@ package controller;
 
 import dao.ProductDao;
 import entity.Product;
-import entity.ProductCategory;
-import jakarta.servlet.RequestDispatcher;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -63,16 +61,19 @@ public class CommissionPoliciesServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
-            ProductDao productDao = new ProductDao();
-            List<Product> productList = productDao.getAllProducts();
-            request.setAttribute("productList", productList);
-            request.getRequestDispatcher("commissionPolicies.jsp").forward(request, response);
-
+            listProducts(request, response);
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("error", "Error loading commission policies: " + e.getMessage());
-            request.getRequestDispatcher("/error.jsp").forward(request, response);
+            throw new ServletException(e);
         }
+    }
+
+    private void listProducts(HttpServletRequest request, HttpServletResponse response)
+            throws Exception {
+        ProductDao productDao = new ProductDao();
+        List<Product> productList = productDao.getAllProducts();
+        request.setAttribute("productList", productList);
+        request.getRequestDispatcher("/commissionPolicies.jsp").forward(request, response);
     }
 
     /**

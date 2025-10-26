@@ -165,14 +165,7 @@
                                         <td>${agent.fullName}</td>
                                         <td>${agent.email}</td>
                                         <td>${agent.phoneNumber}</td>
-                                        <td>
-                                            <span class="badge
-                                                  ${agent.status == 'Active' ? 'bg-success' 
-                                                    : agent.status == 'Pending' ? 'bg-warning' 
-                                                    : 'bg-secondary'}">
-                                                      ${agent.status}
-                                                  </span>
-                                            </td>
+                                        <td>${agent.status}</td>
 
                                             <c:choose>
                                                 <c:when test="${agent.status == 'Pending'}">
@@ -192,7 +185,6 @@
                                         <c:otherwise>
                                             <td>${agent.username}</td>
                                             <td>${agent.password}</td>
-                                            <td>${agent.status}</td>
                                         </c:otherwise>
                                     </c:choose>
                                     </tr>
