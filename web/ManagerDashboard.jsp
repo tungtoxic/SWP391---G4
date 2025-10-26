@@ -36,7 +36,7 @@
     DecimalFormat currencyFormat = new DecimalFormat("###,###,##0 'VNĐ'");
     DecimalFormat compactFormat = new DecimalFormat("0.#");
 %>
-<%! // ===== KHAI BÁO HÀM TRỢ GIÚP (DÙNG <%%! ... %>) =====
+<%! // ===== KHAI BÁO HÀM TRỢ GIÚP (DÙNG <%%! ...  =====
     /**
      * Hàm trợ giúp chuyển đổi BigDecimal sang định dạng Triệu hoặc VNĐ.
      */
