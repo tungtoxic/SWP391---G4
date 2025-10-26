@@ -17,7 +17,7 @@ public class CustomerDao {
     // ========== READ: LẤY DANH SÁCH KHÁCH HÀNG THEO AGENT ==========
     public List<Customer> getAllCustomersByAgentId(int agentId) {
         List<Customer> list = new ArrayList<>();
-        String sql = "SELECT * FROM Customers WHERE created_by = ? ORDER BY customer_id DESC";
+        String sql = "SELECT * FROM Customers WHERE created_by = ? AND status = 'Active' ORDER BY customer_id DESC";
         
         try (Connection conn = DBConnector.makeConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -110,18 +110,19 @@ public class CustomerDao {
 
 
     // ========== DELETE: XÓA KHÁCH HÀNG ==========
-    public boolean deleteCustomer(int id) {
-        String sql = "DELETE FROM Customers WHERE customer_id = ?";
-        try (Connection conn = DBConnector.makeConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, id);
-            return ps.executeUpdate() > 0;
-        } catch (Exception e) {
-            // Cần xử lý trường hợp không xóa được do ràng buộc khóa ngoại (ví dụ: khách hàng đã có hợp đồng
-            e.printStackTrace();
-        }
-        return false;
+public boolean deleteCustomer(int id) {
+    // String sql = "DELETE FROM Customers WHERE customer_id = ?"; // <-- Dòng cũ
+    String sql = "UPDATE Customers SET status = 'Inactive' WHERE customer_id = ?"; // <-- Dòng MỚI
+    try (Connection conn = DBConnector.makeConnection();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+        
+        ps.setInt(1, id);
+        return ps.executeUpdate() > 0;
+    } catch (Exception e) {
+        e.printStackTrace();
     }
+    return false;
+}
     // Thêm 2 phương thức này vào file dao/CustomerDao.java
 
 /**
