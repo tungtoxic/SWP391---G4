@@ -11,7 +11,8 @@ import java.util.Properties;
 public class EmailUtil {
 
     private static final String FROM = "thanh200417@gmail.com";
-    private static final String PASSWORD = "kmka suoi tyva ylmh"; // App password của Gmail
+    private static final String PASSWORD = "xafy ugfo ktzb ysxx"; // App password của Gmail
+
 
     public static void sendEmail(String to, String subject, String content) {
         Properties props = new Properties();
@@ -47,5 +48,6 @@ public class EmailUtil {
             e.printStackTrace();
         }
     }
+
 
 }

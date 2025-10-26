@@ -5,7 +5,6 @@ public class ProductCategory {
     private String categoryName;
     private String description;
 
-    // Getter/Setter
     public int getCategoryId() { return categoryId; }
     public void setCategoryId(int categoryId) { this.categoryId = categoryId; }
 

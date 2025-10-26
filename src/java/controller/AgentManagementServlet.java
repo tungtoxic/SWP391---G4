@@ -32,6 +32,8 @@ public class AgentManagementServlet extends HttpServlet {
                 deactivateAgent(request, response);
             } else if ("delete".equals(action)) {
                 deleteAgent(request, response);
+            } else if ("edit".equals(action)) {
+                showEditForm(request, response);
             } else {
                 listAgents(request, response);
             }
@@ -44,8 +46,8 @@ public class AgentManagementServlet extends HttpServlet {
 
     private void listAgents(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
-        String statusFilter = request.getParameter("status"); // Active / Inactive / null
-        List<User> agentList = userDAO.getUsersByRoleId(1); // 3 = Agent
+        String statusFilter = request.getParameter("status"); 
+        List<User> agentList = userDAO.getUsersByRoleId(1); 
         if (statusFilter != null) {
             agentList = agentList.stream()
                     .filter(u -> u.getStatus().equals(statusFilter))
@@ -59,21 +61,21 @@ public class AgentManagementServlet extends HttpServlet {
     private void activateAgent(HttpServletRequest request, HttpServletResponse response)
             throws SQLException, IOException {
         int id = Integer.parseInt(request.getParameter("id"));
-        userDAO.activateUserById(id); // sửa DAO theo id
+        userDAO.activateUserById(id); 
         response.sendRedirect("AgentManagementServlet?message=Agent activated successfully!");
     }
 
     private void deactivateAgent(HttpServletRequest request, HttpServletResponse response)
             throws SQLException, IOException {
         int id = Integer.parseInt(request.getParameter("id"));
-        userDAO.deactivateUserById(id); // sửa DAO theo id
+        userDAO.deactivateUserById(id); 
         response.sendRedirect("AgentManagementServlet?message=Agent deactivated successfully!");
     }
 
     private void deleteAgent(HttpServletRequest request, HttpServletResponse response)
             throws SQLException, IOException {
         int id = Integer.parseInt(request.getParameter("id"));
-        userDAO.deleteUser(id); // sửa DAO theo id
+        userDAO.deleteUser(id); 
         response.sendRedirect("AgentManagementServlet?message=Agent delete successfully!");
     }
 
@@ -85,15 +87,15 @@ public class AgentManagementServlet extends HttpServlet {
         String email = request.getParameter("email");
         String phone = request.getParameter("phoneNumber");
 
-        String tempPassword = UserDao.generateTempPassword(8); // mk tạm thời
+        String tempPassword = UserDao.generateTempPassword(8); 
         User newAgent = new User();
         newAgent.setUsername(username);
-        newAgent.setPasswordHash(tempPassword); // hash nếu cần
+        newAgent.setPasswordHash(tempPassword); 
         newAgent.setFullName(fullName);
         newAgent.setEmail(email);
         newAgent.setPhoneNumber(phone);
         newAgent.setStatus("Active");
-        newAgent.setRoleId(3); // Agent
+        newAgent.setRoleId(1); 
         newAgent.setIsFirstLogin(true);
         if (userDAO.checkUsernameExists(username)) {
             request.setAttribute("message", "Username already exists!");
@@ -109,6 +111,7 @@ public class AgentManagementServlet extends HttpServlet {
 
         boolean success = userDAO.createUser(newAgent);
         if (success) {
+
             // Gửi email
             
             response.sendRedirect("AgentManagementServlet?message=Agent created & email sent!");
@@ -117,37 +120,67 @@ public class AgentManagementServlet extends HttpServlet {
         }
     }
 
-    @Override
-protected void doPost(HttpServletRequest request, HttpServletResponse response)
-        throws ServletException, IOException {
+    private void updateAgent(HttpServletRequest request, HttpServletResponse response)
+            throws SQLException, IOException, ServletException {
 
-    request.setCharacterEncoding("UTF-8");
-    String action = request.getParameter("action");
+        int id = Integer.parseInt(request.getParameter("id"));
+        String fullName = request.getParameter("fullName");
+        String email = request.getParameter("email");
+        String phone = request.getParameter("phoneNumber");
 
-    try {
-        if ("approve".equals(action)) {
-            approveAgent(request, response);
-            return; // stop sau approve
+        User agent = userDAO.getUserById(id);
+        agent.setFullName(fullName);
+        agent.setEmail(email);
+        agent.setPhoneNumber(phone);
 
-        } else if ("create".equals(action)) {
-            createAgent(request, response);
-            return;
-
-        } else if ("edit".equals(action)) {
-            // handle edit
-            return;
+        boolean success = userDAO.updateAgent(agent);
+        if (success) {
+            response.sendRedirect("AgentManagementServlet?message=Agent updated successfully!");
+        } else {
+            request.setAttribute("message", "Error updating agent!");
+            request.setAttribute("agent", agent);
+            request.getRequestDispatcher("editAgent.jsp").forward(request, response);
         }
-
-        // các action khác...
-    } catch (Exception e) {
-        e.printStackTrace();
-        request.setAttribute("message", "Error: " + e.getMessage());
-        request.getRequestDispatcher("agentmanagement.jsp").forward(request, response);
     }
 
-    response.sendRedirect("AgentManagementServlet");
-}
+    private void showEditForm(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException, SQLException {
+        int id = Integer.parseInt(request.getParameter("id"));
+        User existingAgent = userDAO.getUserById(id);
+        request.setAttribute("agent", existingAgent);
+        request.getRequestDispatcher("editAgent.jsp").forward(request, response);
+    }
 
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        request.setCharacterEncoding("UTF-8");
+        String action = request.getParameter("action");
+
+        try {
+            if ("approve".equals(action)) {
+                approveAgent(request, response);
+                return; 
+
+            } else if ("create".equals(action)) {
+                createAgent(request, response);
+                return;
+
+            } else if ("edit".equals(action)) {
+                updateAgent(request, response);
+                return;
+            }
+
+  
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("message", "Error: " + e.getMessage());
+            request.getRequestDispatcher("agentmanagement.jsp").forward(request, response);
+        }
+
+        response.sendRedirect("AgentManagementServlet");
+    }
 
     private void approveAgent(HttpServletRequest request, HttpServletResponse response)
             throws SQLException, IOException {
@@ -158,10 +191,10 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response)
 
         User agent = userDAO.getUserById(id);
         agent.setUsername(username);
-        agent.setPasswordHash(password); // không hash theo yêu cầu
+        agent.setPasswordHash(password); 
         agent.setStatus("Active");
 
-        boolean success = userDAO.updateUser(agent); // update DB
+        boolean success = userDAO.updateUser(agent); 
         if (success) {
             EmailUtil.sendEmail(agent.getEmail(),
                     "Thông tin tài khoản",

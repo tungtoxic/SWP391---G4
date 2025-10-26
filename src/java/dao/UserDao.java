@@ -3,19 +3,20 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package dao;
+import utility.DBConnector;
 import entity.AgentPerformanceDTO; 
 import entity.*;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import utility.DBConnector;
 
 /**
  *
  * @author Helios 16
  */
 public class UserDao {
+
     // Hàm login check DB
 public User login(String username, String password) {
         String sql = "SELECT * FROM Users WHERE username = ? AND password_hash = ? AND status ='active'";
@@ -27,6 +28,7 @@ public User login(String username, String password) {
             ps.setString(2, password);
 
             try (ResultSet rs = ps.executeQuery()) {
+
                 if (rs.next()) {
                     User user = new User();
                     user.setUserId(rs.getInt("user_id"));
@@ -55,7 +57,7 @@ public User login(String username, String password) {
 
             ps.setString(1, email);
             try (ResultSet rs = ps.executeQuery()) {
-                return rs.next(); // nếu có bản ghi => true
+                return rs.next();
             }
 
         } catch (Exception e) {
@@ -64,7 +66,6 @@ public User login(String username, String password) {
         return false;
     }
 
-    // Kiểm tra username đã tồn tại chưa
     public boolean checkUsernameExists(String username) {
         String sql = "SELECT user_id FROM Users WHERE username = ?";
         try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -80,7 +81,6 @@ public User login(String username, String password) {
         return false;
     }
 
-    //check username exist
     public boolean isUsernameExists(String username) throws SQLException {
         String sql = "SELECT COUNT(*) FROM Users WHERE username = ?";
         try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -93,7 +93,6 @@ public User login(String username, String password) {
         }
         return false;
     }
-//kiem tra phone_number
 
     public boolean isPhoneExists(String phoneNumber) throws SQLException {
         String sql = "SELECT COUNT(*) FROM Users WHERE phone_number = ?";
@@ -119,7 +118,6 @@ public User login(String username, String password) {
             ps.setInt(6, user.getRoleId());
             ps.setString(7, user.getStatus());
             return ps.executeUpdate() > 0;
-            // ✅ phải kiểm tra số dòng insert
         }
     }
 
@@ -135,8 +133,9 @@ public User login(String username, String password) {
                 }
             }
         }
-        return -1; // Không tìm thấy role
+        return -1;
     }
+
    
 // Thêm/Sửa phương thức này trong file dao/UserDao.java
 
@@ -162,7 +161,7 @@ public List<User> getAllUsers(String roleIdFilter) throws SQLException {
         }
 
         try (ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
+    while (rs.next()) {
                 User user = new User();
                 user.setUserId(rs.getInt("user_id"));
                 user.setUsername(rs.getString("username"));
@@ -176,9 +175,11 @@ public List<User> getAllUsers(String roleIdFilter) throws SQLException {
             }
         }
     }
+
     return userList;
 }
     //lấy rolename theo role_id
+
     public String getRoleNameById(int roleId) throws SQLException {
         String sql = "SELECT role_name FROM Roles WHERE role_id = ?";
         try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -189,10 +190,9 @@ public List<User> getAllUsers(String roleIdFilter) throws SQLException {
                 }
             }
         }
-        return "Unknown"; // Nếu không có role
+        return "Unknown";
     }
 
-    // Lấy user theo id
     public User getUserById(int id) throws SQLException {
         String sql = "SELECT u.*, r.role_name FROM Users u JOIN Roles r ON u.role_id = r.role_id WHERE u.user_id = ?";
         try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -208,11 +208,9 @@ public List<User> getAllUsers(String roleIdFilter) throws SQLException {
                     user.setPasswordHash(rs.getString("password_hash"));
                     user.setRoleId(rs.getInt("role_id"));
                     user.setStatus(rs.getString("status"));
-                    // Nếu entity User có field roleName
                     try {
                         user.setRoleName(rs.getString("role_name"));
                     } catch (Exception e) {
-                        // nếu chưa thêm roleName thì bỏ qua
                     }
                     return user;
                 }
@@ -266,6 +264,7 @@ public List<User> getAllUsers(String roleIdFilter) throws SQLException {
             return ps.executeUpdate() > 0;
         }
     }
+
 
     public boolean activateUserById(int id) throws SQLException {
         String sql = "UPDATE Users SET status = 'Active' WHERE user_id = ?";
@@ -329,7 +328,7 @@ public List<User> getAllUsers(String roleIdFilter) throws SQLException {
         try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, user.getUsername());
-            ps.setString(2, user.getPassword()); // hoặc hash nếu muốn
+            ps.setString(2, user.getPassword()); 
             ps.setString(3, user.getFullName());
             ps.setString(4, user.getEmail());
             ps.setString(5, user.getPhoneNumber());
@@ -338,11 +337,10 @@ public List<User> getAllUsers(String roleIdFilter) throws SQLException {
             ps.setBoolean(8, user.getIsFirstLogin());
 
             int rows = ps.executeUpdate();
-            return rows > 0; // true nếu insert thành công
+            return rows > 0;
         }
     }
 
-    //xóa user bangid
     public boolean deleteUser(int userId) throws SQLException {
         String sql = "DELETE FROM Users WHERE user_id=?";
         try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -350,7 +348,6 @@ public List<User> getAllUsers(String roleIdFilter) throws SQLException {
             return ps.executeUpdate() > 0;
         }
     }
-    // update password
 
     public boolean updatePassword(int userId, String newPasswordHash) {
         String sql = "UPDATE Users SET password_hash = ? WHERE user_id = ?";
@@ -359,7 +356,7 @@ public List<User> getAllUsers(String roleIdFilter) throws SQLException {
             ps.setInt(2, userId);
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
-            e.printStackTrace(); // xem log server để biết chi tiết lỗi
+            e.printStackTrace();
             return false;
         }
     }
@@ -455,7 +452,21 @@ public List<User> getAllUsers(String roleIdFilter) throws SQLException {
         e.printStackTrace(); // Luôn in ra lỗi để dễ debug
     }
     return allAgents;
-}
+    }
+
+    public boolean updateAgent(User user) throws SQLException {
+        String sql = "UPDATE users SET full_name=?, email=?, phone_number=? WHERE user_id =?";
+        try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, user.getFullName());
+            ps.setString(2, user.getEmail());
+            ps.setString(3, user.getPhoneNumber());
+            ps.setInt(4, user.getUserId());
+            return ps.executeUpdate() > 0;
+        }
+    }
+
+
+
     /**
      * Lấy danh sách xếp hạng tất cả các Agent dựa trên tổng doanh thu từ hợp
      * đồng Active.

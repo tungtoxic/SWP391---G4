@@ -1,10 +1,12 @@
 package entity;
 
+import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.math.BigDecimal;
 
 public class Contract {
+
     private int contractId;
     private int customerId;
     private int agentId;
@@ -14,6 +16,21 @@ public class Contract {
     private String status;
     private BigDecimal premiumAmount; // Dùng BigDecimal cho tiền tệ là tốt nhất
     private Timestamp createdAt;
+
+    public Contract() {
+    }
+
+    public Contract(int contractId, int customerId, int agentId, int productId, Date startDate, Date endDate, String status, BigDecimal premiumAmount, Timestamp createdAt) {
+        this.contractId = contractId;
+        this.customerId = customerId;
+        this.agentId = agentId;
+        this.productId = productId;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.status = status;
+        this.premiumAmount = premiumAmount;
+        this.createdAt = createdAt;
+    }
     
     // Getters and Setters
     public int getContractId() { return contractId; }
@@ -35,3 +52,4 @@ public class Contract {
     public Timestamp getCreatedAt() { return createdAt; }
     public void setCreatedAt(Timestamp createdAt) { this.createdAt = createdAt; }
 }
+   

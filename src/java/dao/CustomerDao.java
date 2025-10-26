@@ -1,9 +1,15 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+
 package dao;
 
 import entity.Customer;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+
 import utility.DBConnector;
 
 public class CustomerDao {
@@ -37,13 +43,12 @@ public class CustomerDao {
         }
         return list;
     }
-
     // ========== READ: LẤY MỘT KHÁCH HÀNG THEO ID ==========
     public Customer getCustomerById(int id) {
         String sql = "SELECT * FROM Customers WHERE customer_id = ?";
         try (Connection conn = DBConnector.makeConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            
+           
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -57,6 +62,7 @@ public class CustomerDao {
                     c.setCreatedBy(rs.getInt("created_by"));
                     c.setCreatedAt(rs.getTimestamp("created_at"));
                     c.setCustomerType(rs.getString("customer_type"));
+                    c.setCreatedAt(rs.getTimestamp("created_at")); 
                     return c;
                 }
             }
@@ -65,13 +71,11 @@ public class CustomerDao {
         }
         return null;
     }
-
     // ========== CREATE: THÊM KHÁCH HÀNG MỚI ==========
     public boolean insertCustomer(Customer c) {
         String sql = "INSERT INTO Customers(full_name, date_of_birth, phone_number, email, address, created_by, customer_type) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBConnector.makeConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            
             ps.setString(1, c.getFullName());
             ps.setDate(2, c.getDateOfBirth());
             ps.setString(3, c.getPhoneNumber());
@@ -85,14 +89,12 @@ public class CustomerDao {
         }
         return false;
     }
-
     // ========== UPDATE: CẬP NHẬT THÔNG TIN KHÁCH HÀNG ==========
     public boolean updateCustomer(Customer c) {
         // Lưu ý: Không cho phép cập nhật created_by
         String sql = "UPDATE Customers SET full_name=?, date_of_birth=?, phone_number=?, email=?, address=? WHERE customer_id=?";
         try (Connection conn = DBConnector.makeConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            
             ps.setString(1, c.getFullName());
             ps.setDate(2, c.getDateOfBirth());
             ps.setString(3, c.getPhoneNumber());
@@ -106,16 +108,16 @@ public class CustomerDao {
         return false;
     }
 
+
     // ========== DELETE: XÓA KHÁCH HÀNG ==========
     public boolean deleteCustomer(int id) {
         String sql = "DELETE FROM Customers WHERE customer_id = ?";
         try (Connection conn = DBConnector.makeConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            
             ps.setInt(1, id);
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
-            // Cần xử lý trường hợp không xóa được do ràng buộc khóa ngoại (ví dụ: khách hàng đã có hợp đồng)
+            // Cần xử lý trường hợp không xóa được do ràng buộc khóa ngoại (ví dụ: khách hàng đã có hợp đồng
             e.printStackTrace();
         }
         return false;

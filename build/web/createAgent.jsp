@@ -1,83 +1,77 @@
-tao <%-- 
-    Document   : addCategoryProduct
-    Created on : Oct 10, 2025, 3:23:55 PM
+<%-- 
+    Document   : createAgent
+    Created on : Oct 11, 2025, 3:44:40 PM
     Author     : Helios 16
 --%>
-
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
     String ctx = request.getContextPath();
 %>
 <!DOCTYPE html>
-<html lang="vi">
+<html>
 <head>
     <meta charset="UTF-8">
-    <title>Chọn loại sản phẩm</title>
+    <title>Create New Agent</title>
 
     <!-- Bootstrap + FontAwesome -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
-    <!-- Layout CSS (dùng lại :root bạn đã có) -->
-    <link rel="stylesheet" href="<%=ctx%>/css/layout.css" />
+    <!-- Layout CSS (màu chủ đạo, sidebar, main-content, v.v.) -->
+    <link rel="stylesheet" href="<%=ctx%>/css/layout.css">
 
     <style>
-        main {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: calc(100vh - var(--navbar-height));
-            background-color: var(--bg-page);
-        }
-        .category-card {
-            background: white;
-            padding: 40px 35px;
+        .form-container {
+            background: #fff;
+            padding: 30px;
             border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-            width: 420px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-top: 100px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .form-container h2 {
             text-align: center;
-        }
-        .category-card h2 {
+            color: var(--primary);
             margin-bottom: 25px;
-            color: var(--text);
         }
-        select, button {
-            padding: 10px;
+
+        label {
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        input[type="text"], input[type="email"], input[type="tel"] {
             width: 100%;
-            margin-top: 12px;
-            border-radius: 6px;
+            padding: 10px;
             border: 1px solid #ccc;
-            font-size: 1rem;
+            border-radius: 6px;
         }
-        button {
-            background-color: var(--primary);
-            color: white;
+
+        .btn-primary {
+            background: var(--primary);
             border: none;
-            cursor: pointer;
-            font-weight: bold;
-            transition: background 0.2s;
         }
-        button:hover {
-            background-color: #0b5ed7;
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .alert {
+            background: #e6f4ea;
+            color: #2e7d32;
+            border-left: 4px solid #2e7d32;
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
         }
     </style>
 </head>
 <body>
 
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom fixed-top">
-        <div class="container-fluid">
-            <a class="navbar-brand fw-bold" href="<%=ctx%>/home.jsp">Company</a>
-            <div>
-                <ul class="navbar-nav d-flex flex-row align-items-center">
-                    <li class="nav-item me-3"><a class="nav-link" href="<%=ctx%>/home.jsp">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="<%=ctx%>/logout"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Sidebar -->
     <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom fixed-top">
         <div class="container-fluid">
             <a class="navbar-brand fw-bold" href="<%=ctx%>/home.jsp">Company</a>
@@ -116,30 +110,55 @@ tao <%--
 
     <!-- Main Content -->
     <main class="main-content">
-        <div class="category-card">
-            <h2>🛡️ Chọn loại sản phẩm bảo hiểm</h2>
-            <form action="ProductServlet" method="post">
-                <input type="hidden" name="action" value="addChosenCategory">
-                <select name="category" required>
-                    <option value="">-- Chọn loại sản phẩm --</option>
-                    <option value="life">Bảo hiểm nhân thọ</option>
-                    <option value="health">Bảo hiểm sức khỏe</option>
-                    <option value="car">Bảo hiểm ô tô</option>
-                </select>
-                <button type="submit" class="mt-3">Thêm sản phẩm ➜</button>
+        <div class="form-container">
+            <h2><i class="fas fa-user-plus me-2"></i>Create New Agent</h2>
+
+            <c:if test="${not empty message}">
+                <div class="alert">${message}</div>
+            </c:if>
+
+            <form action="AgentManagementServlet?action=create" method="post">
+                <div class="mb-3">
+                    <label>Username:</label>
+                    <input type="text" name="username" class="form-control" required>
+                </div>
+
+                <div class="mb-3">
+                    <label>Full Name:</label>
+                    <input type="text" name="fullName" class="form-control" required>
+                </div>
+
+                <div class="mb-3">
+                    <label>Email:</label>
+                    <input type="email" name="email" class="form-control" required>
+                </div>
+
+                <div class="mb-3">
+                    <label>Phone Number:</label>
+                    <input type="tel" name="phoneNumber" class="form-control">
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="fas fa-save me-2"></i>Create Agent
+                </button>
             </form>
+
+            <div class="text-center mt-3">
+                <a href="AgentManagementServlet" class="text-decoration-none">
+                    <i class="fas fa-arrow-left me-1"></i>Back to Agent List
+                </a>
+            </div>
         </div>
     </main>
 
     <footer class="main-footer text-muted">
         <div class="container-fluid d-flex justify-content-between py-2">
-            <div>© Your Company</div>
+            <div>© 2025 SWP391 - Insurance Management System</div>
             <div><b>Version</b> 1.0</div>
         </div>
     </footer>
 
 </body>
 </html>
-
 
 
