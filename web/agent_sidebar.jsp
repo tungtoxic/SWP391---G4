@@ -40,7 +40,7 @@
         </a>
         
         <a class="nav-link text-white py-2 <%= "product".equals(activePage) ? "active" : "" %>" href="#"> <%-- Sửa link # sau --%>
-            <i class="fas fa-box me-2"></i> Product
+            <i class="fas fa-box me-2"></i> Product12
         </a>
         
         <a class="nav-link text-white py-2 <%= "contracts".equals(activePage) ? "active" : "" %>" href="<%=ctx%>/agent/contracts">
