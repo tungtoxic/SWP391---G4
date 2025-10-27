@@ -27,7 +27,7 @@ import java.util.List;
 public class AgentLeaderboardServlet extends HttpServlet {
 
     private UserDao userDao;
-    private static final int ROLE_AGENT = 1; // Giả định Agent role là 1
+    private static final int ROLE_AGENT = 1; 
     private static final int ROLE_MANAGER = 2;
 
     @Override
