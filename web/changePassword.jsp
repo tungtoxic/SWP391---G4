@@ -1,4 +1,5 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -106,6 +107,7 @@
             border-radius: 8px;
             font-weight: 500;
         }
+        .alert:empty {display:none}
 
         .success {
             background: rgba(67, 233, 123, 0.2);
@@ -148,11 +150,11 @@
     </form>
 
     <c:if test="${not empty message}">
-        <div class="alert success">${message}</div>
+    <div class="alert success">${fn:trim(message)}</div>
     </c:if>
 
     <c:if test="${not empty error}">
-        <div class="alert error">${error}</div>
+    <div class="alert error">${fn:trim(error)}</div>
     </c:if>
 
     <a href="profile.jsp" class="btn btn-back">← Quay lại Profile</a>
