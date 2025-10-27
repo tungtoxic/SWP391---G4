@@ -8,6 +8,7 @@ package dao;
  *
  * @author hoang
  */
+import utility.DBConnector;
 import entity.Role;
 import java.sql.*;
 import java.util.ArrayList;

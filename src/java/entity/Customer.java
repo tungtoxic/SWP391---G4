@@ -14,15 +14,14 @@ public class Customer {
     private String phoneNumber;
     private String email;
     private String address;
-    private int createdBy;       
+    private int createdBy;
     private Timestamp createdAt;
+    private String customerType;
 
     public Customer() {
     }
 
-    public Customer(int customerId, String fullName, Date dateOfBirth, String phoneNumber,
-                    String email, String address, int createdBy,
-                    Timestamp createdAt) {
+    public Customer(int customerId, String fullName, Date dateOfBirth, String phoneNumber, String email, String address, int createdBy, Timestamp createdAt, String customerType) {
         this.customerId = customerId;
         this.fullName = fullName;
         this.dateOfBirth = dateOfBirth;
@@ -31,7 +30,9 @@ public class Customer {
         this.address = address;
         this.createdBy = createdBy;
         this.createdAt = createdAt;
+        this.customerType = customerType;
     }
+    
 
     public int getCustomerId() {
         return customerId;
@@ -96,6 +97,14 @@ public class Customer {
     public void setCreatedAt(Timestamp createdAt) {
         this.createdAt = createdAt;
     }
+    public String getCustomerType() {
+        return customerType;
+    }
 
+    public void setCustomerType(String customerType) {
+        this.customerType = customerType;
+    }
+    
+    
 }
 

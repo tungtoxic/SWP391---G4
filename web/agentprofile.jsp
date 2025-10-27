@@ -6,7 +6,6 @@
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.util.*, entity.User" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
 <html>
 <head>
@@ -131,7 +130,12 @@
                 <td>${agent.fullName}</td>
                 <td>${agent.email}</td>
                 <td>${agent.phoneNumber}</td>
-                <td>${agent.status}</td>
+                <td>
+                    <span class="badge 
+                        ${agent.status == 'Active' ? 'bg-success' : 'bg-secondary'}">
+                        ${agent.status}
+                    </span>
+                </td>
                 <td>${agent.createdAt}</td>
                 <td>
                     <a href="AgentManagementServlet?action=edit&id=${agent.userId}" class="btn btn-warning btn-sm">Edit</a>

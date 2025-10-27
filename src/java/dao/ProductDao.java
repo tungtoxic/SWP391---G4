@@ -1,5 +1,6 @@
 package dao;
 
+import utility.DBConnector;
 import entity.InsuranceProductDetails;
 import entity.Product;
 import entity.ProductCategory;

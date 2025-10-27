@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
- */
 package controller;
 
 import dao.UserDao;
@@ -13,7 +9,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
-import java.sql.SQLException;
 
 @WebServlet("/LoginServlet")
 public class LoginServlet extends HttpServlet {
@@ -39,28 +34,25 @@ public class LoginServlet extends HttpServlet {
         String password = request.getParameter("password");
 
         User user = userDAO.login(username, password);
-
+        
         if (user != null) {
             HttpSession session = request.getSession();
             session.setAttribute("user", user);
-
-            try {
-                boolean activated = userDAO.activateUserById(user.getUserId());
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-
+            
+            // --- THAY ĐỔI 2: SỬ DỤNG HẰNG SỐ ĐỂ ĐIỀU HƯỚNG ---
+            // Code bây giờ đã "biết nói"
             switch (user.getRoleId()) {
                 case ROLE_AGENT:
                     response.sendRedirect(request.getContextPath() + "/agent/dashboard");
                     break;
                 case ROLE_MANAGER:
-                    response.sendRedirect("ManagerDashboard.jsp");
+                    response.sendRedirect("manager/dashboard");
                     break;
                 case ROLE_ADMIN:
                     response.sendRedirect("AdminDashboard.jsp");
                     break;
                 default:
+                    // Trong trường hợp có vai trò không xác định, chuyển về trang chủ
                     response.sendRedirect("home.jsp");
                     break;
             }
@@ -69,5 +61,4 @@ public class LoginServlet extends HttpServlet {
             request.getRequestDispatcher("login.jsp").forward(request, response);
         }
     }
-
 }

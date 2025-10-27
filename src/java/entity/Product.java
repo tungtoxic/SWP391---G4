@@ -8,31 +8,64 @@ public class Product {
     private double basePrice;
     private int categoryId;
     private Timestamp createdAt;
-
+    private Timestamp updateAt;
     public Product() {}
 
-    public Product(int productId, String productName, 
-                   double basePrice, int categoryId) {
+    public Product(int productId, String productName, double basePrice, int categoryId, Timestamp createdAt, Timestamp updateAt) {
         this.productId = productId;
         this.productName = productName;
         this.basePrice = basePrice;
         this.categoryId = categoryId;
+        this.createdAt = createdAt;
+        this.updateAt = updateAt;
     }
 
-    // Getters & Setters
-    public int getProductId() { return productId; }
-    public void setProductId(int productId) { this.productId = productId; }
+    public int getProductId() {
+        return productId;
+    }
 
-    public String getProductName() { return productName; }
-    public void setProductName(String productName) { this.productName = productName; }
+    public void setProductId(int productId) {
+        this.productId = productId;
+    }
 
-    public double getBasePrice() { return basePrice; }
-    public void setBasePrice(double basePrice) { this.basePrice = basePrice; }
+    public String getProductName() {
+        return productName;
+    }
 
-    public int getCategoryId() { return categoryId; }
-    public void setCategoryId(int categoryId) { this.categoryId = categoryId; }
+    public void setProductName(String productName) {
+        this.productName = productName;
+    }
 
-    public Timestamp getCreatedAt() { return createdAt; }
-    public void setCreatedAt(Timestamp createdAt) { this.createdAt = createdAt; }
+    public double getBasePrice() {
+        return basePrice;
+    }
+
+    public void setBasePrice(double basePrice) {
+        this.basePrice = basePrice;
+    }
+
+    public int getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(int categoryId) {
+        this.categoryId = categoryId;
+    }
+
+    public Timestamp getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Timestamp createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Timestamp getUpdateAt() {
+        return updateAt;
+    }
+
+    public void setUpdateAt(Timestamp updateAt) {
+        this.updateAt = updateAt;
+    }
 
 }

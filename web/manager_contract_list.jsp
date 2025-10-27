@@ -1,0 +1,142 @@
+<%-- 
+    Document   : manager_contract_list
+    Created on : Oct 25, 2025, 11:14:09 AM
+    Author     : Nguyễn Tùng
+--%>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="java.util.*, entity.*, java.text.*" %>
+<%
+    String ctx = request.getContextPath();
+    User currentUser = (User) request.getAttribute("currentUser"); // Get from request
+    List<ContractDTO> contractList = (List<ContractDTO>) request.getAttribute("contractList");
+    String viewTitle = (String) request.getAttribute("viewTitle");
+    Boolean isPendingView = (Boolean) request.getAttribute("isPendingView"); // Check which view this is
+    String activePage = (isPendingView != null && isPendingView) ? "pending" : "all";
+    // Default values in case attributes are somehow null
+    if (viewTitle == null) viewTitle = "Managed Contracts";
+    if (isPendingView == null) isPendingView = false;
+    if (contractList == null) contractList = new ArrayList<>();
+
+
+    DecimalFormat currencyFormat = new DecimalFormat("###,###,##0 'VNĐ'");
+    SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+    String message = request.getParameter("message"); // For success/error messages
+%>
+<!DOCTYPE html>
+<html>
+<head>
+    <title><%= viewTitle %></title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    <link rel="stylesheet" href="<%= ctx %>/css/layout.css" />
+</head>
+<body>
+    
+    <%-- Include Navbar --%>
+    <%@ include file="manager_navbar.jsp" %>
+
+    <%-- Include Sidebar (nó sẽ tự dùng currentUser và activePage đã định nghĩa ở trên) --%>
+    <%@ include file="manager_sidebar.jsp" %>
+    <main class="main-content">
+        <div class="container-fluid">
+            <h1 class="mb-4"><%= viewTitle %></h1>
+
+            <%-- Display messages --%>
+             <% if ("approveSuccess".equals(message)) { %>
+                <div class="alert alert-success">Contract approved successfully! A commission has been created (if applicable).</div>
+            <% } else if ("rejectSuccess".equals(message)) { %>
+                <div class="alert alert-warning">Contract has been rejected/cancelled.</div>
+             <% } else if ("rejectError".equals(message)) { %>
+                 <div class="alert alert-danger">Failed to reject the contract. Please try again.</div>
+             <% } else if ("AuthError".equals(message)) { %>
+                 <div class="alert alert-danger">You do not have permission for this action.</div>
+             <% } %>
+
+            <div class="card">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0 align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Agent</th> <%-- Added Agent column --%>
+                                    <th>Customer</th>
+                                    <th>Product</th>
+                                    <th>Start Date</th> <%-- Added Start Date --%>
+                                    <th>Status</th>
+                                    <th class="text-end">Premium</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            <% if (!contractList.isEmpty()) {
+                                for (ContractDTO c : contractList) { %>
+                                <tr>
+                                    <td>#<%= c.getContractId() %></td>
+                                    <td><%= c.getAgentName() %></td> <%-- Display Agent Name --%>
+                                    <td><%= c.getCustomerName() %></td>
+                                    <td><%= c.getProductName() %></td>
+                                    <td><%= c.getStartDate() != null ? dateFormat.format(c.getStartDate()) : "N/A" %></td> <%-- Display Start Date --%>
+                                    <td>
+                                        <%-- Status Badge Logic (copied from agent list) --%>
+                                        <span class="badge
+                                            <% if("Active".equals(c.getStatus())) out.print("bg-success");
+                                               else if("Pending".equals(c.getStatus())) out.print("bg-warning text-dark");
+                                               else if("Expired".equals(c.getStatus())) out.print("bg-secondary"); // Use secondary for Expired
+                                               else if("Cancelled".equals(c.getStatus())) out.print("bg-danger"); // Use danger for Cancelled
+                                               else out.print("bg-dark"); %>
+                                        "><%= c.getStatus() %></span>
+                                    </td>
+                                    <td class="text-end"><%= currencyFormat.format(c.getPremiumAmount()) %></td>
+                                    <td>
+                                        <%-- Actions depend on the view (Pending or All) --%>
+                                        <% if (isPendingView) { %>
+                                            <%-- Show Approve/Reject buttons only in Pending view --%>
+                                            <div class="d-flex gap-1">
+                                                <form action="<%=ctx%>/manager/contracts" method="post" class="d-inline-block">
+                                                    <input type="hidden" name="action" value="approve">
+                                                    <input type="hidden" name="contractId" value="<%= c.getContractId() %>">
+                                                    <button type="submit" class="btn btn-success btn-sm" onclick="return confirm('Approve contract #<%= c.getContractId() %>?')">
+                                                        <i class="fa fa-check"></i>
+                                                    </button>
+                                                </form>
+                                                <form action="<%=ctx%>/manager/contracts" method="post" class="d-inline-block">
+                                                    <input type="hidden" name="action" value="reject">
+                                                    <input type="hidden" name="contractId" value="<%= c.getContractId() %>">
+                                                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Reject contract #<%= c.getContractId() %>?');">
+                                                        <i class="fa fa-times"></i>
+                                                    </button>
+                                                </form>
+                                                 <%-- Add View Detail Button --%>
+                                                 <a href="<%=ctx%>/manager/contracts?action=viewDetail&id=<%= c.getContractId() %>" class="btn btn-info btn-sm" title="View Details"><i class="fa fa-eye"></i></a>
+                                            </div>
+                                        <% } else { %>
+                                            <%-- Show only View Detail button in All Contracts view --%>
+                                            <a href="<%=ctx%>/manager/contracts?action=viewDetail&id=<%= c.getContractId() %>" class="btn btn-info btn-sm" title="View Details"><i class="fa fa-eye"></i></a>
+                                             <%-- Maybe add other actions later, like manually cancelling an Active contract --%>
+                                        <% } %>
+                                    </td>
+                                </tr>
+                            <% } // end for loop
+                               } else { %>
+                                <tr>
+                                    <td colspan="8" class="text-center p-4 text-muted">
+                                        <% if (isPendingView) { %>
+                                            No pending contracts found for your team.
+                                        <% } else { %>
+                                            No contracts found for your team.
+                                        <% } %>
+                                    </td>
+                                </tr>
+                            <% } // end if-else empty check %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

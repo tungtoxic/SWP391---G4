@@ -1,9 +1,3 @@
-<%-- 
-    Document   : AdminDashboard
-    Created on : Oct 5, 2025, 11:02:43 AM
-    Author     : hoang
---%>
-
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <% String ctx = request.getContextPath(); %>
 <!DOCTYPE html>
@@ -18,7 +12,6 @@
     <link rel="stylesheet" href="<%=ctx%>/css/layout.css" />
     <link rel="stylesheet" href="<%=ctx%>/css/admin-dashboard.css" />
     <style>
-        /* Tùy chỉnh nhỏ cho KPI cards và bảng */
         .kpi-card-icon { font-size: 2.5rem; opacity: 0.5; }
         .alert-widget { border-left: 5px solid #ffc107; }
     </style>
@@ -49,10 +42,11 @@
         </div>
 
         <nav class="nav flex-column px-2">
-            <a class="nav-link text-white active py-2" href="#"><i class="fas fa-desktop me-2"></i> Admin Dashboard</a>
+            <a class="nav-link text-white active py-2" href="#"><i class="fas fa-desktop me-2"></i> Dashboard</a>
+            <a class="nav-link text-white py-2" href="<%= request.getContextPath() %>/profile.jsp"><i class="fas fa-desktop me-2"></i> Profile</a>           
             <a class="nav-link text-white py-2" href="usermanagement.jsp"><i class="fas fa-users-cog me-2"></i> User Management</a>
-            <a class="nav-link text-white py-2" href="#"><i class="fas fa-tools me-2"></i> System Settings</a>
-            <a class="nav-link text-white py-2" href="#"><i class="fas fa-file-export me-2"></i> Reporting</a>
+            <a class="nav-link text-white py-2" href="#"><i class="fas fa-tools me-2"></i> Commission Management</a>
+            <a class="nav-link text-white py-2" href="ReportServlet"><i class="fas fa-file-export me-2"></i> Performance Report</a>
             <div class="mt-3 px-2">
                 <a class="btn btn-danger w-100" href="<%=ctx%>/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
             </div>
@@ -149,7 +143,6 @@
                                 <li class="list-group-item text-center">
                                     <a href="#"><i class="fas fa-cog me-1"></i> Go to Admin Logs</a>
                                 </li>
-                                <%-- End Dữ liệu giả lập --%>
                             </ul>
                         </div>
                     </div>
@@ -234,7 +227,7 @@
                     labels: ['Agents', 'Managers', 'Admins'],
                     datasets: [{
                         data: [120, 25, 5], // Số lượng người dùng theo vai trò
-                        backgroundColor: ['#198754', '#0d6efd', '#dc3545'],
+                        backgroundColor: ['#198754', '#0d6efd', '#dc3545']
                     }]
                 },
                 options: {

@@ -51,7 +51,27 @@ public class VerifyServlet extends HttpServlet {
                     e.printStackTrace();
                     req.setAttribute("error", "Lỗi hệ thống: " + e.getMessage());
                 }
-            } 
+            } else if ("login".equals(authType)) {
+                cleanup(session);
+                session.setAttribute("user", tempUser);
+
+                int roleId = tempUser.getRoleId();
+                switch (roleId) {
+                    case 1:
+                        resp.sendRedirect("AgentDashboard.jsp");
+                        break;
+                    case 2:
+                        resp.sendRedirect("ManagementDashboard.jsp");
+                        break;
+                    case 3:
+                        resp.sendRedirect("AdminDashboard.jsp");
+                        break;
+
+                    default:
+                        resp.sendRedirect("profile.jsp");
+                }
+                return;
+            }
         } else {
             req.setAttribute("error", "Mã OTP không đúng hoặc đã hết hạn.");
         }

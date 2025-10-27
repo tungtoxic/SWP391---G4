@@ -6,6 +6,7 @@ import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;
+import utility.PasswordUtils;
 
 @WebServlet("/ChangePassword")
 public class ChangePasswordServlet extends HttpServlet {
@@ -50,11 +51,12 @@ public class ChangePasswordServlet extends HttpServlet {
         }
 
         try {
-            if (oldPassword.equals(user.getPasswordHash())) {
-                boolean ok = userDao.updatePassword(user.getUserId(), newPassword);
+            if (PasswordUtils.verifyPassword(oldPassword, user.getPasswordHash())) {
+                String newHash = PasswordUtils.hashPassword(newPassword);
+                boolean ok = userDao.updatePassword(user.getUserId(), newHash);
                 if (ok) {
                     // cập nhật session user
-                    user.setPasswordHash(newPassword);
+                    user.setPasswordHash(newHash);
                     session.setAttribute("user", user);
 
                     // lưu message vào session để hiển thị ở profile sau redirect
