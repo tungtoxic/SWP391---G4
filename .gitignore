@@ -1,1 +1,41 @@
-/dist/
+# Compiled class file
+*.class
+
+# Log file
+*.log
+
+# BlueJ files
+*.ctxt
+
+# Mobile Tools for Java (J2ME)
+.mtj.tmp/
+
+# Package Files #
+*.jar
+*.war
+*.ear
+
+# NetBeans specific #
+nbproject/private/
+build/
+dist/
+nbbuild/
+nbdist/
+nbactions.xml
+nb-configuration.xml
+.nb-gradle/
+
+# IDE settings
+.idea/
+*.iml
+*.ipr
+*.iws
+.classpath
+.project
+.settings/
+/nbproject
+web/src/conf/META-INF/context.xml
+/build
+/nbproject
+*.sql
+/nbproject
