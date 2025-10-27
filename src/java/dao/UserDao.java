@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import utility.DBConnector;
+import utility.PasswordUtils;
 
 public class UserDao {
 
@@ -18,13 +19,14 @@ public class UserDao {
      * @return Đối tượng User nếu hợp lệ và Active, null nếu không.
      */
     public User login(String username, String password) {
+        String hashed = PasswordUtils.hashPassword(password);
         // Cần kiểm tra status = 'Active' trong SQL
         String sql = "SELECT * FROM Users WHERE username = ? AND password_hash = ? AND status ='Active'";
         try (Connection conn = DBConnector.makeConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, username);
-            ps.setString(2, password); // Giả định password chưa hash khi truyền vào
+            ps.setString(2, hashed); // Giả định password chưa hash khi truyền vào
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -649,4 +651,4 @@ public class UserDao {
         return user;
     }
 
-} // <--- Đảm bảo dấu đóng class cuối cùng
+}

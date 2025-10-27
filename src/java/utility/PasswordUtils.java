@@ -26,7 +26,8 @@ public class PasswordUtils {
 
     // Hàm verify để so sánh mật khẩu nhập vào với hash trong DB
     public static boolean verifyPassword(String rawPassword, String storedHash) {
-        String hashedInput = hashPassword(rawPassword); // hash lại input
-        return hashedInput.equals(storedHash); // so sánh với hash trong DB
+        String hashedInput = hashPassword(rawPassword);
+        return hashedInput.equals(storedHash);
     }
+
 }

@@ -6,7 +6,10 @@
         response.sendRedirect("login.jsp");
         return;
     }
-    String message = (String) request.getAttribute("message");
+    String message = (String) session.getAttribute("message");
+    if (message != null) {
+        session.removeAttribute("message");
+    }
 %>
 <!DOCTYPE html>
 <html>
