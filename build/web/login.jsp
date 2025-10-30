@@ -19,7 +19,7 @@
     </p>
     
     <p class="redirect-text">Quên mật khẩu?
-        <a href="resetpassword.jsp">Reset password</a>
+        <a href="resetPassword.jsp">Reset password</a>
     </p>
 
     <%
