@@ -1,9 +1,3 @@
-<%-- 
-    Document   : login
-    Created on : Oct 2, 2025, 3:35:21 PM
-    Author     : Helios 16
---%>
-
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
@@ -22,6 +16,10 @@
 
     <p class="redirect-text">Chưa có tài khoản?
         <a href="register.jsp">Đăng ký</a>
+    </p>
+    
+    <p class="redirect-text">Quên mật khẩu?
+        <a href="resetpassword.jsp">Reset password</a>
     </p>
 
     <%
