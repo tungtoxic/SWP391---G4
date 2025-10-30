@@ -54,9 +54,9 @@ public class ChangePasswordServlet extends HttpServlet {
 
         boolean success = userDao.changePassword(userId, oldPassword, newPassword);
         if (success) {
-            request.setAttribute("message", "Đổi mật khẩu thành công!");
+            request.setAttribute("message", "Your password has been changed successfully!");
         } else {
-            request.setAttribute("error", "Mật khẩu cũ không đúng hoặc có lỗi hệ thống.");
+            request.setAttribute("error", "Old password is incorrect.");
         }
 
         request.getRequestDispatcher("changePassword.jsp").forward(request, response);
