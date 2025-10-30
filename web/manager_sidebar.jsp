@@ -22,7 +22,7 @@
         <a class="nav-link text-white py-2 <%= "dashboard".equals(activePage) ? "active" : "" %>" href="<%=ctx%>/manager/dashboard"><i class="fas fa-chart-line me-2"></i> Dashboard</a>
         <a class="nav-link text-white py-2 <%= "profile".equals(activePage) ? "active" : "" %>" href="<%=ctx%>/profile.jsp"><i class="fas fa-user me-2"></i> Profile</a>
         <a class="nav-link text-white py-2 <%= "performance".equals(activePage) ? "active" : "" %>" href="<%=ctx%>/manager/performance"><i class="fas fa-users-cog me-2"></i> Team Performance</a>
-        <a class="nav-link text-white py-2 <%= "agentMgmt".equals(activePage) ? "active" : "" %>" href="<%=ctx%>/agentmanagement.jsp"><i class="fas fa-users-cog me-2"></i> Agent Management</a>
+        <a class="nav-link text-white py-2 <%= "agentMgmt".equals(activePage) ? "active" : "" %>" href="<%=ctx%>/AgentManagementServlet?action="><i class="fas fa-users-cog me-2"></i> Agent Management</a>
 
         <%-- ===== MENU LEADERBOARD XỔ XUỐNG (ĐÃ SỬA) ===== --%>
         <%-- 1. Xác định xem section này có active không (cần Servlet gửi activePage="agentLeaderboard" hoặc "managerLeaderboard") --%>
@@ -45,9 +45,23 @@
             </a>
         </div>
         <%-- ===== HẾT PHẦN SỬA LEADERBOARD ===== --%>
-        
-        <a class="nav-link text-white py-2 <%= "commPolicies".equals(activePage) ? "active" : "" %>" href="#"><i class="fas fa-file-invoice-dollar me-2"></i> Commission Policies</a>
-        <a class="nav-link text-white py-2 <%= "productMgmt".equals(activePage) ? "active" : "" %>" href="<%=ctx%>/productmanagement.jsp"><i class="fas fa-box me-2"></i> Product</a>
+        <a class="nav-link text-white py-2 d-flex justify-content-between align-items-center <%= isLeaderboardSectionActive ? "active" : "" %>"
+           data-bs-toggle="collapse" href="#leaderboardSubmenu" role="button" aria-expanded="<%= isLeaderboardSectionActive ? "true" : "false" %>" aria-controls="leaderboardSubmenu">
+            <span><i class="fas fa-trophy me-2"></i> Policies</span>
+            <%-- Dùng class "leaderboard-arrow-icon" riêng biệt --%>
+            <i class="fas <%= isLeaderboardSectionActive ? "fa-chevron-down" : "fa-chevron-right" %> small leaderboard-arrow-icon"></i>
+        </a>
+        <div class="collapse ps-3 <%= isLeaderboardSectionActive ? "show" : "" %>" id="leaderboardSubmenu">
+            <%-- Link 1: Xếp hạng Agent (chúng ta sẽ đặt activePage="agentLeaderboard" cho trang này) --%>
+            <a class="nav-link text-white py-1 <%= "agentLeaderboard".equals(activePage) ? "active" : "" %>" href="<%=ctx%>/CommissionPoliciesServlet">
+                 <i class="fas fa-user-friends me-2 small"></i> Commission Policies
+            </a>
+            <%-- Link 2: Xếp hạng Manager (chúng ta sẽ đặt activePage="managerLeaderboard" cho trang này) --%>
+            <a class="nav-link text-white py-1 <%= "managerLeaderboard".equals(activePage) ? "active" : "" %>" href="<%=ctx%>/managers/leaderboard">
+                 <i class="fas fa-sitemap me-2 small"></i> Contract Policies
+            </a>
+        </div>
+        <a class="nav-link text-white py-2 <%= "productMgmt".equals(activePage) ? "active" : "" %>" href="<%=ctx%>/ProductServlet?action=list"><i class="fas fa-box me-2"></i> Product</a>
 
         <%-- Menu Contract (Giữ nguyên) --%>
          <% boolean isContractSectionActive = "all".equals(activePage) || "pending".equals(activePage); %>
@@ -65,7 +79,7 @@
             </a>
         </div>
 
-        <a class="nav-link text-white py-2 <%= "policies".equals(activePage) ? "active" : "" %>" href="#"><i class="fas fa-file-alt me-2"></i> Policies</a>
+        
         <div class="mt-3 px-2">
             <a class="btn btn-danger w-100" href="<%=ctx%>/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </div>

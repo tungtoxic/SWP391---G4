@@ -13,8 +13,6 @@ import java.io.IOException;
 @WebServlet("/LoginServlet")
 public class LoginServlet extends HttpServlet {
 
-    // --- THAY ĐỔI 1: ĐỊNH NGHĨA HẰNG SỐ CHO VAI TRÒ ---
-    // Giúp code dễ đọc và dễ bảo trì hơn
     private static final int ROLE_AGENT = 1;
     private static final int ROLE_MANAGER = 2;
     private static final int ROLE_ADMIN = 3;
@@ -38,9 +36,7 @@ public class LoginServlet extends HttpServlet {
         if (user != null) {
             HttpSession session = request.getSession();
             session.setAttribute("user", user);
-            
-            // --- THAY ĐỔI 2: SỬ DỤNG HẰNG SỐ ĐỂ ĐIỀU HƯỚNG ---
-            // Code bây giờ đã "biết nói"
+
             switch (user.getRoleId()) {
                 case ROLE_AGENT:
                     response.sendRedirect(request.getContextPath() + "/agent/dashboard");
@@ -52,7 +48,7 @@ public class LoginServlet extends HttpServlet {
                     response.sendRedirect("AdminDashboard.jsp");
                     break;
                 default:
-                    // Trong trường hợp có vai trò không xác định, chuyển về trang chủ
+
                     response.sendRedirect("home.jsp");
                     break;
             }

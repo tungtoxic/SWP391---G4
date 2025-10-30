@@ -64,7 +64,8 @@
 <body>
 
     <%@ include file="agent_navbar.jsp" %>
-    <%@ include file="agent_sidebar.jsp" %> <%-- Sidebar sẽ tự động lấy activePage="dashboard" --%>
+    <%@ include file="agent_sidebar.jsp" %>
+     <%-- Sidebar sẽ tự động lấy activePage="dashboard" --%>
 
     <main class="main-content">
         <div class="container-fluid">
