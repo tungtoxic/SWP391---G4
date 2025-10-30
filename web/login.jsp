@@ -6,19 +6,19 @@
 </head>
 <body>
 <div class="form-box">
-    <h2>Đăng nhập</h2>
+    <h2>Login</h2>
 
     <form action="LoginServlet" method="post">
-        <input type="text" name="username" placeholder="Email hoặc Username" required>
-        <input type="password" name="password" placeholder="Mật khẩu" required>
-        <button type="submit" class="btn">Đăng nhập</button>
+        <input type="text" name="username" placeholder="Enter Email or Username" required>
+        <input type="password" name="password" placeholder="Enter password" required>
+        <button type="submit" class="btn">Login</button>
     </form>
 
-    <p class="redirect-text">Chưa có tài khoản?
-        <a href="register.jsp">Đăng ký</a>
+    <p class="redirect-text">Don't have an account?
+        <a href="register.jsp">Register</a>
     </p>
     
-    <p class="redirect-text">Quên mật khẩu?
+    <p class="redirect-text">Forgot password?
         <a href="resetPassword.jsp">Reset password</a>
     </p>
 

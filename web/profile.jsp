@@ -143,6 +143,7 @@
             <div class="btn-group">
                 <a href="ChangePassword" class="btn btn-change-pass">Change Password</a>
                 <button class="btn btn-update" onclick="switchToEdit()">Update Profile</button>
+                <a href="AdminDashboard.jsp" class="btn btn-change-pass">Return to Dashboard</a>
             </div>
         </div>
 

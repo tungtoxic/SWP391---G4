@@ -40,22 +40,22 @@
 </head>
 <body>
 <div class="card">
-    <h3>Reset mật khẩu</h3>
+    <h3>Reset Password</h3>
 
     <div id="stepEmail">
         <input type="email" id="email" class="form-control" placeholder="Nhập email của bạn">
-        <button class="btn btn-primary" onclick="sendOTP()">Gửi OTP</button>
+        <button class="btn btn-primary" onclick="sendOTP()">Send OTP</button>
     </div>
 
     <div id="stepOTP" style="display:none;">
         <input type="text" id="otp" class="form-control" placeholder="Nhập mã OTP">
-        <button class="btn btn-primary" onclick="verifyOTP()">Xác nhận OTP</button>
+        <button class="btn btn-primary" onclick="verifyOTP()">Confirm OTP</button>
     </div>
 
     <div id="stepNewPass" style="display:none;">
         <input type="password" id="newPass" class="form-control" placeholder="Mật khẩu mới">
         <input type="password" id="confirmPass" class="form-control" placeholder="Xác nhận mật khẩu mới">
-        <button class="btn btn-primary" onclick="confirmPassword()">Xác nhận mật khẩu</button>
+        <button class="btn btn-primary" onclick="confirmPassword()">Confirm Password</button>
     </div>
 </div>
 

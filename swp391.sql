@@ -418,10 +418,8 @@ CREATE TABLE `Agent_Targets` (
 );
 
 SET SQL_SAFE_UPDATES = 0;
-
 UPDATE users
 SET password_hash = SHA2(password_hash, 256);
-
 SET SQL_SAFE_UPDATES = 1;
 
 
