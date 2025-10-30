@@ -37,12 +37,6 @@ CREATE TABLE `Users` (
     `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (`role_id`) REFERENCES `Roles`(`role_id`)
 );
-SET SQL_SAFE_UPDATES = 0;
-
-UPDATE users
-SET password_hash = SHA2(password_hash, 256);
-
-SET SQL_SAFE_UPDATES = 1;
 
 -- Bảng `Manager_Agent` để quản lý quan hệ
 CREATE TABLE `Manager_Agent` (
@@ -422,4 +416,11 @@ CREATE TABLE `Agent_Targets` (
   -- Liên kết với bảng Users
   FOREIGN KEY (`agent_id`) REFERENCES `Users`(`user_id`) ON DELETE CASCADE
 );
+
+SET SQL_SAFE_UPDATES = 0;
+
+UPDATE users
+SET password_hash = SHA2(password_hash, 256);
+
+SET SQL_SAFE_UPDATES = 1;
 
