@@ -1,12 +1,10 @@
 package controller;
 
 import dao.UserDao;
-import entity.User;
 import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;
-import utility.PasswordUtils;
 
 @WebServlet("/ChangePassword")
 public class ChangePasswordServlet extends HttpServlet {
@@ -14,7 +12,7 @@ public class ChangePasswordServlet extends HttpServlet {
     private UserDao userDao;
 
     @Override
-    public void init() throws ServletException {
+    public void init() {
         userDao = new UserDao();
     }
 
@@ -32,45 +30,35 @@ public class ChangePasswordServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        HttpSession session = request.getSession(false);
-        User user = (User) session.getAttribute("user");
 
-        if (user == null) {
+        request.setCharacterEncoding("UTF-8");
+
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("user") == null) {
             response.sendRedirect("login.jsp");
             return;
         }
+
+        entity.User user = (entity.User) session.getAttribute("user");
+        int userId = user.getUserId();
 
         String oldPassword = request.getParameter("oldPassword");
         String newPassword = request.getParameter("newPassword");
         String confirmPassword = request.getParameter("confirmPassword");
 
         if (!newPassword.equals(confirmPassword)) {
-            request.setAttribute("error", "Mật khẩu mới không trùng khớp!");
+            request.setAttribute("error", "Mật khẩu xác nhận không khớp!");
             request.getRequestDispatcher("changePassword.jsp").forward(request, response);
             return;
         }
 
-        try {
-            if (PasswordUtils.verifyPassword(oldPassword, user.getPasswordHash())) {
-            String newHash = PasswordUtils.hashPassword(newPassword);
-            boolean ok = userDao.updatePassword(user.getUserId(), newHash);
-        if (ok) {
-            user.setPasswordHash(newHash);
-            session.setAttribute("user", user);
-            session.setAttribute("message", "Password changed successfully!");
-            response.sendRedirect("profile.jsp");
-            return;
+        boolean success = userDao.changePassword(userId, oldPassword, newPassword);
+        if (success) {
+            request.setAttribute("message", "Đổi mật khẩu thành công!");
         } else {
-            request.setAttribute("error", "Không thể cập nhật mật khẩu vào DB.");
-        }
-        } else {
-        request.setAttribute("error", "Mật khẩu cũ không đúng!");
+            request.setAttribute("error", "Mật khẩu cũ không đúng hoặc có lỗi hệ thống.");
         }
 
-        } catch (Exception e) {
-            e.printStackTrace(); 
-            request.setAttribute("error", "Có lỗi xảy ra: " + e.getMessage()); 
-        }
         request.getRequestDispatcher("changePassword.jsp").forward(request, response);
     }
 }

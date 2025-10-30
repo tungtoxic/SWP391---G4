@@ -26,7 +26,7 @@ CREATE TABLE `Roles` (
 CREATE TABLE `Users` (
     `user_id` INT AUTO_INCREMENT PRIMARY KEY,
     `username` VARCHAR(50) UNIQUE,
-    `password_hash` VARCHAR(255),
+    `password_hash` CHAR(64) not null,
     `full_name` VARCHAR(100),
     `email` VARCHAR(100) UNIQUE,
     `phone_number` VARCHAR(20),
@@ -416,3 +416,6 @@ CREATE TABLE `Agent_Targets` (
   -- Liên kết với bảng Users
   FOREIGN KEY (`agent_id`) REFERENCES `Users`(`user_id`) ON DELETE CASCADE
 );
+use swp391;
+SELECT username, password_hash FROM users;
+
