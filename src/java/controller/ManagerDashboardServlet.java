@@ -5,6 +5,8 @@
 
 package controller;
 
+import dao.*; 
+import entity.*;
 import dao.ContractDao;
 import dao.UserDao;
 import entity.AgentPerformanceDTO;
@@ -30,11 +32,12 @@ public class ManagerDashboardServlet extends HttpServlet {
     private ContractDao contractDao;
     private UserDao userDao;
     private static final int ROLE_MANAGER = 2;
-
+    private TaskDao taskDao;
     @Override
     public void init() {
         contractDao = new ContractDao();
         userDao = new UserDao();
+        taskDao = new TaskDao();
     }
 
     @Override
@@ -75,7 +78,7 @@ public class ManagerDashboardServlet extends HttpServlet {
 
             // 4. (Tương lai) Lấy dữ liệu cho Biểu đồ Product Distribution
             // Map<String, Double> productDistribution = ... // Cần hàm DAO
-            
+            List<Task> personalTasks = taskDao.getPersonalTasks(managerId); // Dùng managerId
             
             // 5. Gửi dữ liệu sang JSP
             request.setAttribute("currentUser", currentUser); // Gửi currentUser
@@ -96,7 +99,7 @@ public class ManagerDashboardServlet extends HttpServlet {
             // Gửi dữ liệu Biểu đồ
             // request.setAttribute("productLabels", ...); // Gửi khi đã có
             // request.setAttribute("productData", ...); // Gửi khi đã có
-
+            request.setAttribute("personalTasks", personalTasks);
             // Forward
             request.getRequestDispatcher("/ManagerDashboard.jsp").forward(request, response);
 
