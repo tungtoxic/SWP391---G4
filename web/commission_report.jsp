@@ -58,7 +58,7 @@
                 <div class="avatar rounded-circle bg-white me-2" style="width:36px;height:36px;"></div>
                 <div>
                     <div class="fw-bold"><%= currentUser != null ? currentUser.getFullName() : "Agent" %></div>
-                    <div style="font-size:.85rem;opacity:.9">Sales Agent</div>
+                    <div style="font-size:.85rem;opacity:.9">Agent</div>
                 </div>
             </div>
         </div>

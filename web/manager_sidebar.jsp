@@ -25,7 +25,7 @@
         <a class="nav-link text-white py-2 <%= "dashboard".equals(activePage) ? "active" : "" %>" href="<%=ctx%>/ManagerDashboard.jsp"><i class="fas fa-chart-line me-2"></i> Dashboard</a>
         <a class="nav-link text-white py-2 <%= "profile".equals(activePage) ? "active" : "" %>" href="<%=ctx%>/profile.jsp"><i class="fas fa-user me-2"></i> Profile</a>
         <a class="nav-link text-white py-2 <%= "performance".equals(activePage) ? "active" : "" %>" href="<%=ctx%>/manager/performance"><i class="fas fa-users-cog me-2"></i> Team Performance</a>
-        <a class="nav-link text-white py-2 <%= "agentMgmt".equals(activePage) ? "active" : "" %>" href="<%=ctx%>/agentmanagement.jsp"><i class="fas fa-users-cog me-2"></i> Agent Management</a>
+        <a class="nav-link text-white py-2 <%= "agentMgmt".equals(activePage) ? "active" : "" %>" href="<%=ctx%>/AgentManagementServlet?action="><i class="fas fa-users-cog me-2"></i> Agent Management</a>
         <a class="nav-link text-white py-2 <%= "leaderboard".equals(activePage) ? "active" : "" %>" href="<%=ctx%>/managers/leaderboard"><i class="fas fa-trophy me-2"></i> Leader Board</a>
         <a class="nav-link text-white py-2 <%= "commPolicies".equals(activePage) ? "active" : "" %>" href="#"><i class="fas fa-file-invoice-dollar me-2"></i> Commission Policies</a>
         <a class="nav-link text-white py-2 <%= "productMgmt".equals(activePage) ? "active" : "" %>" href="<%=ctx%>/productmanagement.jsp"><i class="fas fa-box me-2"></i> Product</a>
