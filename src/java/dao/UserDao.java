@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import utility.DBConnector;
+import utility.PasswordUtils;
 
 public class UserDao {
 
@@ -19,40 +20,74 @@ public class UserDao {
      * @return Đối tượng User nếu hợp lệ và Active, null nếu không.
      */
     public User login(String username, String password) {
-        // Cần kiểm tra status = 'Active' trong SQL
-        String sql = "SELECT * FROM Users WHERE username = ? AND password_hash = ? AND status ='Active'";
+        String sql = "SELECT * FROM Users WHERE username = ? AND status = 'Active'";
         try (Connection conn = DBConnector.makeConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, username);
-            ps.setString(2, password); // Giả định password chưa hash khi truyền vào
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    User user = new User();
-                    user.setUserId(rs.getInt("user_id"));
-                    user.setUsername(rs.getString("username"));
-                    user.setFullName(rs.getString("full_name"));
-                    user.setEmail(rs.getString("email"));
-                    user.setPhoneNumber(rs.getString("phone_number"));
-                    user.setPasswordHash(rs.getString("password_hash")); // Lấy hash từ DB
-                    user.setStatus(rs.getString("status"));
-                    user.setRoleId(rs.getInt("role_id"));
-                    // Lấy thêm is_first_login nếu cần cho logic đổi pass lần đầu
-                    try {
-                         user.setIsFirstLogin(rs.getBoolean("is_first_login"));
-                    } catch (SQLException e) {
-                        // Bỏ qua nếu cột không tồn tại hoặc có lỗi
-                        System.err.println("Warning: Could not read is_first_login for user " + username);
+                    String storedHash = rs.getString("password_hash");
+
+                    // So sánh hash SHA-256
+                    if (PasswordUtils.verifyPassword(password, storedHash)) {
+                        User user = new User();
+                        user.setUserId(rs.getInt("user_id"));
+                        user.setUsername(rs.getString("username"));
+                        user.setFullName(rs.getString("full_name"));
+                        user.setEmail(rs.getString("email"));
+                        user.setPhoneNumber(rs.getString("phone_number"));
+                        user.setPasswordHash(storedHash);
+                        user.setStatus(rs.getString("status"));
+                        user.setRoleId(rs.getInt("role_id"));
+                        user.setIsFirstLogin(rs.getBoolean("is_first_login"));
+                        return user;
                     }
-                    return user;
                 }
             }
+
         } catch (SQLException e) {
-            System.err.println("Lỗi khi đăng nhập cho user: " + username);
             e.printStackTrace();
         }
         return null;
+    }
+    
+    public boolean changePassword(int userId, String oldPassword, String newPassword) {
+        String checkSql = "SELECT password_hash FROM Users WHERE user_id = ?";
+        String updateSql = "UPDATE Users SET password_hash = ?, is_first_login = false WHERE user_id = ?";
+
+        try (Connection conn = DBConnector.makeConnection();
+             PreparedStatement psCheck = conn.prepareStatement(checkSql)) {
+
+            psCheck.setInt(1, userId);
+            try (ResultSet rs = psCheck.executeQuery()) {
+                if (rs.next()) {
+                    String currentHash = rs.getString("password_hash");
+                    String oldHash = PasswordUtils.hashPassword(oldPassword);
+
+                    // Kiểm tra mật khẩu cũ
+                    if (!currentHash.equals(oldHash)) {
+                        System.out.println("Mật khẩu cũ không đúng.");
+                        return false;
+                    }
+                } else {
+                    return false; // không tìm thấy user
+                }
+            }
+
+            // Hash mật khẩu mới và cập nhật
+            String newHash = PasswordUtils.hashPassword(newPassword);
+            try (PreparedStatement psUpdate = conn.prepareStatement(updateSql)) {
+                psUpdate.setString(1, newHash);
+                psUpdate.setInt(2, userId);
+                return psUpdate.executeUpdate() > 0;
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     /**
@@ -125,7 +160,8 @@ public class UserDao {
     public boolean insertUser(User user) throws SQLException {
         // Cần thêm is_first_login vào câu SQL nếu cột này tồn tại và quan trọng
         String sql = "INSERT INTO users (username, password_hash, full_name, email, phone_number, role_id, status, is_first_login) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-        try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = DBConnector.makeConnection(); 
+            PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, user.getUsername());
             ps.setString(2, user.getPasswordHash()); // Dùng getPasswordHash()
             ps.setString(3, user.getFullName());
@@ -378,18 +414,46 @@ public class UserDao {
      * Xóa User theo ID.
      */
     public boolean deleteUser(int userId) throws SQLException {
-        // Lưu ý: Cần xử lý các ràng buộc khóa ngoại (ví dụ: xóa agent khỏi Manager_Agent?)
-        // Hoặc chỉ nên deactivate thay vì xóa cứng?
-        String sql = "DELETE FROM Users WHERE user_id=?";
-        try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, userId);
-            return ps.executeUpdate() > 0;
-        } catch (SQLException e){
-            System.err.println("Lỗi khi xóa user ID: " + userId + ". Có thể do ràng buộc khóa ngoại.");
+    String deleteCommissionsSQL = "DELETE FROM Commissions WHERE agent_id = ?";
+    String deleteContractsSQL = "DELETE FROM Contracts WHERE agent_id = ?";
+    String deleteManagerAgentSQL = "DELETE FROM Manager_Agent WHERE agent_id = ? OR manager_id = ?";
+    String deleteUserSQL = "DELETE FROM Users WHERE user_id = ?";
+
+    try (Connection conn = DBConnector.makeConnection()) {
+        conn.setAutoCommit(false);
+
+        try (
+            PreparedStatement ps1 = conn.prepareStatement(deleteCommissionsSQL);
+            PreparedStatement ps2 = conn.prepareStatement(deleteContractsSQL);
+            PreparedStatement ps3 = conn.prepareStatement(deleteManagerAgentSQL);
+            PreparedStatement ps4 = conn.prepareStatement(deleteUserSQL)
+        ) {
+            // Xóa các quan hệ khóa ngoại trước
+            ps1.setInt(1, userId);
+            ps1.executeUpdate();
+
+            ps2.setInt(1, userId);
+            ps2.executeUpdate();
+
+            ps3.setInt(1, userId);
+            ps3.setInt(2, userId);
+            ps3.executeUpdate();
+
+            // Cuối cùng xóa user
+            ps4.setInt(1, userId);
+            int rows = ps4.executeUpdate();
+
+            conn.commit();
+            return rows > 0;
+        } catch (SQLException e) {
+            conn.rollback();
+            System.err.println("Lỗi khi xóa user ID: " + userId + ". Đã rollback.");
             e.printStackTrace();
-            throw e; // Ném lại lỗi để báo hiệu xóa thất bại
+            return false;
         }
     }
+}
+
 
     /**
      * Cập nhật mật khẩu (đã hash) cho User.
@@ -469,9 +533,6 @@ public class UserDao {
         return teamPerformance;
     }
 
-    /**
-     * Lấy hiệu suất của TẤT CẢ Agent.
-     */
     public List<AgentPerformanceDTO> getAllAgentsPerformance() {
         List<AgentPerformanceDTO> allAgents = new ArrayList<>();
         int agentRoleId = 1; // Giả định role_id của Agent là 1
@@ -544,16 +605,10 @@ public class UserDao {
         }
     }
 
-    /**
-     * Lấy danh sách xếp hạng Agent (giống getAllAgentsPerformance).
-     */
     public List<AgentPerformanceDTO> getAgentLeaderboard() {
         return getAllAgentsPerformance();
     }
 
-    /**
-     * Lấy danh sách xếp hạng Manager dựa trên tổng doanh thu team.
-     */
     public List<AgentPerformanceDTO> getManagerLeaderboard() {
         List<AgentPerformanceDTO> leaderboard = new ArrayList<>();
         String sql = """
@@ -586,9 +641,6 @@ public class UserDao {
         return leaderboard;
     }
 
-    /**
-     * Lấy danh sách Agents theo Manager ID (dùng cho kiểm tra quyền).
-     */
     public List<User> getAgentsByManagerId(int managerId) {
         List<User> agentList = new ArrayList<>();
         String sql = "SELECT u.*, r.role_name " + // Lấy thêm role_name
@@ -613,10 +665,13 @@ public class UserDao {
     }
 
 
+<<<<<<< HEAD
     
     /**
      * Lấy danh sách Users theo Status cụ thể.
      */
+=======
+>>>>>>> VuTT
     public List<User> getUsersByStatus(String status) throws SQLException {
         List<User> list = new ArrayList<>();
         String sql = "SELECT u.*, r.role_name FROM Users u "
@@ -637,11 +692,6 @@ public class UserDao {
         return list;
     }
 
-
-    // ===== BỔ SUNG TỪ CODE THANH HE (Hữu ích cho sửa thông tin Agent) =====
-    /**
-     * Cập nhật thông tin cơ bản của Agent (không bao gồm username, pass, role, status).
-     */
     public boolean updateAgent(User user) throws SQLException {
         // Chỉ cập nhật full_name, email, phone_number
         String sql = "UPDATE users SET full_name=?, email=?, phone_number=? WHERE user_id =? AND role_id = 1"; // Thêm AND role_id = 1
@@ -654,12 +704,6 @@ public class UserDao {
         }
     }
 
-
-    // ===== HÀM MAP RIÊNG (Tránh lặp code) =====
-    /**
-     * Ánh xạ một dòng ResultSet sang đối tượng User.
-     * Bao gồm cả role_name.
-     */
     private User mapRowToUser(ResultSet rs) throws SQLException {
         User user = new User();
         user.setUserId(rs.getInt("user_id"));
@@ -691,7 +735,13 @@ public class UserDao {
             /* Bỏ qua nếu câu SELECT không có */ }
         return user;
     }
+    
+    
+    public List<User> getAllUsers() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
 
+<<<<<<< HEAD
     /**
      * Kiểm tra xem một Agent có thuộc quyền quản lý của một Manager hay không.
      *
@@ -766,3 +816,6 @@ public boolean setTeamTarget(int managerId, BigDecimal targetAmount, int month, 
     }
 }
 }
+=======
+}
+>>>>>>> VuTT
