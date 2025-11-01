@@ -61,6 +61,7 @@
         }
 
         .alert {
+            display:none;
             background: #e6f4ea;
             color: #2e7d32;
             border-left: 4px solid #2e7d32;

@@ -185,14 +185,14 @@
                     labels: productLabels,
                     datasets: [{
                         data: productData,
-                        backgroundColor: ['#0d6efd', '#198754', '#ffc107'], // Màu sắc tương ứng
+                        backgroundColor: ['#0d6efd', '#198754', '#ffc107']
                     }]
                 },
                 options: { /* ... options ... */
                      maintainAspectRatio: false,
                      responsive: true,
                      plugins: {
-                         legend: { position: 'bottom' },
+                         legend: { position: 'bottom' }
                          // title: { display: true, text: 'Product Premium Distribution' } // Bỏ title nếu đã có ở card-header
                      }
                  }
