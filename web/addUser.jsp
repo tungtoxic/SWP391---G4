@@ -52,7 +52,6 @@
                 <select name="role_id" class="form-select">
                     <option value="1" ${user.roleId == 1 ? "selected" : ""}>Agent</option>
                     <option value="2" ${user.roleId == 2 ? "selected" : ""}>Manager</option>
-                    <option value="3" ${user.roleId == 3 ? "selected" : ""}>Admin</option>
                 </select>
 
             </div>

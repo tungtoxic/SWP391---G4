@@ -261,6 +261,7 @@
             const productLabels = ['Bảo hiểm Nhân thọ', 'Bảo hiểm Sức khỏe']; // Cập nhật theo DB
             const productData = [45, 55]; // Dữ liệu demo
 
+<<<<<<< HEAD
             const ctxProduct = document.getElementById('productDistributionChart');
             if (ctxProduct) { // Kiểm tra xem canvas có tồn tại không
                 new Chart(ctxProduct, {
@@ -278,6 +279,24 @@
                          plugins: {
                              legend: { position: 'bottom' },
                          }
+=======
+            const ctxProduct = document.getElementById('productDistributionChart').getContext('2d');
+            new Chart(ctxProduct, {
+                type: 'doughnut',
+                data: {
+                    labels: productLabels,
+                    datasets: [{
+                        data: productData,
+                        backgroundColor: ['#0d6efd', '#198754', '#ffc107']
+                    }]
+                },
+                options: { /* ... options ... */
+                     maintainAspectRatio: false,
+                     responsive: true,
+                     plugins: {
+                         legend: { position: 'bottom' }
+                         // title: { display: true, text: 'Product Premium Distribution' } // Bỏ title nếu đã có ở card-header
+>>>>>>> VuTT
                      }
                 });
             }

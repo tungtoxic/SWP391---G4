@@ -6,7 +6,10 @@
         response.sendRedirect("login.jsp");
         return;
     }
-    String message = (String) request.getAttribute("message");
+    String message = (String) session.getAttribute("message");
+    if (message != null) {
+        session.removeAttribute("message");
+    }
 %>
 <!DOCTYPE html>
 <html>
@@ -140,6 +143,7 @@
             <div class="btn-group">
                 <a href="ChangePassword" class="btn btn-change-pass">Change Password</a>
                 <button class="btn btn-update" onclick="switchToEdit()">Update Profile</button>
+                <a href="AdminDashboard.jsp" class="btn btn-change-pass">Return to Dashboard</a>
             </div>
         </div>
 

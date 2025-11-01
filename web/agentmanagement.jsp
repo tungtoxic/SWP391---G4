@@ -105,7 +105,7 @@
                     <div class="avatar rounded-circle bg-white me-2" style="width:36px;height:36px;"></div>
                     <div>
                         <div class="fw-bold">Manager Name</div>
-                        <div style="font-size:.85rem;opacity:.9">Sales Manager</div>
+                        <div style="font-size:.85rem;opacity:.9">Manager</div>
                     </div>
                 </div>
             </div>
