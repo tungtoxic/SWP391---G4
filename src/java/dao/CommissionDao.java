@@ -1,27 +1,22 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package dao;
 
+import entity.CommissionPolicy; // <-- THÊM MỚI
 import entity.CommissionReportDTO;
-import entity.ContractDTO;
 import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import utility.DBConnector;
-/**
- *
- * @author Nguyễn Tùng
- */
+
 public class CommissionDao {
 
+    /**
+     * SỬA ĐỔI: Chuyển sang dùng BigDecimal
+     */
     public List<CommissionReportDTO> getCommissionReportByAgentId(int agentId, String startDateStr, String endDateStr) {
         List<CommissionReportDTO> reportList = new ArrayList<>();
         List<Object> params = new ArrayList<>();
 
-        // Câu SQL gốc
         StringBuilder sql = new StringBuilder("""
             SELECT 
                 co.contract_id,
@@ -40,13 +35,11 @@ public class CommissionDao {
         
         params.add(agentId);
 
-        // Thêm điều kiện lọc theo ngày nếu có
         if (startDateStr != null && !startDateStr.isEmpty()) {
             sql.append(" AND com.created_at >= ?");
             params.add(startDateStr);
         }
         if (endDateStr != null && !endDateStr.isEmpty()) {
-            // Thêm giờ phút giây để bao gồm cả ngày kết thúc
             sql.append(" AND com.created_at <= ?");
             params.add(endDateStr + " 23:59:59");
         }
@@ -56,7 +49,6 @@ public class CommissionDao {
         try (Connection conn = DBConnector.makeConnection();
              PreparedStatement ps = conn.prepareStatement(sql.toString())) {
             
-            // Set các tham số cho PreparedStatement
             for (int i = 0; i < params.size(); i++) {
                 ps.setObject(i + 1, params.get(i));
             }
@@ -67,8 +59,8 @@ public class CommissionDao {
                         rs.getInt("contract_id"),
                         rs.getString("customer_name"),
                         rs.getString("product_name"),
-                        rs.getDouble("premium_amount"),
-                        rs.getDouble("commission_amount"),
+                        rs.getBigDecimal("premium_amount"), // <-- SỬA
+                        rs.getBigDecimal("commission_amount"), // <-- SỬA
                         rs.getString("status"),
                         rs.getTimestamp("commission_date")
                     ));
@@ -80,50 +72,67 @@ public class CommissionDao {
         return reportList;
     }
     
-    // Thêm phương thức này vào file dao/CommissionDao.java của bạn
-
     /**
-     * Tạo một bản ghi hoa hồng mới khi một hợp đồng được duyệt.
-     *
-     * @param contract Đối tượng hợp đồng đã được duyệt.
-     * @param amount Số tiền hoa hồng đã được tính.
-     * @return true nếu tạo thành công, false nếu thất bại.
+     * VIẾT LẠI: Hàm "Tự động 100%" (Nghiệp vụ Tầng 1).
+     * Hàm này sẽ tự lấy Policy, tự tính toán, và tự INSERT.
+     * Servlet chỉ cần gọi hàm này.
      */
-    public boolean createCommissionForContract(ContractDTO contract, double amount) {
+    public boolean createCommissionForContract(int contractId, int agentId, BigDecimal premiumAmount) {
+        
+        // Bước 1: Lấy chính sách hiện hành
+        CommissionPolicyDao policyDao = new CommissionPolicyDao();
+        CommissionPolicy currentPolicy = policyDao.getCurrentPolicy();
+        
+        // Nếu không có chính sách nào, không thể tạo hoa hồng
+        if (currentPolicy == null) {
+            System.err.println("Lỗi nghiệp vụ: Không tìm thấy Commission Policy nào đang hiệu lực. Không thể tạo hoa hồng.");
+            return false;
+        }
+
+        // Bước 2: Tự động tính toán
+        BigDecimal rate = currentPolicy.getRate().divide(new BigDecimal("100")); // Chuyển 5.00 thành 0.05
+        BigDecimal amount = premiumAmount.multiply(rate);
+        int policyId = currentPolicy.getPolicyId(); // Lấy ID động (không "fix cứng" 1)
+
+        // Bước 3: INSERT vào CSDL
         String sql = "INSERT INTO Commissions (contract_id, agent_id, policy_id, amount, status) VALUES (?, ?, ?, ?, ?)";
 
-        try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = DBConnector.makeConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setInt(1, contract.getContractId());
-            ps.setInt(2, contract.getAgentId());
-            ps.setInt(3, 1); // Giả định policy_id mặc định là 1, bạn có thể thay đổi logic này
-            ps.setDouble(4, amount);
+            ps.setInt(1, contractId);
+            ps.setInt(2, agentId);
+            ps.setInt(3, policyId); // <-- Động
+            ps.setBigDecimal(4, amount); // <-- Động
             ps.setString(5, "Pending"); // Hoa hồng mới luôn ở trạng thái Pending
 
             return ps.executeUpdate() > 0;
 
         } catch (Exception e) {
             e.printStackTrace();
+            return false;
         }
-        return false;
     }
     
+    /**
+     * GIỮ NGUYÊN: Hàm này đã "sạch"
+     */
     public BigDecimal getPendingCommissionTotal(int agentId) {
-    String sql = "SELECT IFNULL(SUM(amount), 0) FROM Commissions WHERE agent_id = ? AND status = 'Pending'";
-    BigDecimal total = BigDecimal.ZERO;
+        String sql = "SELECT IFNULL(SUM(amount), 0) FROM Commissions WHERE agent_id = ? AND status = 'Pending'";
+        BigDecimal total = BigDecimal.ZERO;
 
-    try (Connection conn = DBConnector.makeConnection();
-         PreparedStatement ps = conn.prepareStatement(sql)) {
-        
-        ps.setInt(1, agentId);
-        try (ResultSet rs = ps.executeQuery()) {
-            if (rs.next()) {
-                total = rs.getBigDecimal(1);
+        try (Connection conn = DBConnector.makeConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setInt(1, agentId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    total = rs.getBigDecimal(1);
+                }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-    } catch (Exception e) {
-        e.printStackTrace();
+        return total;
     }
-    return total;
-}
 }

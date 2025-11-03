@@ -10,12 +10,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
+import java.math.BigDecimal; // <-- THÊM
 import java.util.List;
 
 @WebServlet(name = "CommissionReportServlet", urlPatterns = {"/agent/commission-report"})
 public class CommissionReportServlet extends HttpServlet {
 
-    // Giả sử role_id của Agent là 1
     private static final int AGENT_ROLE_ID = 1; 
     private CommissionDao commissionDao;
 
@@ -41,23 +41,29 @@ public class CommissionReportServlet extends HttpServlet {
             int agentId = currentUser.getUserId();
             String startDate = request.getParameter("startDate");
             String endDate = request.getParameter("endDate");
+
             List<CommissionReportDTO> reportList = commissionDao.getCommissionReportByAgentId(agentId, startDate, endDate);
-        // Tính tổng hoa hồng
-            double totalCommission = reportList.stream()
-                                               .mapToDouble(CommissionReportDTO::getCommissionAmount)
-                                               .sum();
+            
+            // SỬA: Tính tổng bằng BigDecimal (An toàn tuyệt đối)
+            BigDecimal totalCommission = BigDecimal.ZERO;
+            for (CommissionReportDTO item : reportList) {
+                if (item.getCommissionAmount() != null) {
+                    totalCommission = totalCommission.add(item.getCommissionAmount());
+                }
+            }
             
             // Đặt thuộc tính vào request
             request.setAttribute("currentUser", currentUser);
             request.setAttribute("activePage", "commission");
             request.setAttribute("reportList", reportList);
-            request.setAttribute("totalCommission", totalCommission);
+            request.setAttribute("totalCommission", totalCommission); // <-- Đã là BigDecimal
             request.setAttribute("startDate", startDate);
             request.setAttribute("endDate", endDate);
+
             request.getRequestDispatcher("/commission_report.jsp").forward(request, response);
+            
         } catch (Exception e) {
             e.printStackTrace(); // In chi tiết lỗi ra console
-            // Chuyển đến trang lỗi chung
             request.setAttribute("errorMessage", "Đã có lỗi hệ thống xảy ra: " + e.getMessage());
             request.getRequestDispatcher("/error.jsp").forward(request, response);
         }

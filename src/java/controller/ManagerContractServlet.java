@@ -104,29 +104,38 @@ public class ManagerContractServlet extends HttpServlet {
      */
     private void approveContract(HttpServletRequest request, HttpServletResponse response) 
             throws Exception {
+        
         int contractId = Integer.parseInt(request.getParameter("contractId"));
         
-        // Bước 1: Cập nhật trạng thái hợp đồng thành "Active"
+        // Bước 1: Lấy thông tin HĐ TRƯỚC KHI duyệt
+        // (Chúng ta cần thông tin này để tạo hoa hồng)
+        ContractDTO contract = contractDao.getContractById(contractId);
+        
+        if (contract == null) {
+            // Lỗi: Không tìm thấy hợp đồng
+            response.sendRedirect(request.getContextPath() + "/manager/contracts?message=errorNotFound");
+            return;
+        }
+
+        // Bước 2: Cập nhật trạng thái hợp đồng thành "Active"
         boolean updateSuccess = contractDao.updateContractStatus(contractId, "Active");
         
-        // Bước 2: Tự động tạo hoa hồng nếu cập nhật thành công
+        // Bước 3: Tự động tạo hoa hồng nếu cập nhật thành công
         if (updateSuccess) {
-            ContractDTO contract = contractDao.getContractById(contractId);
-            CommissionPolicy currentPolicy = policyDao.getCurrentPolicy();
-
-            if (contract != null && currentPolicy != null) {
-                // Tính hoa hồng dựa trên tỷ lệ động từ CSDL
-                BigDecimal premium = contract.getPremiumAmount();
-                BigDecimal rate = currentPolicy.getRate().divide(new BigDecimal("100")); // Chuyển 5.00 thành 0.05
-                BigDecimal commissionAmount = premium.multiply(rate);
-                
-                commissionDao.createCommissionForContract(contract, commissionAmount.doubleValue());
-            }
+            
+            // === LOGIC TỰ ĐỘNG HÓA MỚI (SẠCH) ===
+            // Giao toàn bộ nghiệp vụ (tính toán, lấy policy) cho DAO
+            commissionDao.createCommissionForContract(
+                contract.getContractId(),
+                contract.getAgentId(),
+                contract.getPremiumAmount() // Truyền BigDecimal
+            );
+            // ===================================
+            
         }
         
         response.sendRedirect(request.getContextPath() + "/manager/contracts?message=approveSuccess");
     }
-    
     /**
      * Xử lý logic khi Manager từ chối một hợp đồng.
      */
