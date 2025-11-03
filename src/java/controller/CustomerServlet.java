@@ -1,7 +1,11 @@
 package controller;
 
 import dao.CustomerDao;
+import dao.InteractionDao; // THÊM MỚI
+import dao.InteractionTypeDao; // THÊM MỚI
 import entity.Customer;
+import entity.Interaction; // THÊM MỚI
+import entity.InteractionType; // THÊM MỚI
 import entity.User;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -13,17 +17,23 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.sql.Date;
 import java.sql.SQLException;
-import java.util.List;
+import java.sql.Timestamp; // THÊM MỚI
+import java.util.List; // THÊM MỚI
 
 @WebServlet(name = "CustomerServlet", urlPatterns = {"/agent/customers"})
 public class CustomerServlet extends HttpServlet {
 
     private CustomerDao customerDao;
+    private InteractionDao interactionDao; // THÊM MỚI
+    private InteractionTypeDao interactionTypeDao; // THÊM MỚI
+    
     private static final int ROLE_AGENT = 1;
 
     @Override
     public void init() {
         customerDao = new CustomerDao();
+        interactionDao = new InteractionDao(); // THÊM MỚI
+        interactionTypeDao = new InteractionTypeDao(); // THÊM MỚI
     }
 
     @Override
@@ -39,34 +49,38 @@ public class CustomerServlet extends HttpServlet {
         request.setAttribute("currentUser", currentUser);
         request.setAttribute("activePage", "customers");
         String action = request.getParameter("action");
-    if (action == null) {
-        action = "list";
-    }
-
-    try {
-        switch (action) {
-            case "showAddForm":
-                showAddForm(request, response);
-                break;
-            case "showEditForm":
-                showEditForm(request, response, currentUser);
-                break;
-            case "delete":
-                deleteCustomer(request, response, currentUser);
-                break;
-                
-            // THÊM CASE NÀY VÀO
-            case "updateType": 
-                updateCustomerType(request, response, currentUser);
-                break;
-                
-            default:
-                listCustomers(request, response, currentUser);
-                break;
+        if (action == null) {
+            action = "list";
         }
-    } catch (Exception e) {
-        throw new ServletException(e);
-    }
+
+        try {
+            switch (action) {
+                case "showAddForm":
+                    showAddForm(request, response);
+                    break;
+                case "showEditForm":
+                    showEditForm(request, response, currentUser);
+                    break;
+                case "delete":
+                    deleteCustomer(request, response, currentUser);
+                    break;
+                
+                // THÊM MỚI: Case để xem trang Chi tiết CRM
+                case "viewDetail": 
+                    viewCustomerDetail(request, response, currentUser);
+                    break;
+                    
+                case "updateType":
+                    updateCustomerType(request, response, currentUser);
+                    break;
+                    
+                default:
+                    listCustomers(request, response, currentUser);
+                    break;
+            }
+        } catch (Exception e) {
+            throw new ServletException(e);
+        }
     }
 
     @Override
@@ -83,6 +97,7 @@ public class CustomerServlet extends HttpServlet {
         request.setAttribute("currentUser", currentUser);
         request.setAttribute("activePage", "customers");
         String action = request.getParameter("action");
+        
         try {
             switch (action) {
                 case "add":
@@ -91,9 +106,16 @@ public class CustomerServlet extends HttpServlet {
                 case "update":
                     updateCustomer(request, response, currentUser);
                     break;
-                case "updateType": 
+                
+                // THÊM MỚI: Case để xử lý form "Thêm Tương tác"
+                case "addInteraction":
+                    addInteraction(request, response, currentUser);
+                    break;
+                    
+                case "updateType":
                     updateCustomerType(request, response, currentUser);
                     break;
+                    
                 default:
                     listCustomers(request, response, currentUser);
                     break;
@@ -103,7 +125,7 @@ public class CustomerServlet extends HttpServlet {
         }
     }
 
-    // ========== CÁC PHƯƠNG THỨC XỬ LÝ LOGIC ==========
+    // ========== CÁC PHƯƠNG THỨC XỬ LÝ LOGIC (Giữ nguyên) ==========
 
     private void listCustomers(HttpServletRequest request, HttpServletResponse response, User currentUser)
             throws SQLException, ServletException, IOException {
@@ -123,7 +145,6 @@ public class CustomerServlet extends HttpServlet {
         int id = Integer.parseInt(request.getParameter("id"));
         Customer existingCustomer = customerDao.getCustomerById(id);
         
-        // Đảm bảo agent chỉ sửa được khách hàng của mình
         if (existingCustomer != null && existingCustomer.getCreatedBy() == currentUser.getUserId()) {
             request.setAttribute("customer", existingCustomer);
             request.getRequestDispatcher("/editCustomer.jsp").forward(request, response);
@@ -146,7 +167,7 @@ public class CustomerServlet extends HttpServlet {
         newCustomer.setPhoneNumber(phone);
         newCustomer.setEmail(email);
         newCustomer.setAddress(address);
-        newCustomer.setCreatedBy(currentUser.getUserId()); // Gán agent tạo là user đang đăng nhập
+        newCustomer.setCreatedBy(currentUser.getUserId());
         newCustomer.setCustomerType("Lead");
 
         customerDao.insertCustomer(newCustomer);
@@ -169,13 +190,13 @@ public class CustomerServlet extends HttpServlet {
         customer.setPhoneNumber(phone);
         customer.setEmail(email);
         customer.setAddress(address);
-        customer.setCreatedBy(currentUser.getUserId()); // Dù không update nhưng cần để kiểm tra quyền
+        customer.setCreatedBy(currentUser.getUserId()); 
 
-        // Tương tự showEditForm, cần kiểm tra quyền trước khi update
         Customer existingCustomer = customerDao.getCustomerById(id);
         if (existingCustomer != null && existingCustomer.getCreatedBy() == currentUser.getUserId()) {
             customerDao.updateCustomer(customer);
-            response.sendRedirect(request.getContextPath() + "/agent/customers?message=UpdateSuccess");
+            // THAY ĐỔI: Chuyển hướng về trang chi tiết (nếu bạn muốn) hoặc trang list
+            response.sendRedirect(request.getContextPath() + "/agent/customers?action=viewDetail&id=" + id + "&message=UpdateSuccess");
         } else {
             response.sendRedirect(request.getContextPath() + "/agent/customers?message=AuthError");
         }
@@ -193,26 +214,102 @@ public class CustomerServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/agent/customers?message=AuthError");
         }
     }
+    
     private void updateCustomerType(HttpServletRequest request, HttpServletResponse response, User currentUser)
             throws SQLException, IOException {
         try {
             int id = Integer.parseInt(request.getParameter("id"));
             String type = request.getParameter("type");
 
-            // Validate type để tránh injection linh tinh
             if (type != null && (type.equals("Lead") || type.equals("Client"))) {
                 boolean success = customerDao.updateCustomerType(id, type, currentUser.getUserId());
                 if (success) {
                     response.sendRedirect(request.getContextPath() + "/agent/customers?message=TypeUpdateSuccess");
                 } else {
-                    // Thất bại (có thể do cố update khách của agent khác)
                     response.sendRedirect(request.getContextPath() + "/agent/customers?message=AuthError");
                 }
             } else {
-                // Type không hợp lệ
                 response.sendRedirect(request.getContextPath() + "/agent/customers?message=Error");
             }
         } catch (NumberFormatException e) {
+            response.sendRedirect(request.getContextPath() + "/agent/customers?message=Error");
+        }
+    }
+    
+    // ========== CÁC PHƯƠNG THỨC CRM MỚI (THÊM MỚI) ==========
+
+    /**
+     * THÊM MỚI: Hiển thị trang chi tiết khách hàng (CRM View).
+     */
+    private void viewCustomerDetail(HttpServletRequest request, HttpServletResponse response, User currentUser)
+            throws SQLException, ServletException, IOException {
+        try {
+            int id = Integer.parseInt(request.getParameter("id"));
+            Customer customer = customerDao.getCustomerById(id);
+
+            // Kiểm tra quyền sở hữu
+            if (customer != null && customer.getCreatedBy() == currentUser.getUserId()) {
+                // 1. Lấy thông tin chi tiết khách hàng (đã có)
+                request.setAttribute("customer", customer);
+                
+                // 2. Lấy Lịch sử Tương tác (Interaction Log)
+                List<Interaction> interactionList = interactionDao.getInteractionsByCustomerId(id);
+                request.setAttribute("interactionList", interactionList);
+                
+                // 3. Lấy Danh sách các Loại Tương tác (để điền vào dropdown)
+                List<InteractionType> typeList = interactionTypeDao.getAllInteractionTypes();
+                request.setAttribute("typeList", typeList);
+                
+                // Forward đến trang JSP mới
+                request.getRequestDispatcher("/customer_detail.jsp").forward(request, response);
+                
+            } else {
+                // Không có quyền
+                response.sendRedirect(request.getContextPath() + "/agent/customers?message=AuthError");
+            }
+        } catch (NumberFormatException e) {
+            response.sendRedirect(request.getContextPath() + "/agent/customers?message=Error");
+        }
+    }
+    
+    /**
+     * THÊM MỚI: Xử lý việc thêm một tương tác mới.
+     */
+    private void addInteraction(HttpServletRequest request, HttpServletResponse response, User currentUser)
+            throws SQLException, IOException {
+        try {
+            int customerId = Integer.parseInt(request.getParameter("customerId"));
+            int typeId = Integer.parseInt(request.getParameter("interactionType"));
+            String notes = request.getParameter("notes");
+            String dateTimeString = request.getParameter("interactionDate"); // "2025-11-03T14:30"
+            
+            // Chuyển đổi chuỗi "datetime-local" sang java.sql.Timestamp
+            // Định dạng "YYYY-MM-DDTHH:mm" -> "YYYY-MM-DD HH:mm:00"
+            Timestamp interactionDate = Timestamp.valueOf(dateTimeString.replace("T", " ") + ":00");
+
+            // Kiểm tra quyền sở hữu (Bảo mật: Agent không thể thêm note cho khách của người khác)
+            Customer customer = customerDao.getCustomerById(customerId);
+            if (customer != null && customer.getCreatedBy() == currentUser.getUserId()) {
+                
+                // Tạo đối tượng Interaction
+                Interaction interaction = new Interaction();
+                interaction.setCustomerId(customerId);
+                interaction.setAgentId(currentUser.getUserId());
+                interaction.setInteractionTypeId(typeId);
+                interaction.setNotes(notes);
+                interaction.setInteractionDate(interactionDate);
+
+                // Lưu vào CSDL
+                interactionDao.addInteraction(interaction);
+                
+                // Điều hướng về trang chi tiết với thông báo thành công
+                response.sendRedirect(request.getContextPath() + "/agent/customers?action=viewDetail&id=" + customerId + "&message=AddInteractionSuccess");
+            } else {
+                // Không có quyền
+                response.sendRedirect(request.getContextPath() + "/agent/customers?message=AuthError");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
             response.sendRedirect(request.getContextPath() + "/agent/customers?message=Error");
         }
     }
