@@ -1,5 +1,5 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -107,6 +107,7 @@
             border-radius: 8px;
             font-weight: 500;
         }
+        .alert:empty {display:none}
 
         .success {
             background: rgba(67, 233, 123, 0.2);
@@ -127,36 +128,36 @@
 <body>
 
 <div class="container">
-    <h1>Đổi mật khẩu</h1>
+    <h1>Change Password</h1>
 
     <form action="ChangePassword" method="post">
         <div class="form-group">
-            <label>Mật khẩu cũ</label>
-            <input type="password" name="oldPassword" placeholder="Nhập mật khẩu cũ" required>
+            <label>Old Password</label>
+            <input type="password" name="oldPassword" placeholder="Enter old password" required>
         </div>
 
         <div class="form-group">
-            <label>Mật khẩu mới</label>
-            <input type="password" name="newPassword" placeholder="Nhập mật khẩu mới" required>
+            <label>New Password</label>
+            <input type="password" name="newPassword" placeholder="Enter new pasword" required>
         </div>
 
         <div class="form-group">
-            <label>Xác nhận mật khẩu mới</label>
-            <input type="password" name="confirmPassword" placeholder="Nhập lại mật khẩu mới" required>
+            <label>Confirm New Password</label>
+            <input type="password" name="confirmPassword" placeholder="Enter new password again" required>
         </div>
 
-        <button type="submit" class="btn btn-confirm">Đổi mật khẩu</button>
+        <button type="submit" class="btn btn-confirm">Confirm</button>
     </form>
 
     <c:if test="${not empty message}">
-        <div class="alert success">${message}</div>
+    <div class="alert success">${fn:trim(message)}</div>
     </c:if>
 
     <c:if test="${not empty error}">
-        <div class="alert error">${error}</div>
+    <div class="alert error">${fn:trim(error)}</div>
     </c:if>
 
-    <a href="profile.jsp" class="btn btn-back">← Quay lại Profile</a>
+    <a href="profile.jsp" class="btn btn-back">← Return to Profile</a>
 </div>
 
 </body>

@@ -114,6 +114,13 @@
                 <label>Phone:</label>
                 <input type="tel" name="phoneNumber" value="${agent.phoneNumber}">
 
+                <label>Status:</label>
+                <select name="status">
+                    <option ${agent.status == 'Active' ? 'selected' : ''}>Active</option>
+                    <option ${agent.status == 'Inactive' ? 'selected' : ''}>Inactive</option>
+                    <option ${agent.status == 'Pending' ? 'selected' : ''}>Pending</option>
+                </select>
+
                 <div class="text-center mt-4">
                     <button type="submit" class="btn-submit"><i class="fas fa-save me-2"></i> Save Changes</button>
                     <a href="AgentManagementServlet" class="btn btn-secondary ms-2">Cancel</a>

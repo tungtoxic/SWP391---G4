@@ -4,6 +4,7 @@
     Author     : Helios 16
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+
 <%
     String ctx = request.getContextPath();
 %>
@@ -160,5 +161,3 @@
 
 </body>
 </html>
-
-

@@ -1,12 +1,3 @@
-/*
-Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
-Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css to edit this template
-*/
-/* 
-    Created on : Oct 8, 2025, 3:55:28 PM
-    Author     : Nguyễn Tùng
-*/
-
 /* layout.css - shared layout: navbar + sidebar + main spacing */
 :root{
   --sidebar-width: 240px;
@@ -84,9 +75,74 @@ body {
 }
 
 /* Chart helper */
-.chart-250 { min-height: 250px; height: 250px; }
+.chart-250 {
+  position: relative;
+  overflow: visible;      /* allow legend / labels to be visible outside the canvas area */
+  padding-bottom: 0.5rem;
+  min-height: 260px;
+}
+
+/* Force canvas to have enough height for chart + legend/labels.
+   You can tweak height (320px) if legend still gets cut. */
+.chart-250 canvas {
+  display: block;
+  width: 100% !important;
+  height: 320px !important;
+  box-sizing: border-box;
+}
+
+/* Chart-specific small spacing */
+.chart-250 .mt-2 {
+  margin-top: 0.6rem;
+}
 
 /* Responsive note: since project is desktop-only we don't collapse sidebar */
 @media (max-width: 991.98px) {
   /* if you ever need mobile, you can add styles here */
 }
+/* layout.css */
+
+/* ... (Toàn bộ code CSS cũ của bạn giữ nguyên) ... */
+
+/* ===== FIX LỖI KÉO GIÃN SIDEBAR TOP ===== */
+
+/* layout.css */
+
+/* ... (Code CSS cũ của bạn) ... */
+
+/* ===== FIX LỖI KÉO GIÃN SIDEBAR TOP (V2) ===== */
+
+/* Reset chiều cao của container bao ngoài thông tin user */
+.sidebar .sidebar-top {
+    height: auto !important; /* Quan trọng: Ép chiều cao tự động theo nội dung */
+    min-height: initial !important; /* Bỏ min-height nếu có */
+    padding-top: 0.5rem !important; /* Giảm padding trên nếu cần */
+    padding-bottom: 0.5rem !important; /* Giảm padding dưới nếu cần */
+}
+
+/* Reset chiều cao của container flex chứa avatar và text */
+.sidebar .sidebar-top .d-flex {
+    height: auto !important; /* Ép chiều cao tự động */
+    min-height: initial !important;
+}
+
+/* Đảm bảo avatar giữ đúng kích thước */
+.sidebar .sidebar-top .avatar {
+    flex-shrink: 0;
+    width: 36px !important;
+    height: 36px !important;
+}
+
+/* Reset line-height cho text (đề phòng) */
+.sidebar .sidebar-top div div {
+    line-height: 1.4; /* Khoảng cách dòng bình thường */
+}
+.sidebar .sidebar-top .fw-bold {
+    line-height: 1.4;
+    margin-bottom: 0; /* Bỏ margin dưới nếu làm giãn cách */
+}
+.sidebar .sidebar-top div[style*="font-size:.85rem"] {
+    line-height: 1.2;
+}
+
+/* ===== HẾT PHẦN FIX ===== */

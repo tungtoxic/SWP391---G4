@@ -9,18 +9,12 @@
 <div class="form-box">
     <h2>Register</h2>
     <form action="register" method="post">
-<<<<<<< HEAD
-        <input type="text" name="fullName" placeholder="Họ và tên" required>
-        <input type="email" name="email" placeholder="Email" required>
-        <input type="text" name="phoneNumber" placeholder="Số điện thoại" required>
-=======
         <input type="text" name="username" placeholder="Username" required>
         <input type="text" name="fullName" placeholder="Full name" required>
         <input type="email" name="email" placeholder="Email" required>
         <input type="password" name="password" placeholder="Password" required>
         <input type="password" name="confirmPassword" placeholder="Enter password again" required>
         <input type="text" name="phoneNumber" placeholder="Phone number" required>
->>>>>>> VuTT
 
         <select name="role" required>
             <option value="">-- Role --</option>
