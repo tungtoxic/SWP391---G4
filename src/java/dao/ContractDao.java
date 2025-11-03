@@ -446,4 +446,46 @@ public List<ContractDTO> getPendingContractsByManagerId(int managerId) {
         }
         return 0;
     }
+    /**
+     * Lấy TẤT CẢ hợp đồng của MỘT khách hàng (để hiển thị trong trang chi tiết).
+     * Sắp xếp mới nhất lên đầu.
+     */
+    public List<Contract> getContractsByCustomerId(int customerId) {
+        List<Contract> list = new ArrayList<>();
+        // Dùng JOIN để lấy Tên Sản phẩm (product_name)
+        String sql = "SELECT c.*, p.product_name " +
+                     "FROM Contracts c " +
+                     "JOIN Products p ON c.product_id = p.product_id " +
+                     "WHERE c.customer_id = ? " +
+                     "ORDER BY c.start_date DESC";
+        
+        try (Connection conn = DBConnector.makeConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setInt(1, customerId);
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Contract contract = new Contract();
+                    contract.setContractId(rs.getInt("contract_id"));
+                    contract.setCustomerId(rs.getInt("customer_id"));
+                    contract.setAgentId(rs.getInt("agent_id"));
+                    contract.setProductId(rs.getInt("product_id"));
+                    contract.setStartDate(rs.getDate("start_date"));
+                    contract.setEndDate(rs.getDate("end_date"));
+                    contract.setStatus(rs.getString("status"));
+                    contract.setPremiumAmount(rs.getBigDecimal("premium_amount"));
+                    
+                    // Thêm dữ liệu JOIN vào trường transient
+                    contract.setProductName(rs.getString("product_name"));
+                    
+                    list.add(contract);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+    
 }

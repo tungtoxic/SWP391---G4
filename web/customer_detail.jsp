@@ -5,6 +5,7 @@
 --%>
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="entity.User, entity.Customer, entity.Interaction, entity.InteractionType, entity.Contract, java.util.List, java.util.ArrayList, java.text.SimpleDateFormat" %>
 <%@ page import="entity.User, entity.Customer, entity.Interaction, entity.InteractionType, java.util.List, java.util.ArrayList, java.text.SimpleDateFormat" %>
 <%
     String ctx = request.getContextPath();
@@ -15,7 +16,7 @@
     Customer customer = (Customer) request.getAttribute("customer");
     List<Interaction> interactionList = (List<Interaction>) request.getAttribute("interactionList");
     List<InteractionType> typeList = (List<InteractionType>) request.getAttribute("typeList");
-    
+    List<Contract> contractList = (List<Contract>) request.getAttribute("contractList"); // <-- THÊM DÒNG NÀY
     // Lấy thông báo từ URL
     String message = request.getParameter("message");
 
@@ -30,6 +31,7 @@
     }
     if (interactionList == null) interactionList = new ArrayList<>();
     if (typeList == null) typeList = new ArrayList<>();
+    if (contractList == null) contractList = new ArrayList<>(); // <-- THÊM DÒNG NÀY
     if (activePage == null) activePage = "customers";
 
     // Định dạng ngày tháng
@@ -131,6 +133,40 @@
                                     <span class="badge bg-success">Client</span>
                                 <% } %>
                             </p>
+                        </div>
+                    </div>
+                            <div class="card shadow-sm mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fa fa-file-signature me-2"></i> Hợp đồng đã ký
+                            </h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <% if (contractList.isEmpty()) { %>
+                                <div class="p-3 text-center text-muted">Khách hàng này chưa có hợp đồng nào.</div>
+                            <% } else { %>
+                                <ul class="list-group list-group-flush">
+                                    <% for (Contract contract : contractList) { %>
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <div class="fw-bold"><%= contract.getProductName() %></div>
+                                                <small class="text-muted">
+                                                    <%= new java.text.DecimalFormat("#,##0").format(contract.getPremiumAmount()) %> VNĐ
+                                                </small>
+                                            </div>
+                                            <% if ("Active".equals(contract.getStatus())) { %>
+                                                <span class="badge bg-success">Active</span>
+                                            <% } else if ("Pending".equals(contract.getStatus())) { %>
+                                                <span class="badge bg-warning text-dark">Pending</span>
+                                            <% } else if ("Expired".equals(contract.getStatus())) { %>
+                                                <span class="badge bg-secondary">Expired</span>
+                                            <% } else { %>
+                                                <span class="badge bg-danger">Cancelled</span>
+                                            <% } %>
+                                        </li>
+                                    <% } %>
+                                </ul>
+                            <% } %>
                         </div>
                     </div>
                 </div>

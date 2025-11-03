@@ -1,8 +1,10 @@
 package controller;
 
+import dao.ContractDao;
 import dao.CustomerDao;
 import dao.InteractionDao; // THÊM MỚI
 import dao.InteractionTypeDao; // THÊM MỚI
+import entity.Contract;
 import entity.Customer;
 import entity.Interaction; // THÊM MỚI
 import entity.InteractionType; // THÊM MỚI
@@ -26,7 +28,8 @@ public class CustomerServlet extends HttpServlet {
     private CustomerDao customerDao;
     private InteractionDao interactionDao; // THÊM MỚI
     private InteractionTypeDao interactionTypeDao; // THÊM MỚI
-    
+    private ContractDao contractDao;
+
     private static final int ROLE_AGENT = 1;
 
     @Override
@@ -34,6 +37,7 @@ public class CustomerServlet extends HttpServlet {
         customerDao = new CustomerDao();
         interactionDao = new InteractionDao(); // THÊM MỚI
         interactionTypeDao = new InteractionTypeDao(); // THÊM MỚI
+        contractDao = new ContractDao();
     }
 
     @Override
@@ -241,7 +245,7 @@ public class CustomerServlet extends HttpServlet {
     /**
      * THÊM MỚI: Hiển thị trang chi tiết khách hàng (CRM View).
      */
-    private void viewCustomerDetail(HttpServletRequest request, HttpServletResponse response, User currentUser)
+private void viewCustomerDetail(HttpServletRequest request, HttpServletResponse response, User currentUser)
             throws SQLException, ServletException, IOException {
         try {
             int id = Integer.parseInt(request.getParameter("id"));
@@ -252,15 +256,19 @@ public class CustomerServlet extends HttpServlet {
                 // 1. Lấy thông tin chi tiết khách hàng (đã có)
                 request.setAttribute("customer", customer);
                 
-                // 2. Lấy Lịch sử Tương tác (Interaction Log)
+                // 2. Lấy Lịch sử Tương tác (Interaction Log) (đã có)
                 List<Interaction> interactionList = interactionDao.getInteractionsByCustomerId(id);
                 request.setAttribute("interactionList", interactionList);
                 
-                // 3. Lấy Danh sách các Loại Tương tác (để điền vào dropdown)
+                // 3. Lấy Danh sách các Loại Tương tác (đã có)
                 List<InteractionType> typeList = interactionTypeDao.getAllInteractionTypes();
                 request.setAttribute("typeList", typeList);
                 
-                // Forward đến trang JSP mới
+                // 4. THÊM MỚI: Lấy danh sách Hợp đồng của khách hàng này
+                List<Contract> contractList = contractDao.getContractsByCustomerId(id);
+                request.setAttribute("contractList", contractList); // <-- THÊM DÒNG NÀY
+                
+                // Forward đến trang JSP
                 request.getRequestDispatcher("/customer_detail.jsp").forward(request, response);
                 
             } else {
