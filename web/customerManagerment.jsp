@@ -92,20 +92,29 @@
                                         <% } %>
                                     </td>
                                     <td><%= customer.getCreatedAt() != null ? new SimpleDateFormat("dd/MM/yyyy").format(customer.getCreatedAt()) : "" %></td>
-                                    <td>
-                                        <%-- Các nút actions (giữ nguyên) --%>
-                                        <div class="btn-group d-inline-block">
-                                            <button type-="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Đổi trạng thái">
-                                                <i class="fa fa-sync-alt"></i>
-                                            </button>
-                                            <ul class="dropdown-menu">
-                                                <li><a class="dropdown-item" href="<%=ctx%>/agent/customers?action=updateType&id=<%=customer.getCustomerId()%>&type=Lead">Chuyển thành Lead</a></li>
-                                                <li><a class="dropdown-item" href="<%=ctx%>/agent/customers?action=updateType&id=<%=customer.getCustomerId()%>&type=Client">Chuyển thành Client</a></li>
-                                            </ul>
-                                        </div>
-                                        <a href="<%=ctx%>/agent/customers?action=showEditForm&id=<%= customer.getCustomerId() %>" class="btn btn-sm btn-warning" title="Chỉnh sửa"><i class="fa fa-edit"></i></a>
-                                        <a href="<%=ctx%>/agent/customers?action=delete&id=<%= customer.getCustomerId() %>" class="btn btn-sm btn-danger" title="Xóa" onclick="return confirm('Bạn có chắc chắn muốn xóa khách hàng này không?');"><i class="fa fa-trash"></i></a>
-                                    </td>
+<td>
+                                            <a href="<%=ctx%>/agent/customers?action=viewDetail&id=<%= customer.getCustomerId() %>" class="btn btn-sm btn-info" title="Xem chi tiết CRM">
+                                                <i class="fa fa-eye"></i>
+                                            </a>
+                                            
+                                            <a href="<%=ctx%>/agent/customers?action=showEditForm&id=<%= customer.getCustomerId() %>" class="btn btn-sm btn-warning" title="Chỉnh sửa thông tin">
+                                                <i class="fa fa-edit"></i>
+                                            </a>
+                                            
+                                            <a href="<%=ctx%>/agent/customers?action=delete&id=<%= customer.getCustomerId() %>" class="btn btn-sm btn-danger" title="Xóa" onclick="return confirm('Bạn có chắc chắn muốn xóa khách hàng này không?');">
+                                                <i class="fa fa-trash"></i>
+                                            </a>
+                                            
+                                            <div class="btn-group d-inline-block ms-1">
+                                                <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Đổi trạng thái">
+                                                    <i class="fa fa-sync-alt"></i>
+                                                </button>
+                                                <ul class="dropdown-menu">
+                                                    <li><a class="dropdown-item" href="<%=ctx%>/agent/customers?action=updateType&id=<%=customer.getCustomerId()%>&type=Lead">Chuyển thành Lead</a></li>
+                                                    <li><a class="dropdown-item" href="<%=ctx%>/agent/customers?action=updateType&id=<%=customer.getCustomerId()%>&type=Client">Chuyển thành Client</a></li>
+                                                </ul>
+                                            </div>
+                                        </td>
                                 </tr>
                                 <%
                                     } // ĐÓNG VÒNG LẶP FOR
