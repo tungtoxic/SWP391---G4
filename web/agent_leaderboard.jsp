@@ -1,139 +1,92 @@
 <%-- 
-    Document   : agent_leaderboard
-    Created on : Oct 22, 2025, 6:14:05 AM
+    Document   : agent_edit_contract
+    Created on : Oct 22, 2025, 3:42:13 AM
     Author     : Nguyễn Tùng
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="java.util.List" %>
-<%@ page import="entity.User" %>
-<%@ page import="entity.AgentPerformanceDTO" %>
-<%@ page import="java.text.DecimalFormat" %>
+<%@ page import="java.util.*, entity.*" %>
 <%
     String ctx = request.getContextPath();
-    User currentUser = (User) session.getAttribute("user");
-    List<AgentPerformanceDTO> leaderboardList = (List<AgentPerformanceDTO>) request.getAttribute("agentLeaderboard");
-    DecimalFormat currencyFormat = new DecimalFormat("###,###,##0 'VNĐ'");
+    User currentUser = (User) request.getAttribute("currentUser"); // Lấy từ Servlet
+    String activePage = (String) request.getAttribute("activePage");
+    ContractDTO contract = (ContractDTO) request.getAttribute("contract");
+    List<Customer> customerList = (List<Customer>) request.getAttribute("customerList");
+    List<Product> productList = (List<Product>) request.getAttribute("productList");
+    if (currentUser == null) {
+        response.sendRedirect(ctx + "/login.jsp");
+        return;
+    }
+    if (contract == null) {
+        // Nếu không có hợp đồng (ví dụ: truy cập URL sai), báo lỗi
+        request.setAttribute("errorMessage", "Không tìm thấy hợp đồng để sửa.");
+        // Không thể dùng forward ở đây, tốt nhất là Servlet đã xử lý
+         response.sendRedirect(ctx + "/agent/contracts?message=AuthError");
+         return;
+    }
+    if (customerList == null) customerList = new ArrayList<>();
+    if (productList == null) productList = new ArrayList<>();
 %>
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8" />
-    <title>Agent Leaderboard</title>
+    <title>Chỉnh Sửa Hợp đồng</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
     <link rel="stylesheet" href="<%= ctx %>/css/layout.css" />
 </head>
 <body>
-     <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom fixed-top">
-        <div class="container-fluid">
-            <a class="navbar-brand fw-bold" href="<%=ctx%>/home.jsp">Company</a>
-            <ul class="navbar-nav d-flex flex-row align-items-center">
-                <li class="nav-item me-3"><a class="nav-link" href="<%=ctx%>/home.jsp">Home</a></li>
-                <li class="nav-item"><a class="nav-link" href="<%=ctx%>/logout"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
-            </ul>
-        </div>
-    </nav>
-
-    <aside class="sidebar bg-primary text-white">
-        <div class="sidebar-top p-3">
-            <div class="d-flex align-items-center mb-3">
-                <div class="avatar rounded-circle bg-white me-2" style="width:36px;height:36px;"></div>
-                <div>
-                    <div class="fw-bold"><%= currentUser != null ? currentUser.getFullName() : "Agent" %></div>
-                    <div style="font-size:.85rem;opacity:.9">Sales Agent</div>
-                </div>
-            </div>
-        </div>
-        <nav class="nav flex-column px-2">
-            <%-- ĐÃ SỬA LỖI ĐIỀU HƯỚNG --%>
-            <a class="nav-link text-white active py-2" href="<%=ctx%>/agent/dashboard"><i class="fas fa-chart-line me-2"></i> Dashboard</a>
-            <a class="nav-link text-white py-2" href="<%=ctx%>/profile.jsp"><i class="fas fa-user me-2"></i> Profile</a>
-            <a class="nav-link text-white py-2" href="<%=ctx%>/agents/leaderboard"><i class="fas fa-trophy me-2"></i> Leaderboard</a>
-            <a class="nav-link text-white py-2" href="<%=ctx%>/agent/commission-report"><i class="fas fa-percent me-2"></i> Commission Report</a>
-            <a class="nav-link text-white py-2" href="#"><i class="fas fa-box me-2"></i> Product</a>
-            <a class="nav-link text-white py-2" href="<%=ctx%>/agent/contracts"><i class="fas fa-file-signature me-2"></i> Contract</a>
-            <a class="nav-link text-white py-2" href="<%=ctx%>/agent/customers"><i class="fas fa-users me-2"></i> Customer</a>
-            <a class="nav-link text-white py-2" href="#"><i class="fas fa-file-alt me-2"></i> Policies</a>
-            <div class="mt-3 px-2">
-                <a class="btn btn-danger w-100" href="<%=ctx%>/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
-            </div>
-        </nav>
-    </aside>
-
-
-    <%-- ================== SIDEBAR (THEO ĐÚNG MẪU CỦA BẠN) ================== --%>
-    <aside class="sidebar bg-primary text-white">
-        <div class="sidebar-top p-3">
-            <div class="d-flex align-items-center mb-3">
-                <div class="avatar rounded-circle bg-white me-2" style="width:36px;height:36px;"></div>
-                <div>
-                    <div class="fw-bold"><%= currentUser != null ? currentUser.getFullName() : "Agent" %></div>
-                    <div style="font-size:.85rem;opacity:.9">Sales Agent</div>
-                </div>
-            </div>
-        </div>
-
-        <nav class="nav flex-column px-2">
-            <a class="nav-link text-white py-2" href="<%=ctx%>/agent/dashboard""><i class="fas fa-chart-line me-2"></i> Dashboard</a>
-            <a class="nav-link text-white py-2" href="<%=ctx%>/profile.jsp"><i class="fas fa-user me-2"></i> Profile</a>
-            <a class="nav-link text-white active py-2" href="<%=ctx%>/leaderboard/agents"><i class="fas fa-trophy me-2"></i> Leader Board</a>
-            <a class="nav-link text-white py-2" href="<%=ctx%>/agent/commission-report"><i class="fas fa-percent me-2"></i> Commission Report</a>
-            <a class="nav-link text-white py-2" href="#"><i class="fas fa-box me-2"></i> Product</a>
-            <a class="nav-link text-white py-2" href="<%=ctx%>/agent/contracts"><i class="fas fa-file-signature me-2"></i> Contract</a>
-            <a class="nav-link text-white py-2" href="<%=ctx%>/agent/customers"><i class="fas fa-users me-2"></i> Customer</a>
-            <a class="nav-link text-white py-2" href="#"><i class="fas fa-file-alt me-2"></i> Policies</a>
-            <div class="mt-3 px-2">
-                <a class="btn btn-danger w-100" href="<%=ctx%>/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
-            </div>
-        </nav>
-    </aside>
-
-    <%-- ================== MAIN CONTENT (NỘI DUNG CHÍNH CỦA TRANG) ================== --%>
+    <%@ include file="agent_navbar.jsp" %>
+    <%@ include file="agent_sidebar.jsp" %>
     <main class="main-content">
         <div class="container-fluid">
-            <h1 class="mb-4"><i class="fas fa-trophy me-2"></i> Agent Leaderboard</h1>
+            <h1 class="mb-4">Chỉnh Sửa Hợp đồng #<%= contract.getContractId() %></h1>
 
             <div class="card">
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0">
-                            <thead class="table-light">
-                                <tr>
-                                    <th style="width: 80px;" class="text-center">Hạng</th>
-                                    <th>Agent</th>
-                                    <th class="text-end">Tổng Doanh Thu</th>
-                                    <th class="text-center">Số Hợp đồng</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            <% if (leaderboardList != null && !leaderboardList.isEmpty()) {
-                                int rank = 0;
-                                for (AgentPerformanceDTO agent : leaderboardList) {
-                                    rank++;
-                                    boolean isCurrentUser = (currentUser != null && agent.getAgentId() == currentUser.getUserId());
-                            %>
-                                    <tr class="<%= isCurrentUser ? "table-primary fw-bold" : "" %>">
-                                        <td class="text-center fs-5">
-                                            <% if (rank == 1) { %> 🥇 <%
-                                               } else if (rank == 2) { %> 🥈 <%
-                                               } else if (rank == 3) { %> 🥉 <%
-                                               } else { %> <%= rank %> <% } %>
-                                        </td>
-                                        <td><%= agent.getAgentName() %></td>
-                                        <td class="text-end"><%= currencyFormat.format(agent.getTotalPremium()) %></td>
-                                        <td class="text-center"><%= agent.getContractsCount() %></td>
-                                    </tr>
-                            <% } } else { %>
-                                <tr><td colspan="4" class="text-center p-4 text-muted">Chưa có dữ liệu doanh thu để xếp hạng.</td></tr>
-                            <% } %>
-                            </tbody>
-                        </table>
-                    </div>
+                <div class="card-body">
+                    <form action="<%= ctx %>/agent/contracts" method="post">
+                        <input type="hidden" name="action" value="update">
+                        <input type="hidden" name="contractId" value="<%= contract.getContractId() %>">
+                        
+                        <div class="mb-3">
+                            <label for="customerId" class="form-label">Khách hàng</label>
+                            <select class="form-select" id="customerId" name="customerId" required>
+                                <% if (customerList != null) { 
+                                    for (Customer c : customerList) { %>
+                                        <option value="<%= c.getCustomerId() %>" <%= c.getCustomerId() == contract.getCustomerId() ? "selected" : "" %>>
+                                            <%= c.getFullName() %>
+                                        </option>
+                                <% } } %>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="productId" class="form-label">Sản phẩm bảo hiểm</label>
+                            <select class="form-select" id="productId" name="productId" required>
+                                <% if (productList != null) { 
+                                    for (Product p : productList) { %>
+                                        <option value="<%= p.getProductId() %>" <%= p.getProductId() == contract.getProductId() ? "selected" : "" %>>
+                                            <%= p.getProductName() %>
+                                        </option>
+                                <% } } %>
+                            </select>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="startDate" class="form-label">Ngày bắt đầu</label>
+                                <input type="date" class="form-control" id="startDate" name="startDate" value="<%= contract.getStartDate() %>" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="premiumAmount" class="form-label">Phí bảo hiểm (VNĐ)</label>
+                                <input type="number" class="form-control" id="premiumAmount" name="premiumAmount" step="1000" min="0" value="<%= contract.getPremiumAmount().toBigInteger() %>" required>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">Cập Nhật Hợp đồng</button>
+                        <a href="<%= ctx %>/agent/contracts" class="btn btn-secondary">Hủy</a>
+                    </form>
                 </div>
             </div>
         </div>
     </main>
-    
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
