@@ -39,7 +39,7 @@
             <i class="fas fa-percent me-2"></i> Commission Report
         </a>
         
-        <a class="nav-link text-white py-2 <%= "product".equals(activePage) ? "active" : "" %>" href="#"> <%-- Sửa link # sau --%>
+        <a class="nav-link text-white py-2 <%= "product".equals(activePage) ? "active" : "" %>" href="<%=ctx%>/agent/products"> <%-- Sửa link # sau --%>
             <i class="fas fa-box me-2"></i> Product
         </a>
         

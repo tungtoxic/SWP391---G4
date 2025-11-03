@@ -61,7 +61,7 @@
                  <i class="fas fa-sitemap me-2 small"></i> Contract Policies
             </a>
         </div>
-        <a class="nav-link text-white py-2 <%= "productMgmt".equals(activePage) ? "active" : "" %>" href="<%=ctx%>/ProductServlet?action=list"><i class="fas fa-box me-2"></i> Product</a>
+        <a class="nav-link text-white py-2 <%= "productMgmt".equals(activePage) ? "active" : "" %>" href="<%=ctx%>/managers/products"><i class="fas fa-box me-2"></i> Product</a>
 
         <%-- Menu Contract (Giữ nguyên) --%>
          <% boolean isContractSectionActive = "all".equals(activePage) || "pending".equals(activePage); %>
