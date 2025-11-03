@@ -194,7 +194,7 @@
                                                 </div>
                                                 <% if (interaction.getNotes() != null && !interaction.getNotes().isEmpty()) { %>
                                                     <div class="notes">
-                                                        <%= interaction.getNotes().replace("\n", "<br>") // Hiển thị xuống dòng %>
+                                                        <%= interaction.getNotes().replace("\n", "<br>")  %>
                                                     </div>
                                                 <% } %>
                                             </div>
