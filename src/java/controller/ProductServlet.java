@@ -21,7 +21,7 @@ import java.util.List;
  *
  * @author Nguyễn Tùng
  */
-@WebServlet(name = "ProductServlet", urlPatterns = {"/products"})
+@WebServlet(name = "ProductServlet", urlPatterns = {"/agent/products", "/manager/products"})
 public class ProductServlet extends HttpServlet {
 
     private ProductDao productDao;
