@@ -1,3 +1,10 @@
+<%-- 
+    Document   : addUser
+    Created on : Oct 5, 2025, 11:51:15 AM
+    Author     : hoang
+--%>
+
+
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.util.List" %>
 <%@ page import="entity.Role" %>
@@ -15,7 +22,7 @@
     </head>
     <body class="container mt-4">
 
-        <h2>➕ Add User</h2>
+        <h2>➕ Thêm Người Dùng</h2>
 
         <% String error = (String) request.getAttribute("error"); %>
         <% if (error != null) { %>
@@ -33,8 +40,8 @@
             </div>
 
             <div class="mb-3">
-                <label class="form-label">Full Name:</label>
-                <input type="text" name="fullName" class="form-control" required/>
+                <label class="form-label">Họ tên:</label>
+                <input type="text" name="fullName" class="form-control"/>
             </div>
 
             <div class="mb-3">
@@ -43,29 +50,29 @@
             </div>
 
             <div class="mb-3">
-                <label class="form-label">Phone Number:</label>
+                <label class="form-label">Số điện thoại:</label>
                 <input type="text" name="phoneNumber" class="form-control" required/>
             </div>
 
             <div class="mb-3">
-                <label class="form-label">Role:</label>
+                <label class="form-label">Vai trò:</label>
                 <select name="role_id" class="form-select">
-                    <option value="1" ${user.roleId == 1 ? "selected" : ""}>Agent</option>
-                    <option value="2" ${user.roleId == 2 ? "selected" : ""}>Manager</option>
+                    <% for(Role r : roles) { %>
+                    <option value="<%= r.getRoleId() %>"><%= r.getRoleName() %></option>
+                    <% } %>
                 </select>
-
             </div>
 
             <div class="mb-3">
-                <label class="form-label">Status:</label>
+                <label class="form-label">Trạng thái:</label>
                 <select name="status" class="form-select">
                     <option value="Active">Active</option>
                     <option value="Inactive">Inactive</option>
                 </select>
             </div>
 
-            <button type="submit" class="btn btn-success">Add</button>
-            <a href="<%= request.getContextPath() %>/usermanagement.jsp" class="btn btn-secondary">Return</a>
+            <button type="submit" class="btn btn-success">Thêm</button>
+            <a href="<%= request.getContextPath() %>/usermanagement.jsp" class="btn btn-secondary">Quay lại</a>
         </form>
 
     </body>

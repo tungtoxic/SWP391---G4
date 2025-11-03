@@ -110,7 +110,6 @@ public class AgentContractServlet extends HttpServlet {
             throws Exception {
         List<ContractDTO> contractList = contractDao.getContractsByAgentId(currentUser.getUserId());
         request.setAttribute("contractList", contractList);
-        request.setAttribute("activePage", "contracts");
         request.getRequestDispatcher("/agent_contract_list.jsp").forward(request, response);
     }
 
@@ -123,7 +122,6 @@ public class AgentContractServlet extends HttpServlet {
 
         request.setAttribute("customerList", customerList);
         request.setAttribute("productList", productList);
-        request.setAttribute("activePage", "contracts");
         // (Không cần set currentUser nữa vì đã làm ở doGet)
         request.getRequestDispatcher("/agent_add_contract.jsp").forward(request, response);
     }
@@ -161,7 +159,6 @@ public class AgentContractServlet extends HttpServlet {
             request.setAttribute("contract", existingContract);
             request.setAttribute("customerList", customerList);
             request.setAttribute("productList", productList);
-            request.setAttribute("activePage", "contracts");
             // (Không cần set currentUser nữa vì đã làm ở doGet)
             request.getRequestDispatcher("/agent_edit_contract.jsp").forward(request, response);
         } else {

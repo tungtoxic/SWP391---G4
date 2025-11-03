@@ -32,7 +32,6 @@ public class Customer {
         this.createdAt = createdAt;
         this.customerType = customerType;
     }
-    
 
     public int getCustomerId() {
         return customerId;
@@ -97,6 +96,7 @@ public class Customer {
     public void setCreatedAt(Timestamp createdAt) {
         this.createdAt = createdAt;
     }
+
     public String getCustomerType() {
         return customerType;
     }
@@ -107,4 +107,3 @@ public class Customer {
     
     
 }
-

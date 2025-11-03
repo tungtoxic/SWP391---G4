@@ -62,6 +62,7 @@ public class RegisterServlet extends HttpServlet {
             if (error == null) {
                 String hashedPassword = PasswordUtils.hashPassword(password);
                 int roleId = userDAO.getRoleIdByName(roleName);
+
                 if (roleId == -1) {
                     error = "Vai trò không hợp lệ!";
                 } else {

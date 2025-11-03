@@ -2,13 +2,14 @@
     Document   : AgentDashboard
     Created on : Oct 6, 2025, 4:49:19 PM
     Author     : Nguyễn Tùng
+   
 --%>
-<%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ page import="java.util.*, entity.*, java.math.BigDecimal, java.text.DecimalFormat, java.time.temporal.ChronoUnit, java.time.LocalDate"%>
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page import="java.util.*, entity.*, java.math.BigDecimal, java.text.DecimalFormat, java.time.temporal.ChronoUnit, java.time.LocalDate"%>
 <%
     String ctx = request.getContextPath();
-    User currentUser = (User) session.getAttribute("user"); 
-    String activePage = (String) request.getAttribute("activePage");
+    User currentUser = (User) session.getAttribute("user");
+    
     // --- 1. Lấy dữ liệu (ĐÃ THÊM NULL CHECKS ĐỂ SỬA LỖI) ---
     BigDecimal pendingCommission = (BigDecimal) request.getAttribute("pendingCommission");
     Integer leadCount = (Integer) request.getAttribute("leadCount");
@@ -30,12 +31,6 @@
     if (topAgents == null) topAgents = new ArrayList<>();
     if (salesChartLabels == null) salesChartLabels = new ArrayList<>();
     if (salesChartValues == null) salesChartValues = new ArrayList<>();
-    if (currentUser == null) {
-        response.sendRedirect(ctx + "/login.jsp");
-        return;
-    }
-    // Đặt giá trị mặc định cho activePage nếu Servlet quên gửi
-    if (activePage == null) activePage = "dashboard";
 
     // --- 3. Định dạng & Tính toán ---
     DecimalFormat currencyFormat = new DecimalFormat("###,###,##0 'VND'");
@@ -62,10 +57,44 @@
     </style>
 </head>
 <body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="<%=ctx%>/home.jsp">Company</a>
+            <ul class="navbar-nav d-flex flex-row align-items-center">
+                <li class="nav-item me-3"><a class="nav-link" href="<%=ctx%>/home.jsp">Home</a></li>
+                <a class="nav-link" href="#">
+                        <i class="fas fa-bell"></i>
+                        <span class="badge rounded-pill badge-notification bg-danger">1</span>
+                    </a>
+            </ul>
+        </div>
+    </nav>
 
-    <%@ include file="agent_navbar.jsp" %>
-    <%@ include file="agent_sidebar.jsp" %>
-     <%-- Sidebar sẽ tự động lấy activePage="dashboard" --%>
+    <aside class="sidebar bg-primary text-white">
+        <div class="sidebar-top p-3">
+            <div class="d-flex align-items-center mb-3">
+                <div class="avatar rounded-circle bg-white me-2" style="width:36px;height:36px;"></div>
+                <div>
+                    <div class="fw-bold"><%= currentUser != null ? currentUser.getFullName() : "Agent" %></div>
+                    <div style="font-size:.85rem;opacity:.9">Sales Agent</div>
+                </div>
+            </div>
+        </div>
+        <nav class="nav flex-column px-2">
+            <%-- ĐÃ SỬA LỖI ĐIỀU HƯỚNG --%>
+            <a class="nav-link text-white active py-2" href="<%=ctx%>/agent/dashboard"><i class="fas fa-chart-line me-2"></i> Dashboard</a>
+            <a class="nav-link text-white py-2" href="<%=ctx%>/profile.jsp"><i class="fas fa-user me-2"></i> Profile</a>
+            <a class="nav-link text-white py-2" href="<%=ctx%>/agents/leaderboard"><i class="fas fa-trophy me-2"></i> Leaderboard</a>
+            <a class="nav-link text-white py-2" href="<%=ctx%>/agent/commission-report"><i class="fas fa-percent me-2"></i> Commission Report</a>
+            <a class="nav-link text-white py-2" href="#"><i class="fas fa-box me-2"></i> Product</a>
+            <a class="nav-link text-white py-2" href="<%=ctx%>/agent/contracts"><i class="fas fa-file-signature me-2"></i> Contract</a>
+            <a class="nav-link text-white py-2" href="<%=ctx%>/agent/customers"><i class="fas fa-users me-2"></i> Customer</a>
+            <a class="nav-link text-white py-2" href="#"><i class="fas fa-file-alt me-2"></i> Policies</a>
+            <div class="mt-3 px-2">
+                <a class="btn btn-danger w-100" href="<%=ctx%>/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
+        </nav>
+    </aside>
 
     <main class="main-content">
         <div class="container-fluid">

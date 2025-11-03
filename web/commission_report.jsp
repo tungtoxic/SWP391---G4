@@ -5,7 +5,6 @@
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.util.List" %>
-<%@ page import="java.util.List, java.util.ArrayList" %>
 <%@ page import="entity.User" %>
 <%@ page import="entity.CommissionReportDTO" %>
 <%@ page import="java.text.DecimalFormat" %>
@@ -13,8 +12,9 @@
 <%
     // Lấy context path
     String ctx = request.getContextPath();
-    User currentUser = (User) request.getAttribute("currentUser");
-    String activePage = (String) request.getAttribute("activePage");
+
+    // Lấy dữ liệu từ session và request
+    User currentUser = (User) session.getAttribute("user");
     List<CommissionReportDTO> reportList = (List<CommissionReportDTO>) request.getAttribute("reportList");
     Double totalCommission = (Double) request.getAttribute("totalCommission");
     String startDate = (String) request.getAttribute("startDate");
@@ -25,15 +25,9 @@
     SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 
     // Xử lý giá trị null để tránh lỗi
-    if (currentUser == null) {
-        response.sendRedirect(ctx + "/login.jsp");
-        return;
-    }
-    if (reportList == null) reportList = new ArrayList<>();
     if (totalCommission == null) totalCommission = 0.0;
     if (startDate == null) startDate = "";
     if (endDate == null) endDate = "";
-    if (activePage == null) activePage = "commission"; 
 %>
 <!DOCTYPE html>
 <html>
@@ -44,8 +38,45 @@
     <link rel="stylesheet" href="<%= ctx %>/css/layout.css" />
 </head>
 <body>
-    <%@ include file="agent_navbar.jsp" %>
-    <%@ include file="agent_sidebar.jsp" %>
+    <%-- ======================== NAVBAR ======================== --%>
+    <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="<%=ctx%>/home.jsp">Company</a>
+            <ul class="navbar-nav d-flex flex-row align-items-center">
+                <li class="nav-item me-3"><a class="nav-link" href="<%=ctx%>/home.jsp">Home</a></li>
+                <a class="nav-link" href="#">
+                        <i class="fas fa-bell"></i>
+                        <span class="badge rounded-pill badge-notification bg-danger">1</span>
+                    </a>
+            </ul>
+        </div>
+    </nav>
+
+    <aside class="sidebar bg-primary text-white">
+        <div class="sidebar-top p-3">
+            <div class="d-flex align-items-center mb-3">
+                <div class="avatar rounded-circle bg-white me-2" style="width:36px;height:36px;"></div>
+                <div>
+                    <div class="fw-bold"><%= currentUser != null ? currentUser.getFullName() : "Agent" %></div>
+                    <div style="font-size:.85rem;opacity:.9">Sales Agent</div>
+                </div>
+            </div>
+        </div>
+        <nav class="nav flex-column px-2">
+            <%-- ĐÃ SỬA LỖI ĐIỀU HƯỚNG --%>
+            <a class="nav-link text-white active py-2" href="<%=ctx%>/agent/dashboard"><i class="fas fa-chart-line me-2"></i> Dashboard</a>
+            <a class="nav-link text-white py-2" href="<%=ctx%>/profile.jsp"><i class="fas fa-user me-2"></i> Profile</a>
+            <a class="nav-link text-white py-2" href="<%=ctx%>/agents/leaderboard"><i class="fas fa-trophy me-2"></i> Leaderboard</a>
+            <a class="nav-link text-white py-2" href="<%=ctx%>/agent/commission-report"><i class="fas fa-percent me-2"></i> Commission Report</a>
+            <a class="nav-link text-white py-2" href="#"><i class="fas fa-box me-2"></i> Product</a>
+            <a class="nav-link text-white py-2" href="<%=ctx%>/agent/contracts"><i class="fas fa-file-signature me-2"></i> Contract</a>
+            <a class="nav-link text-white py-2" href="<%=ctx%>/agent/customers"><i class="fas fa-users me-2"></i> Customer</a>
+            <a class="nav-link text-white py-2" href="#"><i class="fas fa-file-alt me-2"></i> Policies</a>
+            <div class="mt-3 px-2">
+                <a class="btn btn-danger w-100" href="<%=ctx%>/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
+        </nav>
+    </aside>
     <%-- ======================== MAIN CONTENT ======================== --%>
     <main class="main-content">
         <div class="container-fluid">

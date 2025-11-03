@@ -1,14 +1,14 @@
 package dao;
 
-import utility.DBConnector;
 import entity.InsuranceProductDetails;
+import utility.DBConnector;
 import entity.Product;
-import entity.ProductCategory;
 import java.sql.*;
 import java.util.*;
 
 public class ProductDao {
 
+    // ================== Lấy tất cả sản phẩm ==================
     public List<Product> getAllProducts() throws Exception {
         List<Product> list = new ArrayList<>();
         String sql = "SELECT * FROM Products";
@@ -22,12 +22,14 @@ public class ProductDao {
                 p.setBasePrice(rs.getDouble("base_price"));
                 p.setCategoryId(rs.getInt("category_id"));
                 p.setCreatedAt(rs.getTimestamp("created_at"));
+                p.setUpdatedAt(rs.getTimestamp("updated_at"));
                 list.add(p);
             }
         }
         return list;
     }
 
+    // ================== Lấy sản phẩm theo ID ==================
     public Product getProductById(int id) {
         Product product = null;
         String sql = "SELECT * FROM Products WHERE product_id = ?";
@@ -44,6 +46,7 @@ public class ProductDao {
                 product.setBasePrice(rs.getDouble("base_price"));
                 product.setCategoryId(rs.getInt("category_id"));
                 product.setCreatedAt(rs.getTimestamp("created_at"));
+                product.setUpdatedAt(rs.getTimestamp("updated_at"));
             }
 
         } catch (Exception e) {
@@ -52,6 +55,7 @@ public class ProductDao {
         return product;
     }
 
+    // ================== Thêm sản phẩm (có chi tiết bảo hiểm) ==================
     public boolean insertProduct(Product product, InsuranceProductDetails details) throws SQLException {
         String insertProductSQL = "INSERT INTO Products (product_name, base_price, category_id) VALUES (?, ?, ?)";
         String insertDetailSQL = "INSERT INTO Insurance_Product_Details ("
@@ -66,18 +70,21 @@ public class ProductDao {
             conn = DBConnector.makeConnection();
             conn.setAutoCommit(false);
 
+            // 1️⃣ Insert sản phẩm chính
             PreparedStatement psProduct = conn.prepareStatement(insertProductSQL, Statement.RETURN_GENERATED_KEYS);
             psProduct.setString(1, product.getProductName());
             psProduct.setDouble(2, product.getBasePrice());
             psProduct.setInt(3, product.getCategoryId());
             psProduct.executeUpdate();
 
+            // Lấy product_id tự sinh
             ResultSet rs = psProduct.getGeneratedKeys();
             int productId = 0;
             if (rs.next()) {
                 productId = rs.getInt(1);
             }
 
+            // 2️⃣ Insert chi tiết bảo hiểm
             PreparedStatement psDetail = conn.prepareStatement(insertDetailSQL);
             psDetail.setInt(1, productId);
             psDetail.setInt(2, details.getCategoryId());
@@ -114,6 +121,7 @@ public class ProductDao {
         }
     }
 
+    // ================== Cập nhật sản phẩm ==================
     public boolean updateProduct(Product product, InsuranceProductDetails details) throws SQLException {
         String updateProductSQL = "UPDATE Products SET product_name=?, base_price=?, category_id=? WHERE product_id=?";
         String updateDetailSQL = "UPDATE Insurance_Product_Details SET "
@@ -170,33 +178,28 @@ public class ProductDao {
         }
     }
 
+    // ================== Xóa sản phẩm ==================
     public boolean deleteProduct(int id) throws Exception {
         try (Connection conn = DBConnector.makeConnection()) {
             conn.setAutoCommit(false);
-            try {
-                try (PreparedStatement ps1 = conn.prepareStatement(
-                        "DELETE FROM insurance_product_details WHERE product_id = ?")) {
-                    ps1.setInt(1, id);
-                    ps1.executeUpdate();
-                }
 
-                boolean deleted;
-                try (PreparedStatement ps2 = conn.prepareStatement(
-                        "DELETE FROM products WHERE product_id = ?")) {
-                    ps2.setInt(1, id);
-                    deleted = ps2.executeUpdate() > 0;
-                }
+            // Xóa chi tiết trước
+            try (PreparedStatement ps1 = conn.prepareStatement("DELETE FROM insurance_product_details WHERE product_id = ?")) {
+                ps1.setInt(1, id);
+                ps1.executeUpdate();
+            }
 
+            // Sau đó xóa sản phẩm
+            try (PreparedStatement ps2 = conn.prepareStatement("DELETE FROM products WHERE product_id = ?")) {
+                ps2.setInt(1, id);
+                boolean deleted = ps2.executeUpdate() > 0;
                 conn.commit();
                 return deleted;
-
-            } catch (Exception e) {
-                conn.rollback();
-                throw e;
             }
         }
     }
 
+    // ================== Lấy theo danh mục ==================
     public List<Product> getProductsByCategory(int categoryId) {
         List<Product> list = new ArrayList<>();
         String sql = "SELECT * FROM Products WHERE category_id = ?";
@@ -212,7 +215,7 @@ public class ProductDao {
                 p.setBasePrice(rs.getDouble("base_price"));
                 p.setCategoryId(rs.getInt("category_id"));
                 p.setCreatedAt(rs.getTimestamp("created_at"));
-
+                p.setUpdatedAt(rs.getTimestamp("updated_at"));
                 list.add(p);
             }
         } catch (Exception e) {
@@ -221,6 +224,7 @@ public class ProductDao {
         return list;
     }
 
+    // ================== Lấy chi tiết bảo hiểm ==================
     public InsuranceProductDetails getInsuranceProductDetailsByProductId(int productId) throws SQLException {
         String sql = "SELECT * FROM insurance_product_details WHERE product_id = ?";
         InsuranceProductDetails d = null;
@@ -291,38 +295,17 @@ public class ProductDao {
         return null;
     }
 
-    public List<ProductCategory> getAllCategories() throws Exception {
-        List<ProductCategory> list = new ArrayList<>();
-        String sql = "SELECT * FROM Product_Categories";
-
-        try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
-
-            while (rs.next()) {
-                ProductCategory c = new ProductCategory();
-                c.setCategoryId(rs.getInt("category_id"));
-                c.setCategoryName(rs.getString("category_name"));
-                c.setDescription(rs.getString("description"));
-                list.add(c);
+    // ================== TEST MAIN ==================
+    public static void main(String[] args) {
+        try {
+            ProductDao dao = new ProductDao();
+            System.out.println("✅ Số lượng sản phẩm: " + dao.getAllProducts().size());
+            Product p = dao.getProductById(1);
+            if (p != null) {
+                System.out.println("🧩 Tên sản phẩm: " + p.getProductName());
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        return list;
-    }
-
-    public ProductCategory getCategoryByName(String categoryName) throws Exception {
-        String sql = "SELECT * FROM Product_Categories WHERE category_name LIKE ?";
-        try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setString(1, "%" + categoryName + "%");
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    ProductCategory category = new ProductCategory();
-                    category.setCategoryId(rs.getInt("category_id"));
-                    category.setCategoryName(rs.getString("category_name"));
-                    category.setDescription(rs.getString("description"));
-                    return category;
-                }
-            }
-        }
-        return null;
     }
 }
