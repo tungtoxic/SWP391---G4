@@ -92,10 +92,7 @@ public class CommissionPoliciesServlet extends HttpServlet {
             List<Product> productList = productDao.getAllProducts();
             Map<Integer, List<CommissionPolicy>> productPolicies = new HashMap<>();
 
-            for (Product product : productList) {
-                List<CommissionPolicy> policies = policyDao.getPoliciesByProductId(product.getProductId());
-                productPolicies.put(product.getProductId(), policies);
-            }
+            
 
             request.setAttribute("productList", productList);
             request.setAttribute("productPolicies", productPolicies);
