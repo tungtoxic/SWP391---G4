@@ -664,14 +664,11 @@ public class UserDao {
         return agentList;
     }
 
-
-<<<<<<< HEAD
     
     /**
      * Lấy danh sách Users theo Status cụ thể.
      */
-=======
->>>>>>> VuTT
+
     public List<User> getUsersByStatus(String status) throws SQLException {
         List<User> list = new ArrayList<>();
         String sql = "SELECT u.*, r.role_name FROM Users u "
@@ -741,7 +738,6 @@ public class UserDao {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
-<<<<<<< HEAD
     /**
      * Kiểm tra xem một Agent có thuộc quyền quản lý của một Manager hay không.
      *
@@ -816,6 +812,4 @@ public boolean setTeamTarget(int managerId, BigDecimal targetAmount, int month, 
     }
 }
 }
-=======
-}
->>>>>>> VuTT
+
