@@ -16,12 +16,13 @@ public class Customer {
     private String address;
     private int createdBy;
     private Timestamp createdAt;
-    private String customerType;
+    private int stageId;
+    private String stageName;
 
     public Customer() {
     }
 
-    public Customer(int customerId, String fullName, Date dateOfBirth, String phoneNumber, String email, String address, int createdBy, Timestamp createdAt, String customerType) {
+    public Customer(int customerId, String fullName, Date dateOfBirth, String phoneNumber, String email, String address, int createdBy, Timestamp createdAt, int stageId, String stageName) {
         this.customerId = customerId;
         this.fullName = fullName;
         this.dateOfBirth = dateOfBirth;
@@ -30,8 +31,11 @@ public class Customer {
         this.address = address;
         this.createdBy = createdBy;
         this.createdAt = createdAt;
-        this.customerType = customerType;
+        this.stageId = stageId;
+        this.stageName = stageName;
     }
+    
+    
 
     public int getCustomerId() {
         return customerId;
@@ -97,13 +101,22 @@ public class Customer {
         this.createdAt = createdAt;
     }
 
-    public String getCustomerType() {
-        return customerType;
+    public int getStageId() {
+        return stageId;
     }
 
-    public void setCustomerType(String customerType) {
-        this.customerType = customerType;
+    public void setStageId(int stageId) {
+        this.stageId = stageId;
     }
-    
+
+    public String getStageName() {
+        return stageName;
+    }
+
+    public void setStageName(String stageName) {
+        this.stageName = stageName;
+    }
+
+   
     
 }

@@ -3,7 +3,9 @@ package dao;
 import entity.Customer;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import utility.DBConnector;
 
 public class CustomerDao {
@@ -28,7 +30,8 @@ public class CustomerDao {
                     c.setAddress(rs.getString("address"));
                     c.setCreatedBy(rs.getInt("created_by"));
                     c.setCreatedAt(rs.getTimestamp("created_at"));
-                    c.setCustomerType(rs.getString("customer_type"));
+                    c.setStageId(rs.getInt("stage_id")); // <-- SỬA
+                    c.setStageName(rs.getString("stage_name"));
                     list.add(c);
                 }
             }
@@ -40,7 +43,10 @@ public class CustomerDao {
 
     // ========== READ: LẤY MỘT KHÁCH HÀNG THEO ID ==========
     public Customer getCustomerById(int id) {
-        String sql = "SELECT * FROM Customers WHERE customer_id = ?";
+        String sql = "SELECT c.*, s.stage_name " +
+                     "FROM Customers c " +
+                     "JOIN Customer_Stages s ON c.stage_id = s.stage_id " +
+                     "WHERE c.customer_id = ?";
         try (Connection conn = DBConnector.makeConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             
@@ -56,7 +62,8 @@ public class CustomerDao {
                     c.setAddress(rs.getString("address"));
                     c.setCreatedBy(rs.getInt("created_by"));
                     c.setCreatedAt(rs.getTimestamp("created_at"));
-                    c.setCustomerType(rs.getString("customer_type"));
+                    c.setStageId(rs.getInt("stage_id")); // <-- SỬA
+                    c.setStageName(rs.getString("stage_name"));
                     return c;
                 }
             }
@@ -78,7 +85,7 @@ public class CustomerDao {
             ps.setString(4, c.getEmail());
             ps.setString(5, c.getAddress());
             ps.setInt(6, c.getCreatedBy());
-            ps.setString(7, c.getCustomerType());
+            ps.setInt(7, 1);
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
             e.printStackTrace();
@@ -162,11 +169,16 @@ public int countLeadsByAgent(int agentId) {
 
     }
 
-    public boolean updateCustomerType(int customerId, String customerType, int agentId) {
-        String sql = "UPDATE Customers SET customer_type = ? WHERE customer_id = ? AND created_by = ?";
-        try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+/**
+     * HÀM MỚI: Thay thế cho updateCustomerType()
+     * Cập nhật Giai đoạn (Journey) của một khách hàng.
+     */
+    public boolean updateCustomerStage(int customerId, int stageId, int agentId) {
+        String sql = "UPDATE Customers SET stage_id = ? WHERE customer_id = ? AND created_by = ?";
+        try (Connection conn = DBConnector.makeConnection(); 
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setString(1, customerType);
+            ps.setInt(1, stageId);
             ps.setInt(2, customerId);
             ps.setInt(3, agentId); // Đảm bảo agent chỉ update được khách của mình
             return ps.executeUpdate() > 0;
@@ -174,5 +186,28 @@ public int countLeadsByAgent(int agentId) {
             e.printStackTrace();
         }
         return false;
+    }
+    public Map<String, Integer> countCustomersByStage(int agentId) {
+        Map<String, Integer> stageCounts = new HashMap<>();
+        String sql = "SELECT s.stage_name, COUNT(c.customer_id) as count " +
+                     "FROM Customers c " +
+                     "JOIN Customer_Stages s ON c.stage_id = s.stage_id " +
+                     "WHERE c.created_by = ? AND c.status = 'Active' " +
+                     "GROUP BY s.stage_id, s.stage_name, s.stage_order " +
+                     "ORDER BY s.stage_order"; // Sắp xếp (Lead -> Potential...)
+
+        try (Connection conn = DBConnector.makeConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setInt(1, agentId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    stageCounts.put(rs.getString("stage_name"), rs.getInt("count"));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return stageCounts;
     }
 }
