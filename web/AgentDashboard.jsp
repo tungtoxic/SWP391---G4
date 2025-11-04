@@ -23,7 +23,7 @@
     Integer loyals = (Integer) request.getAttribute("loyals");
 
     List<ContractDTO> expiringContracts = (List<ContractDTO>) request.getAttribute("expiringContracts");
-    List<Task> followUps = (List<Task>) request.getAttribute("followUps");
+    List<Interaction> followUps = (List<Interaction>) request.getAttribute("followUps");
     List<Task> personalTasks = (List<Task>) request.getAttribute("personalTasks");
     List<AgentPerformanceDTO> topAgents = (List<AgentPerformanceDTO>) request.getAttribute("topAgents");
     List<String> salesChartLabels = (List<String>) request.getAttribute("salesChartLabels");
