@@ -78,44 +78,10 @@
         </style>
     </head>
     <body>
+           <%@ include file="manager_navbar.jsp" %>
 
-        <!-- Navbar -->
-        <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom fixed-top">
-        <div class="container-fluid">
-            <a class="navbar-brand fw-bold" href="<%=ctx%>/home.jsp">Company</a>
-            <div>
-                <ul class="navbar-nav d-flex flex-row align-items-center">
-                    <li class="nav-item me-3"><a class="nav-link" href="<%=ctx%>/home.jsp">Home</a></li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-
-    <aside class="sidebar bg-primary text-white">
-        <%-- ... (Phần Sidebar Navigation của Manager sẽ tương tự Agent nhưng có thể thêm mục Admin nếu có) ... --%>
-        <div class="sidebar-top p-3">
-            <div class="d-flex align-items-center mb-3">
-                <div class="avatar rounded-circle bg-white me-2" style="width:36px;height:36px;"></div>
-                <div>
-                    <div class="fw-bold">Manager Name</div>
-                    <div style="font-size:.85rem;opacity:.9">Sales Manager</div>
-                </div>
-            </div>
-        </div>
-
-        <nav class="nav flex-column px-2">
-            <a class="nav-link text-white active py-2" href="#"><i class="fas fa-chart-line me-2"></i> Dashboard</a>
-            <a class="nav-link text-white py-2" href="<%=ctx%>/profile.jsp"><i class="fas fa-user me-2"></i> Profile</a>
-            <a class="nav-link text-white py-2" href="AgentManagementServlet?action="><i class="fas fa-users-cog me-2"></i> Agent Management</a>
-            <a class="nav-link text-white py-2" href="#"><i class="fas fa-file-invoice-dollar me-2"></i> Commission Contracts</a>
-            <a class="nav-link text-white py-2" href="ProductServlet?action=list"><i class="fas fa-box me-2"></i> Product</a>
-            <a class="nav-link text-white py-2" href="ContractManagementServlet?action=list"><i class="fas fa-file-alt me-2"></i> Contracts</a>
-            <div class="mt-3 px-2">
-                <a class="btn btn-danger w-100" href="<%=ctx%>/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
-            </div>
-        </nav>
-    </aside>
-
+    <%-- Include Sidebar (nó sẽ tự dùng currentUser và activePage đã định nghĩa ở trên) --%>
+    <%@ include file="manager_sidebar.jsp" %>
         <!-- Main Content -->
         <main class="main-content">
             <div class="container-fluid">
