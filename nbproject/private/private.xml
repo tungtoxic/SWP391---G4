@@ -3,7 +3,10 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
+            <file>file:/D:/SWP/project/SWP391---G4/src/java/controller/CommissionReportServlet.java</file>
             <file>file:/D:/SWP/project/SWP391---G4/src/java/controller/AgentContractServlet.java</file>
+            <file>file:/D:/SWP/project/SWP391---G4/src/java/entity/CommissionReportDTO.java</file>
+            <file>file:/D:/SWP/project/SWP391---G4/src/java/dao/CommissionDao.java</file>
             <file>file:/D:/SWP/project/SWP391---G4/src/java/controller/ManagerContractServlet.java</file>
         </group>
     </open-files>
