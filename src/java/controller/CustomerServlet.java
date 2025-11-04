@@ -2,10 +2,12 @@ package controller;
 
 import dao.ContractDao;
 import dao.CustomerDao;
+import dao.CustomerStageDao;
 import dao.InteractionDao; // THÊM MỚI
 import dao.InteractionTypeDao; // THÊM MỚI
 import entity.Contract;
 import entity.Customer;
+import entity.CustomerStage;
 import entity.Interaction; // THÊM MỚI
 import entity.InteractionType; // THÊM MỚI
 import entity.User;
@@ -29,12 +31,14 @@ public class CustomerServlet extends HttpServlet {
     private InteractionDao interactionDao; // THÊM MỚI
     private InteractionTypeDao interactionTypeDao; // THÊM MỚI
     private ContractDao contractDao;
+    private CustomerStageDao customerStageDao;
 
     private static final int ROLE_AGENT = 1;
 
     @Override
     public void init() {
         customerDao = new CustomerDao();
+        customerStageDao = new CustomerStageDao();
         interactionDao = new InteractionDao(); // THÊM MỚI
         interactionTypeDao = new InteractionTypeDao(); // THÊM MỚI
         contractDao = new ContractDao();
@@ -73,11 +77,7 @@ public class CustomerServlet extends HttpServlet {
                 case "viewDetail": 
                     viewCustomerDetail(request, response, currentUser);
                     break;
-                    
-                case "updateType":
-                    updateCustomerType(request, response, currentUser);
-                    break;
-                    
+
                 default:
                     listCustomers(request, response, currentUser);
                     break;
@@ -110,16 +110,13 @@ public class CustomerServlet extends HttpServlet {
                 case "update":
                     updateCustomer(request, response, currentUser);
                     break;
-                
+                case "updateStage": 
+                    updateCustomerStage(request, response, currentUser);
+                    break;
                 // THÊM MỚI: Case để xử lý form "Thêm Tương tác"
                 case "addInteraction":
                     addInteraction(request, response, currentUser);
                     break;
-                    
-                case "updateType":
-                    updateCustomerType(request, response, currentUser);
-                    break;
-                    
                 default:
                     listCustomers(request, response, currentUser);
                     break;
@@ -172,8 +169,6 @@ public class CustomerServlet extends HttpServlet {
         newCustomer.setEmail(email);
         newCustomer.setAddress(address);
         newCustomer.setCreatedBy(currentUser.getUserId());
-        newCustomer.setCustomerType("Lead");
-
         customerDao.insertCustomer(newCustomer);
         response.sendRedirect(request.getContextPath() + "/agent/customers?message=AddSuccess");
     }
@@ -219,26 +214,7 @@ public class CustomerServlet extends HttpServlet {
         }
     }
     
-    private void updateCustomerType(HttpServletRequest request, HttpServletResponse response, User currentUser)
-            throws SQLException, IOException {
-        try {
-            int id = Integer.parseInt(request.getParameter("id"));
-            String type = request.getParameter("type");
-
-            if (type != null && (type.equals("Lead") || type.equals("Client"))) {
-                boolean success = customerDao.updateCustomerType(id, type, currentUser.getUserId());
-                if (success) {
-                    response.sendRedirect(request.getContextPath() + "/agent/customers?message=TypeUpdateSuccess");
-                } else {
-                    response.sendRedirect(request.getContextPath() + "/agent/customers?message=AuthError");
-                }
-            } else {
-                response.sendRedirect(request.getContextPath() + "/agent/customers?message=Error");
-            }
-        } catch (NumberFormatException e) {
-            response.sendRedirect(request.getContextPath() + "/agent/customers?message=Error");
-        }
-    }
+    
     
     // ========== CÁC PHƯƠNG THỨC CRM MỚI (THÊM MỚI) ==========
 
@@ -253,24 +229,20 @@ private void viewCustomerDetail(HttpServletRequest request, HttpServletResponse 
 
             // Kiểm tra quyền sở hữu
             if (customer != null && customer.getCreatedBy() == currentUser.getUserId()) {
-                // 1. Lấy thông tin chi tiết khách hàng (đã có)
-                request.setAttribute("customer", customer);
-                
-                // 2. Lấy Lịch sử Tương tác (Interaction Log) (đã có)
+    // 1. Lấy Tương tác (Task 1.1)
                 List<Interaction> interactionList = interactionDao.getInteractionsByCustomerId(id);
-                request.setAttribute("interactionList", interactionList);
-                
-                // 3. Lấy Danh sách các Loại Tương tác (đã có)
-                List<InteractionType> typeList = interactionTypeDao.getAllInteractionTypes();
-                request.setAttribute("typeList", typeList);
-                
-                // 4. THÊM MỚI: Lấy danh sách Hợp đồng của khách hàng này
+                // 2. Lấy Hợp đồng (Task 1.1 - Nâng cao)
                 List<Contract> contractList = contractDao.getContractsByCustomerId(id);
-                request.setAttribute("contractList", contractList); // <-- THÊM DÒNG NÀY
+                // 3. Lấy Danh sách Giai đoạn (cho dropdown "Hành trình")
+                List<CustomerStage> stageList = customerStageDao.getAllStages();
                 
-                // Forward đến trang JSP
+                request.setAttribute("customer", customer);
+                request.setAttribute("interactionList", interactionList);
+                request.setAttribute("contractList", contractList);
+                request.setAttribute("stageList", stageList);
+                
+                // Forward đến trang JSP MỚI
                 request.getRequestDispatcher("/customer_detail.jsp").forward(request, response);
-                
             } else {
                 // Không có quyền
                 response.sendRedirect(request.getContextPath() + "/agent/customers?message=AuthError");
@@ -318,6 +290,36 @@ private void viewCustomerDetail(HttpServletRequest request, HttpServletResponse 
             }
         } catch (Exception e) {
             e.printStackTrace();
+            response.sendRedirect(request.getContextPath() + "/agent/customers?message=Error");
+        }
+    }
+    /**
+     * HÀM MỚI (Nâng cấp Journey): Thay thế "updateCustomerType"
+     */
+    private void updateCustomerStage(HttpServletRequest request, HttpServletResponse response, User currentUser)
+            throws SQLException, IOException {
+        try {
+            int customerId = Integer.parseInt(request.getParameter("id"));
+            int stageId = Integer.parseInt(request.getParameter("stageId")); // <-- SỬA
+
+            // (Không cần validate vì stageId là số)
+            boolean success = customerDao.updateCustomerStage(customerId, stageId, currentUser.getUserId());
+            
+            if (success) {
+                // SỬA: Quyết định xem nên quay lại trang List hay trang Detail
+                String redirectUrl = request.getContextPath() + "/agent/customers?message=StageUpdateSuccess";
+                
+                // Nếu có "source=detail", quay lại trang detail
+                String source = request.getParameter("source");
+                if ("detail".equals(source)) {
+                    redirectUrl = request.getContextPath() + "/agent/customers?action=viewDetail&id=" + customerId + "&message=StageUpdateSuccess";
+                }
+                response.sendRedirect(redirectUrl);
+                
+            } else {
+                response.sendRedirect(request.getContextPath() + "/agent/customers?message=AuthError");
+            }
+        } catch (NumberFormatException e) {
             response.sendRedirect(request.getContextPath() + "/agent/customers?message=Error");
         }
     }

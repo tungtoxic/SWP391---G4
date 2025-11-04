@@ -1,17 +1,16 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="entity.Customer" %>
-<%@ page import="entity.User" %>
-<%@ page import="java.util.List" %>
-<%@ page import="java.text.SimpleDateFormat" %>
-<%@ page import="entity.Customer, entity.User, java.util.*, java.text.SimpleDateFormat" %>
+<%@ page import="entity.User, entity.Customer, entity.CustomerStage" %> 
+<%@ page import="java.util.List, java.util.ArrayList, java.text.SimpleDateFormat" %>
 <%
     String ctx = request.getContextPath();
     User currentUser = (User) session.getAttribute("user");
     String activePage = (String) request.getAttribute("activePage");
     List<Customer> customerList = (List<Customer>) request.getAttribute("customerList");
-    String message = request.getParameter("message"); // Lấy thông báo từ URL
+    List<CustomerStage> stageList = (List<CustomerStage>) request.getAttribute("stageList"); // <-- LẤY DỮ LIỆU MỚI
+    String message = request.getParameter("message");
     if (customerList == null) customerList = new ArrayList<>();
-    if (currentUser == null) { // Phòng trường hợp truy cập trực tiếp
+    if (stageList == null) stageList = new ArrayList<>(); // <-- KHỞI TẠO
+    if (currentUser == null) {
         response.sendRedirect(ctx + "/login.jsp");
         return;
     }
@@ -34,16 +33,18 @@
 <body>
 
     <%@ include file="agent_navbar.jsp" %>
-    <%@ include file="agent_sidebar.jsp" %> <%-- Sidebar sẽ tự động lấy activePage="dashboard" --%>
+    <%@ include file="agent_sidebar.jsp" %> 
 
-    <main class="main-content">
+   <main class="main-content">
         <div class="container-fluid">
 
-            <%-- Hiển thị thông báo thành công/lỗi --%>
+            <%-- Hiển thị thông báo (SỬA: Thêm StageUpdateSuccess) --%>
             <% if ("DeleteSuccess".equals(message)) { %>
-            <div class="alert alert-success">Đã xóa khách hàng thành công!</div>
-            <% } else if ("TypeUpdateSuccess".equals(message)) { %> <div class="alert alert-success">Cập nhật trạng thái khách hàng thành công!</div>
-            <% } else if ("AuthError".equals(message)) { %> <div class="alert alert-danger">Bạn không có quyền thực hiện thao tác này!</div>
+                <div class="alert alert-success">Đã xóa khách hàng thành công!</div>
+            <% } else if ("StageUpdateSuccess".equals(message)) { %> 
+                <div class="alert alert-success">Cập nhật Giai đoạn (Journey) khách hàng thành công!</div>
+            <% } else if ("AuthError".equals(message)) { %> 
+                <div class="alert alert-danger">Bạn không có quyền thực hiện thao tác này!</div>
             <% } %>
 
             <div class="card">
@@ -58,73 +59,86 @@
                         <table class="table table-hover table-striped mb-0">
                             <thead class="table-light">
                                 <tr>
-                                    <th>ID</th>
+                                    <th>#</th>
                                     <th>Tên Khách Hàng</th>
-                                    <th>Ngày Sinh</th>
                                     <th>Số Điện Thoại</th>
                                     <th>Email</th>
-                                    <th>Trạng Thái</th> <th>Ngày Tạo</th>
-                                    <th style="width: 150px;">Thao Tác</th> </tr>
+                                    <th>Giai đoạn (Journey)</th> <%-- SỬA TIÊU ĐỀ --%>
+                                    <th>Ngày Tạo</th>
+                                    <th style="width: 200px;">Thao Tác</th> <%-- Tăng độ rộng --%>
+                                </tr>
                             </thead>
                             <tbody>
                                 <%
                                 if (customerList != null && !customerList.isEmpty()) {
-                                    // KHAI BÁO BIẾN ĐẾM Ở ĐÂY (bên ngoài vòng lặp)
                                     int index = 0; 
-        
-                                    // BẮT ĐẦU VÒNG LẶP
                                     for (Customer customer : customerList) { 
-                                        index++; // Tăng biến đếm
+                                        index++;
                                 %>
                                 <tr>
-                                    <td><%= index %></td> <%-- Dùng biến đếm --%>
+                                    <td><%= index %></td>
                                     <td><%= customer.getFullName() %></td>
-                                    <td><%= customer.getDateOfBirth() != null ? dateFormat.format(customer.getDateOfBirth()) : "" %></td>
                                     <td><%= customer.getPhoneNumber() %></td>
                                     <td><%= customer.getEmail() %></td>
+                                    
+                                    <%-- SỬA LỖI: Cột Trạng Thái (Giờ dùng 4 Giai đoạn) --%>
                                     <td>
-                                        <% if ("Lead".equals(customer.getCustomerType())) { %>
-                                        <span class="badge bg-warning text-dark">Lead</span>
-                                        <% } else if ("Client".equals(customer.getCustomerType())) { %>
-                                        <span class="badge bg-success">Client</span>
+                                        <% String stageName = customer.getStageName();
+                                           if ("Lead".equals(stageName)) { %>
+                                            <span class="badge bg-warning text-dark">Lead</span>
+                                        <% } else if ("Potential".equals(stageName)) { %>
+                                            <span class="badge bg-info text-dark">Potential</span>
+                                        <% } else if ("Client".equals(stageName)) { %>
+                                            <span class="badge bg-success">Client</span>
+                                        <% } else if ("Loyal".equals(stageName)) { %>
+                                            <span class="badge bg-primary">Loyal</span>
                                         <% } else { %>
-                                        <span class="badge bg-secondary">N/A</span>
+                                            <span class="badge bg-secondary"><%= stageName %></span>
                                         <% } %>
                                     </td>
-                                    <td><%= customer.getCreatedAt() != null ? new SimpleDateFormat("dd/MM/yyyy").format(customer.getCreatedAt()) : "" %></td>
-<td>
-                                            <a href="<%=ctx%>/agent/customers?action=viewDetail&id=<%= customer.getCustomerId() %>" class="btn btn-sm btn-info" title="Xem chi tiết CRM">
-                                                <i class="fa fa-eye"></i>
-                                            </a>
-                                            
-                                            <a href="<%=ctx%>/agent/customers?action=showEditForm&id=<%= customer.getCustomerId() %>" class="btn btn-sm btn-warning" title="Chỉnh sửa thông tin">
-                                                <i class="fa fa-edit"></i>
-                                            </a>
-                                            
-                                            <a href="<%=ctx%>/agent/customers?action=delete&id=<%= customer.getCustomerId() %>" class="btn btn-sm btn-danger" title="Xóa" onclick="return confirm('Bạn có chắc chắn muốn xóa khách hàng này không?');">
-                                                <i class="fa fa-trash"></i>
-                                            </a>
-                                            
-                                            <div class="btn-group d-inline-block ms-1">
-                                                <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Đổi trạng thái">
-                                                    <i class="fa fa-sync-alt"></i>
-                                                </button>
-                                                <ul class="dropdown-menu">
-                                                    <li><a class="dropdown-item" href="<%=ctx%>/agent/customers?action=updateType&id=<%=customer.getCustomerId()%>&type=Lead">Chuyển thành Lead</a></li>
-                                                    <li><a class="dropdown-item" href="<%=ctx%>/agent/customers?action=updateType&id=<%=customer.getCustomerId()%>&type=Client">Chuyển thành Client</a></li>
-                                                </ul>
-                                            </div>
-                                        </td>
+                                    
+                                    <td><%= dateFormat.format(customer.getCreatedAt()) %></td>
+                                    
+                                    <%-- SỬA LỖI: Cột Thao Tác (Load 4 Giai đoạn động) --%>
+                                    <td>
+                                        <a href="<%=ctx%>/agent/customers?action=viewDetail&id=<%= customer.getCustomerId() %>" class="btn btn-sm btn-info" title="Xem chi tiết (CRM)">
+                                            <i class="fa fa-eye"></i>
+                                        </a>
+                                        
+                                        <a href="<%=ctx%>/agent/customers?action=showEditForm&id=<%= customer.getCustomerId() %>" class="btn btn-sm btn-warning" title="Chỉnh sửa thông tin">
+                                            <i class="fa fa-edit"></i>
+                                        </a>
+                                        
+                                        <a href="<%=ctx%>/agent/customers?action=delete&id=<%= customer.getCustomerId() %>" class="btn btn-sm btn-danger" title="Xóa" onclick="return confirm('Bạn có chắc chắn muốn xóa khách hàng này không?');">
+                                            <i class="fa fa-trash"></i>
+                                        </a>
+                                        
+                                        <div class="btn-group d-inline-block ms-1">
+                                            <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Chuyển Giai đoạn">
+                                                <i class="fa fa-sync-alt"></i>
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <%-- Dùng vòng lặp động (thay vì "fix cứng") --%>
+                                                <% for (CustomerStage stage : stageList) { %>
+                                                    <li><a class="dropdown-item" 
+                                                           href="<%=ctx%>/agent/customers?action=updateStage&id=<%=customer.getCustomerId()%>&stageId=<%=stage.getStageId()%>">
+                                                           <%= stage.getStageName() %>
+                                                        </a>
+                                                    </li>
+                                                <% } %>
+                                            </ul>
+                                        </div>
+                                    </td>
                                 </tr>
                                 <%
-                                    } // ĐÓNG VÒNG LẶP FOR
-                                } else { // ĐÂY LÀ KHỐI ELSE KHI DANH SÁCH RỖNG
+                                    } // Đóng vòng lặp for
+                                } else { // Nếu danh sách rỗng
                                 %>
                                 <tr>
-                                    <td colspan="8" class="text-center text-muted py-4">Chưa có khách hàng nào được bạn thêm vào.</td>
+                                    <td colspan="7" class="text-center text-muted py-4">Chưa có khách hàng nào.</td>
                                 </tr>
                                 <%
-                                } // ĐÓNG IF-ELSE
+                                } // Đóng if-else
                                 %>
                             </tbody>
                         </table>
