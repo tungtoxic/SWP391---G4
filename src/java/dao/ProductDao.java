@@ -37,6 +37,7 @@ public class ProductDao {
                 p.setDescription(rs.getString("description"));
                 p.setBasePrice(rs.getBigDecimal("base_price")); // Dùng getBigDecimal
                 p.setCategoryId(rs.getInt("category_id"));
+                p.setDurationMonths(rs.getInt("duration_months"));
                 p.setCreatedAt(rs.getTimestamp("created_at"));
                 
                 list.add(p);
@@ -65,6 +66,7 @@ public class ProductDao {
                     p.setDescription(rs.getString("description"));
                     p.setBasePrice(rs.getBigDecimal("base_price"));
                     p.setCategoryId(rs.getInt("category_id"));
+                    p.setDurationMonths(rs.getInt("duration_months"));
                     return p;
                 }
             }

@@ -20,16 +20,24 @@ public class Product {
     private BigDecimal basePrice; // Dùng BigDecimal cho kiểu DECIMAL
     private Timestamp createdAt;
     private Timestamp updatedAt;
+    private int durationMonths;
 
     // Constructors
     public Product() {
     }
 
-    // Getters and Setters
-    // (Bạn tự generate getters/setters cho tất cả các trường nhé)
-    // ...
+    public Product(int productId, String productName, String description, int categoryId, BigDecimal basePrice, Timestamp createdAt, Timestamp updatedAt, int durationMonths) {
+        this.productId = productId;
+        this.productName = productName;
+        this.description = description;
+        this.categoryId = categoryId;
+        this.basePrice = basePrice;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.durationMonths = durationMonths;
+    }
+
     
-    // Ví dụ:
     public int getProductId() {
         return productId;
     }
@@ -85,4 +93,13 @@ public class Product {
     public void setUpdatedAt(Timestamp updatedAt) {
         this.updatedAt = updatedAt;
     }
+
+    public int getDurationMonths() {
+        return durationMonths;
+    }
+
+    public void setDurationMonths(int durationMonths) {
+        this.durationMonths = durationMonths;
+    }
+    
 }

@@ -86,13 +86,15 @@
                                     <th>Tên Sản phẩm</th>
                                     <th>Mô tả</th>
                                     <th class="text-end">Giá cơ bản (Ước tính)</th>
-                                </tr>
+                                    
+                                    <th class="text-center">Thời hạn</th>
+                                    </tr>
                             </thead>
                             <tbody>
                                 <% if (productList.isEmpty()) { %>
                                     <tr>
-                                        <td colspan="4" class="text-center text-muted py-4">
-                                            Chưa có sản phẩm nào trong cơ sở dữ liệu.
+                                        <td colspan="5" class="text-center text-muted py-4">
+                                        Chưa có sản phẩm nào trong cơ sở dữ liệu.
                                         </td>
                                     </tr>
                                 <% } else { %>
@@ -104,7 +106,11 @@
                                             <td class="text-end">
                                                 <%= (p.getBasePrice() != null ? formatter.format(p.getBasePrice()) : "N/A") %>
                                             </td>
-                                        </tr>
+                                            
+                                            <td class="text-center">
+                                                <%= p.getDurationMonths() %> tháng
+                                            </td>
+                                            </tr>
                                     <% } %>
                                 <% } %>
                             </tbody>
@@ -115,7 +121,6 @@
             
         </div>
     </main>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
