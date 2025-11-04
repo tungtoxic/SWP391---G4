@@ -225,32 +225,38 @@
                         </div>
                     </div>
                 </div>
-
-                <div class="col-lg-6 mb-4">
-                    <div class="card">
-                        <div class="card-header bg-primary text-white"><h5 class="mb-0"><i class="fas fa-phone me-2"></i> Today's Follow-ups</h5></div>
-                        <div class="card-body p-0">
-                            <ul class="list-group list-group-flush">
-                                <% if (followUps != null && !followUps.isEmpty()) {
-                                    for (Task task : followUps) { %>
-                                    <%-- SỬA: Link trỏ đến trang Customer Detail --%>
-                                <li class="list-group-item list-group-item-action">
-                                    <a href="<%=ctx%>/agent/customers?action=viewDetail&id=<%= task.getCustomerId() %>" class="text-decoration-none text-dark">
-                                        <div>
-                                            <span class="fw-bold"><i class="fas fa-user-tag me-2"></i> <%= task.getTitle() %></span>
-                                            <div><small class="text-muted"><%= task.getCustomerName() %></small></div>
-                                        </div>
-                                    </a>
-                                </li>
-                                <% } } else { %>
-                                    <li class="list-group-item text-muted text-center">No follow-ups scheduled for today.</li>
-                                <% } %>
-                            </ul>
+<div class="col-lg-6 mb-4">
+    <div class="card">
+        <div class="card-header bg-primary text-white"><h5 class="mb-0"><i class="fas fa-phone me-2"></i> Today's Follow-ups (CRM)</h5></div>
+        <div class="card-body p-0">
+            <ul class="list-group list-group-flush">
+                <%-- SỬA: "followUps" giờ là List<Interaction> --%>
+                <% if (followUps != null && !followUps.isEmpty()) {
+                    for (Interaction interaction : followUps) { %>
+                
+                <%-- SỬA: Link 100% "sạch", trỏ về customer_detail --%>
+                <li class="list-group-item list-group-item-action">
+                    <a href="<%=ctx%>/agent/customers?action=viewDetail&id=<%= interaction.getCustomerId() %>" class="text-decoration-none text-dark">
+                        <div>
+                            <%-- SỬA: Dùng getNotes() hoặc getInteractionTypeName() --%>
+                            <span class="fw-bold">
+                                <i class="<%= interaction.getInteractionTypeIcon() %> me-2"></i> 
+                                <%= interaction.getInteractionTypeName() %>: 
+                                <%= interaction.getNotes() != null ? interaction.getNotes() : "" %>
+                            </span>
+                            <%-- SỬA: Dùng getCustomerName() (đã JOIN) --%>
+                            <div><small class="text-muted"><%= interaction.getCustomerName() %></small></div>
                         </div>
-                    </div>
-                </div>
-            </div>
-            
+                    </a>
+                </li>
+                
+                <% } } else { %>
+                    <li class="list-group-item text-muted text-center">No follow-ups scheduled for today.</li>
+                <% } %>
+            </ul>
+        </div>
+    </div>
+</div>
             <%-- ================== ROW 4: TO-DO LIST & GOAL (ĐÃ SỬA) ================== --%>
             <div class="row">
                 <div class="col-lg-7 mb-4">

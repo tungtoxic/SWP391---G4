@@ -4,7 +4,7 @@
  */
 package dao;
 
-import entity.Interaction;
+import entity.*;
 import utility.DBConnector;
 
 import java.sql.Connection;
@@ -84,4 +84,52 @@ public class InteractionDao {
         }
         return list;
     }
+    /**
+     * HÀM MỚI (THEO LOGIC "SẠCH" CỦA BẠN):
+     * Lấy tất cả các "Tương tác" (Interactions) được lên lịch
+     * cho HÔM NAY (CURDATE()) và JOIN với tên khách hàng.
+     * Đây chính là "Today's Follow-ups".
+     */
+    public List<Interaction> getTodaysFollowUps(int agentId) {
+        List<Interaction> list = new ArrayList<>();
+        
+        // SQL "SẠCH": Đọc từ customer_interactions, không phải Tasks
+        String sql = "SELECT i.*, c.full_name as customer_name, it.type_name, it.icon_class " +
+                     "FROM customer_interactions i " +
+                     "JOIN Customers c ON i.customer_id = c.customer_id " +
+                     "JOIN interaction_types it ON i.interaction_type_id = it.type_id " +
+                     "WHERE i.agent_id = ? " +
+                     "AND DATE(i.interaction_date) = CURDATE() " + // Chỉ lấy hẹn HÔM NAY
+                     "ORDER BY i.interaction_date ASC"; // Sắp xếp theo giờ hẹn
+
+        try (Connection conn = DBConnector.makeConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setInt(1, agentId);
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Interaction interaction = new Interaction();
+                    interaction.setInteractionId(rs.getInt("interaction_id"));
+                    interaction.setCustomerId(rs.getInt("customer_id"));
+                    interaction.setAgentId(rs.getInt("agent_id"));
+                    interaction.setInteractionTypeId(rs.getInt("interaction_type_id"));
+                    interaction.setNotes(rs.getString("notes"));
+                    interaction.setInteractionDate(rs.getTimestamp("interaction_date"));
+                    interaction.setCreatedAt(rs.getTimestamp("created_at"));
+                    
+                    // Thêm dữ liệu JOIN
+                    interaction.setCustomerName(rs.getString("customer_name")); // <-- Tên KH
+                    interaction.setInteractionTypeName(rs.getString("type_name")); // <-- Tên Tương tác
+                    interaction.setInteractionTypeIcon(rs.getString("icon_class")); // <-- Icon
+                    
+                    list.add(interaction);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
 }
+

@@ -34,6 +34,7 @@ public class AgentDashboardServlet extends HttpServlet {
     private CustomerDao customerDao;
     private CommissionDao commissionDao;
     private TaskDao taskDao;
+    private InteractionDao interactionDao;
 
     @Override
     public void init() {
@@ -42,6 +43,7 @@ public class AgentDashboardServlet extends HttpServlet {
         customerDao = new CustomerDao();
         commissionDao = new CommissionDao();
         taskDao = new TaskDao();
+        interactionDao = new InteractionDao();
     }
 
     @Override
@@ -86,11 +88,11 @@ public class AgentDashboardServlet extends HttpServlet {
             
             // --- Renewal Alerts ---
             List<ContractDTO> expiringContracts = contractDao.getExpiringContracts(agentId);
-            
+
             // --- Follow-ups & To-do List ---
-            List<Task> followUps = taskDao.getTodaysFollowUps(agentId);
-            List<Task> personalTasks = taskDao.getPersonalTasks(agentId); 
-            
+            List<Interaction> followUps = interactionDao.getTodaysFollowUps(agentId);
+            List<Task> personalTasks = taskDao.getPersonalTasks(agentId);
+
             // --- Chart Data (Sales Performance) ---
             Map<String, Double> salesData = contractDao.getMonthlySalesData(agentId);
             List<String> salesChartLabels = new ArrayList<>(salesData.keySet());
