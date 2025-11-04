@@ -231,6 +231,7 @@ private void viewCustomerDetail(HttpServletRequest request, HttpServletResponse 
             if (customer != null && customer.getCreatedBy() == currentUser.getUserId()) {
     // 1. Lấy Tương tác (Task 1.1)
                 List<Interaction> interactionList = interactionDao.getInteractionsByCustomerId(id);
+                List<InteractionType> typeList = interactionTypeDao.getAllInteractionTypes();
                 // 2. Lấy Hợp đồng (Task 1.1 - Nâng cao)
                 List<Contract> contractList = contractDao.getContractsByCustomerId(id);
                 // 3. Lấy Danh sách Giai đoạn (cho dropdown "Hành trình")
@@ -240,7 +241,7 @@ private void viewCustomerDetail(HttpServletRequest request, HttpServletResponse 
                 request.setAttribute("interactionList", interactionList);
                 request.setAttribute("contractList", contractList);
                 request.setAttribute("stageList", stageList);
-                
+                request.setAttribute("typeList", typeList);
                 // Forward đến trang JSP MỚI
                 request.getRequestDispatcher("/customer_detail.jsp").forward(request, response);
             } else {
