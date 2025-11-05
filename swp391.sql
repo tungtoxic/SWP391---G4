@@ -6,9 +6,9 @@
 -- PHẦN 1: DỌN DẸP VÀ TẠO CSDL
 -- ---------------------------------------------------------------------
 SET FOREIGN_KEY_CHECKS = 0;
-DROP DATABASE IF EXISTS swp391;
-CREATE DATABASE swp391;
-USE swp391;
+DROP DATABASE IF EXISTS `swp391`;
+CREATE DATABASE `swp391`;
+USE `swp391`;
 SET FOREIGN_KEY_CHECKS = 1;
 
 -- ---------------------------------------------------------------------
@@ -16,32 +16,17 @@ SET FOREIGN_KEY_CHECKS = 1;
 -- ---------------------------------------------------------------------
 
 -- Bảng `Roles`
-CREATE TABLE Roles (
-    role_id INT AUTO_INCREMENT PRIMARY KEY,
-    role_name ENUM('Admin', 'Manager', 'Agent') NOT NULL UNIQUE,
-    description VARCHAR(255)
+CREATE TABLE `Roles` (
+    `role_id` INT AUTO_INCREMENT PRIMARY KEY,
+    `role_name` ENUM('Admin', 'Manager', 'Agent') NOT NULL UNIQUE,
+    `description` VARCHAR(255)
 );
 
-<<<<<<< HEAD
-CREATE TABLE Users (
-    user_id INT AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(50) UNIQUE,
-    password_hash VARCHAR(255),
-    full_name VARCHAR(100),
-    email VARCHAR(100) UNIQUE,
-    phone_number VARCHAR(20),
-    role_id INT,
-    status ENUM('Active', 'Inactive', 'Pending') DEFAULT 'Active',
-    is_first_login BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (role_id) REFERENCES Roles(role_id)
-=======
 -- Bảng `Users`
 CREATE TABLE `Users` (
     `user_id` INT AUTO_INCREMENT PRIMARY KEY,
     `username` VARCHAR(50) UNIQUE,
-    `password_hash` CHAR(64) not null,
+    `password_hash` VARCHAR(255),
     `full_name` VARCHAR(100),
     `email` VARCHAR(100) UNIQUE,
     `phone_number` VARCHAR(20),
@@ -51,113 +36,81 @@ CREATE TABLE `Users` (
     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (`role_id`) REFERENCES `Roles`(`role_id`)
->>>>>>> VuTT
 );
 
-
 -- Bảng `Manager_Agent` để quản lý quan hệ
-CREATE TABLE Manager_Agent (
-    manager_id INT NOT NULL,
-    agent_id INT NOT NULL,
-    PRIMARY KEY(manager_id, agent_id),
-    FOREIGN KEY (manager_id) REFERENCES Users(user_id),
-    FOREIGN KEY (agent_id) REFERENCES Users(user_id)
+CREATE TABLE `Manager_Agent` (
+    `manager_id` INT NOT NULL,
+    `agent_id` INT NOT NULL,
+    PRIMARY KEY(`manager_id`, `agent_id`),
+    FOREIGN KEY (`manager_id`) REFERENCES `Users`(`user_id`),
+    FOREIGN KEY (`agent_id`) REFERENCES `Users`(`user_id`)
 );
 
 
 -- Bảng `Customers`
-CREATE TABLE Customers (
-    customer_id INT AUTO_INCREMENT PRIMARY KEY,
-    full_name VARCHAR(100),
-    date_of_birth DATE,
-    phone_number VARCHAR(20),
-    email VARCHAR(100),
-    address VARCHAR(255),
-    created_by INT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (created_by) REFERENCES Users(user_id)
+CREATE TABLE `Customers` (
+    `customer_id` INT AUTO_INCREMENT PRIMARY KEY,
+    `full_name` VARCHAR(100),
+    `date_of_birth` DATE,
+    `phone_number` VARCHAR(20),
+    `email` VARCHAR(100),
+    `address` VARCHAR(255),
+    `created_by` INT, -- Agent đã tạo customer này
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (`created_by`) REFERENCES `Users`(`user_id`)
 );
 
 -- Bảng `Product_Categories` và `Products`
-CREATE TABLE Product_Categories (
-    category_id INT AUTO_INCREMENT PRIMARY KEY,
-    category_name VARCHAR(100) NOT NULL,
-    description TEXT
+CREATE TABLE `Product_Categories` (
+    `category_id` INT AUTO_INCREMENT PRIMARY KEY,
+    `category_name` VARCHAR(100) NOT NULL,
+    `description` TEXT
 );
 
-
--- Bảng Products
-CREATE TABLE Products (
-    product_id INT AUTO_INCREMENT PRIMARY KEY,
-    product_name VARCHAR(100) NOT NULL,
-    base_price DECIMAL(12, 2),
-    category_id INT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (category_id) REFERENCES Product_Categories(category_id)
-);
-
-
-CREATE TABLE Insurance_Product_Details (
-    product_id INT PRIMARY KEY,
-    category_id INT NOT NULL,
-    product_type ENUM('life', 'health', 'car') NOT NULL,
-    coverage_amount DECIMAL(12,2),
-    duration_years INT,
-    beneficiaries TEXT,
-    maturity_benefit TEXT,
-    maturity_amount DECIMAL(15,2),
-    hospitalization_limit DECIMAL(12,2),
-    surgery_limit DECIMAL(12,2),
-    maternity_limit DECIMAL(12,2),
-    min_age INT DEFAULT 0,
-    max_age INT DEFAULT 100,
-    waiting_period INT,
-    vehicle_type VARCHAR(100),
-    vehicle_value DECIMAL(12,2),
-    coverage_type VARCHAR(255),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (product_id) REFERENCES Products(product_id) ON DELETE CASCADE,
-    FOREIGN KEY (category_id) REFERENCES Product_Categories(category_id)
+CREATE TABLE `Products` (
+    `product_id` INT AUTO_INCREMENT PRIMARY KEY,
+    `product_name` VARCHAR(100) NOT NULL,
+    `description` TEXT,
+    `category_id` INT,
+    FOREIGN KEY (`category_id`) REFERENCES `Product_Categories`(`category_id`)
 );
 
 -- Bảng `Contracts`
-CREATE TABLE Contracts (
-    contract_id INT AUTO_INCREMENT PRIMARY KEY,
-    customer_id INT NOT NULL,
-    agent_id INT NOT NULL,
-    product_id INT NOT NULL,
-    start_date DATE NOT NULL,
-    end_date DATE,
-    status ENUM('Pending', 'Active', 'Expired', 'Cancelled') DEFAULT 'Pending',
-    premium_amount DECIMAL(12, 2) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (customer_id) REFERENCES Customers(customer_id),
-    FOREIGN KEY (agent_id) REFERENCES Users(user_id),
-    FOREIGN KEY (product_id) REFERENCES Products(product_id)
+CREATE TABLE `Contracts` (
+    `contract_id` INT AUTO_INCREMENT PRIMARY KEY,
+    `customer_id` INT NOT NULL,
+    `agent_id` INT NOT NULL,
+    `product_id` INT NOT NULL,
+    `start_date` DATE NOT NULL,
+    `end_date` DATE,
+    `status` ENUM('Pending', 'Active', 'Expired', 'Cancelled') DEFAULT 'Pending',
+    `premium_amount` DECIMAL(12, 2) NOT NULL,
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (`customer_id`) REFERENCES `Customers`(`customer_id`),
+    FOREIGN KEY (`agent_id`) REFERENCES `Users`(`user_id`),
+    FOREIGN KEY (`product_id`) REFERENCES `Products`(`product_id`)
 );
 
-CREATE TABLE Commission_Policies (
-    policy_id INT AUTO_INCREMENT PRIMARY KEY,
-    policy_name VARCHAR(100) NOT NULL,
-    rate DECIMAL(5, 2) NOT NULL,
-    rate_type ENUM('Fixed', 'Tiered'),
-    effective_from DATE,
-    effective_to DATE,                                
-    status ENUM('Active', 'Expired', 'Draft')
+-- Bảng `Commission_Policies` và `Commissions`
+CREATE TABLE `Commission_Policies` (
+    `policy_id` INT AUTO_INCREMENT PRIMARY KEY,
+    `policy_name` VARCHAR(100) NOT NULL,
+    `rate` DECIMAL(5, 2) NOT NULL, -- Tỷ lệ hoa hồng (ví dụ: 5.00 cho 5%)
+    `effective_from` DATE NOT NULL
 );
 
-CREATE TABLE Commissions (
-    commission_id INT AUTO_INCREMENT PRIMARY KEY,
-    contract_id INT NOT NULL,
-    agent_id INT NOT NULL,
-    policy_id INT NOT NULL,
-    amount DECIMAL(12, 2) NOT NULL,
-    status ENUM('Pending', 'Paid', 'Cancelled') NOT NULL DEFAULT 'Pending',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (contract_id) REFERENCES Contracts(contract_id),
-    FOREIGN KEY (agent_id) REFERENCES Users(user_id),
-    FOREIGN KEY (policy_id) REFERENCES Commission_Policies(policy_id)
+CREATE TABLE `Commissions` (
+    `commission_id` INT AUTO_INCREMENT PRIMARY KEY,
+    `contract_id` INT NOT NULL,
+    `agent_id` INT NOT NULL,
+    `policy_id` INT NOT NULL,
+    `amount` DECIMAL(12, 2) NOT NULL,
+    `status` ENUM('Pending', 'Paid', 'Cancelled') NOT NULL DEFAULT 'Pending',
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (`contract_id`) REFERENCES `Contracts`(`contract_id`),
+    FOREIGN KEY (`agent_id`) REFERENCES `Users`(`user_id`),
+    FOREIGN KEY (`policy_id`) REFERENCES `Commission_Policies`(`policy_id`)
 );
 
 
@@ -166,109 +119,60 @@ CREATE TABLE Commissions (
 -- ---------------------------------------------------------------------
 
 -- Chèn `Roles`
-INSERT INTO Roles (role_id, role_name, description) VALUES
+INSERT INTO `Roles` (`role_id`, `role_name`, `description`) VALUES
 (1, 'Agent', 'Nhân viên tư vấn / đại lý bán hàng'),
 (2, 'Manager', 'Quản lý giám sát đại lý'),
 (3, 'Admin', 'Quản trị hệ thống');
 
--- Chèn Users (Admin, Manager, 2 Agents)
-INSERT INTO Users (user_id, username, password_hash, full_name, email, phone_number, role_id, status) VALUES
+-- Chèn `Users` (Admin, Manager, 2 Agents)
+INSERT INTO `Users` (`user_id`, `username`, `password_hash`, `full_name`, `email`, `phone_number`, `role_id`, `status`) VALUES
 (1, 'agent1', '123', 'Agent One (Tùng)', 'agent1@example.com', '0901111111', 1, 'Active'),
 (2, 'manager1', '123', 'Manager One', 'manager1@example.com', '0902222222', 2, 'Active'),
 (3, 'admin1', '123', 'Admin One', 'admin1@example.com', '0903333333', 3, 'Active'),
 (4, 'agent2', '123', 'Agent Two', 'agent2@example.com', '0904444444', 1, 'Active');
 
--- Chèn quan hệ Manager_Agent
-INSERT INTO Manager_Agent (manager_id, agent_id) VALUES
+-- Chèn quan hệ `Manager_Agent`
+INSERT INTO `Manager_Agent` (`manager_id`, `agent_id`) VALUES
 (2, 1), -- Manager 1 quản lý Agent 1
 (2, 4); -- Manager 1 quản lý Agent 2
 
--- Chèn Product_Categories và Products
-INSERT INTO Product_Categories (category_name) VALUES 
-('Bảo hiểm nhân thọ'), 
-('Bảo hiểm sức khỏe'),
-('Bảo hiểm xe');
+-- Chèn `Product_Categories` và `Products`
+INSERT INTO `Product_Categories` (`category_name`) VALUES ('Bảo hiểm nhân thọ'), ('Bảo hiểm sức khỏe');
+INSERT INTO `Products` (`product_name`, `category_id`) VALUES ('Gói nhân thọ An Tâm', 1), ('Sức khỏe Vàng', 2);
 
-INSERT INTO Products (product_name, category_id) VALUES 
-('Gói nhân thọ An Tâm', 1), 
-('Sức khỏe Vàng', 2);
+-- Chèn `Commission_Policies`
+INSERT INTO `Commission_Policies` (`policy_name`, `rate`, `effective_from`) VALUES ('Hoa hồng chuẩn 2025', 5.00, '2025-01-01');
 
-INSERT INTO Insurance_Product_Details (
-    product_id, category_id, product_type,
-    coverage_amount, duration_years,
-    beneficiaries, maturity_benefit, maturity_amount,
-    hospitalization_limit, surgery_limit, maternity_limit,
-    min_age, max_age, waiting_period,
-    vehicle_type, vehicle_value, coverage_type
-) VALUES (
-    1, 1, 'life',
-    200000000, 20,
-    'Vợ/chồng, con cái',
-    'Chi trả toàn bộ khi tử vong hoặc đáo hạn hợp đồng',
-    100000000,
-    NULL, NULL, NULL,
-    18, 65, NULL,
-    NULL, NULL, NULL
-);
-INSERT INTO Insurance_Product_Details (
-    product_id, category_id, product_type,
-    coverage_amount, duration_years,
-    beneficiaries, maturity_benefit, maturity_amount,
-    hospitalization_limit, surgery_limit, maternity_limit,
-    min_age, max_age, waiting_period,
-    vehicle_type, vehicle_value, coverage_type
-) VALUES (
-    2, 2, 'health',
-    50000000, 1,
-    NULL, NULL, NULL,
-    20000000, 10000000, 5000000,
-    0, 70, 30,
-    NULL, NULL, NULL
-);
-
--- Chèn Commission_Policies
-INSERT INTO Commission_Policies 
-(policy_name, rate, rate_type, effective_from, effective_to, status)
-VALUES
--- Life Insurance
-('Life Insurance Standard Commission', 6.00, 'Fixed', '2025-01-01', '2035-01-01', 'Active'),
-('Life Insurance High Performance Bonus', 8.50, 'Tiered', '2025-01-01', '2035-01-01', 'Active'),
-
--- Health Insurance
-('Health Insurance Basic Commission', 4.50, 'Fixed', '2025-01-01', '2035-01-01', 'Active'),
-('Health Insurance Annual Bonus', 6.00, 'Tiered', '2025-01-01', '2035-01-01', 'Active'),
-
--- Auto Insurance
-('Auto Insurance Standard Commission', 3.50, 'Fixed', '2025-01-01', '2035-01-01', 'Active'),
-('Auto Insurance Tiered Incentive', 5.00, 'Tiered', '2025-01-01', '2035-01-01', 'Active');
-
-SELECT * FROM commission_policies WHERE product_id = 1;
-SELECT * FROM products;
--- Chèn dữ liệu test cho Agent 1
-INSERT INTO Customers (full_name, created_by) VALUES 
-('Khách hàng Test A', 1);
-
-INSERT INTO Contracts (customer_id, agent_id, product_id, start_date, status, premium_amount) 
+-- Chèn dữ liệu test cho Agent 1 để kiểm tra chức năng
+INSERT INTO `Customers` (`full_name`, `created_by`) VALUES ('Khách hàng Test A', 1);
+INSERT INTO `Contracts` (`customer_id`, `agent_id`, `product_id`, `start_date`, `status`, `premium_amount`) 
 VALUES (LAST_INSERT_ID(), 1, 1, '2025-10-01', 'Active', 10000000);
-
-INSERT INTO Commissions (contract_id, agent_id, policy_id, amount, status) 
+INSERT INTO `Commissions` (`contract_id`, `agent_id`, `policy_id`, `amount`, `status`) 
 VALUES (LAST_INSERT_ID(), 1, 1, 500000, 'Pending'); -- 5% của 10,000,000
+
 
 
 -- =====================================================================
 -- SCRIPT CHÈN DỮ LIỆU MẪU QUY MÔ LỚN
 -- =====================================================================
-USE swp391;
+USE `swp391`;
 
 -- ---------------------------------------------------------------------
 -- PHẦN 1: TẠO THÊM NGƯỜI DÙNG (USERS)
 -- ---------------------------------------------------------------------
-INSERT INTO Users (user_id, username, password_hash, full_name, email, phone_number, role_id, status) VALUES
+-- (Giữ lại user_id 1-4 đã có, bắt đầu từ 5)
+
+INSERT INTO `Users` (`user_id`, `username`, `password_hash`, `full_name`, `email`, `phone_number`, `role_id`, `status`) VALUES
+-- Thêm 1 Admin
 (5, 'admin2', '123', 'Admin Two', 'admin2@example.com', '0905555555', 3, 'Active'),
+
+-- Thêm 4 Manager
 (6, 'manager2', '123', 'Manager Thị B', 'manager2@example.com', '0906666666', 2, 'Active'),
 (7, 'manager3', '123', 'Manager Văn C', 'manager3@example.com', '0907777777', 2, 'Active'),
 (8, 'manager4', '123', 'Manager Thị D', 'manager4@example.com', '0908888888', 2, 'Active'),
 (9, 'manager5', '123', 'Manager Văn E', 'manager5@example.com', '0909999999', 2, 'Active'),
+
+-- Thêm 8 Agent
 (10, 'agent3', '123', 'Agent Thị F', 'agent3@example.com', '0913333333', 1, 'Active'),
 (11, 'agent4', '123', 'Agent Văn G', 'agent4@example.com', '0914444444', 1, 'Active'),
 (12, 'agent5', '123', 'Agent Thị H', 'agent5@example.com', '0915555555', 1, 'Active'),
@@ -282,17 +186,18 @@ INSERT INTO Users (user_id, username, password_hash, full_name, email, phone_num
 -- ---------------------------------------------------------------------
 -- PHẦN 2: PHÂN BỔ AGENT CHO MANAGER
 -- ---------------------------------------------------------------------
-INSERT INTO Manager_Agent (manager_id, agent_id) VALUES
-(6, 10), (6, 11),
-(7, 12), (7, 13),
-(8, 14), (8, 15), (8, 16),
-(9, 17);
+-- (Giữ lại các phân bổ cũ cho manager1 (user_id=2))
+INSERT INTO `Manager_Agent` (`manager_id`, `agent_id`) VALUES
+(6, 10), (6, 11), -- Manager 2 quản lý 2 agent
+(7, 12), (7, 13), -- Manager 3 quản lý 2 agent
+(8, 14), (8, 15), (8, 16), -- Manager 4 quản lý 3 agent
+(9, 17); -- Manager 5 quản lý 1 agent
 
 
 -- ---------------------------------------------------------------------
 -- PHẦN 3: TẠO KHÁCH HÀNG (CUSTOMERS)
 -- ---------------------------------------------------------------------
-INSERT INTO Customers (full_name, date_of_birth, phone_number, email, address, created_by) VALUES
+INSERT INTO `Customers` (`full_name`, `date_of_birth`, `phone_number`, `email`, `address`, `created_by`) VALUES
 ('Lê Minh Anh', '1988-03-15', '0981112222', 'minhanh@mail.com', '123 Đường A, Q1, TPHCM', 1),
 ('Trần Ngọc Bích', '1995-07-20', '0982223333', 'ngocbich@mail.com', '456 Đường B, Q3, TPHCM', 4),
 ('Phạm Văn Cường', '1980-11-01', '0983334444', 'vancuong@mail.com', '789 Đường C, Q5, TPHCM', 10),
@@ -317,33 +222,27 @@ INSERT INTO Customers (full_name, date_of_birth, phone_number, email, address, c
 -- ---------------------------------------------------------------------
 -- PHẦN 4: TẠO HỢP ĐỒNG (CONTRACTS) VÀ HOA HỒNG (COMMISSIONS)
 -- ---------------------------------------------------------------------
-INSERT INTO Contracts (customer_id, agent_id, product_id, start_date, status, premium_amount) VALUES (2, 4, 2, '2025-08-10', 'Active', 15000000);
-INSERT INTO Commissions (contract_id, agent_id, policy_id, amount, status) VALUES (LAST_INSERT_ID(), 4, 3, 750000, 'Paid');
 
-INSERT INTO Contracts (customer_id, agent_id, product_id, start_date, status, premium_amount) VALUES (11, 4, 1, '2025-09-05', 'Active', 25000000);
-INSERT INTO Commissions (contract_id, agent_id, policy_id, amount, status) VALUES (LAST_INSERT_ID(), 4, 1, 1250000, 'Pending');
+-- Hợp đồng và Hoa hồng cho Agent 4 (user_id = 4)
+INSERT INTO `Contracts` (customer_id, agent_id, product_id, start_date, status, premium_amount) VALUES (2, 4, 2, '2025-08-10', 'Active', 15000000);
+INSERT INTO `Commissions` (contract_id, agent_id, policy_id, amount, status) VALUES (LAST_INSERT_ID(), 4, 1, 750000, 'Paid');
+INSERT INTO `Contracts` (customer_id, agent_id, product_id, start_date, status, premium_amount) VALUES (11, 4, 1, '2025-09-05', 'Active', 25000000);
+INSERT INTO `Commissions` (contract_id, agent_id, policy_id, amount, status) VALUES (LAST_INSERT_ID(), 4, 1, 1250000, 'Pending');
 
-INSERT INTO Contracts (customer_id, agent_id, product_id, start_date, status, premium_amount) VALUES (3, 10, 1, '2025-07-15', 'Active', 30000000);
-INSERT INTO Commissions (contract_id, agent_id, policy_id, amount, status) VALUES (LAST_INSERT_ID(), 10, 2, 1500000, 'Paid');
+-- Hợp đồng và Hoa hồng cho Agent 10 (user_id = 10)
+INSERT INTO `Contracts` (customer_id, agent_id, product_id, start_date, status, premium_amount) VALUES (3, 10, 1, '2025-07-15', 'Active', 30000000);
+INSERT INTO `Commissions` (contract_id, agent_id, policy_id, amount, status) VALUES (LAST_INSERT_ID(), 10, 1, 1500000, 'Paid');
+INSERT INTO `Contracts` (customer_id, agent_id, product_id, start_date, status, premium_amount) VALUES (12, 10, 2, '2025-10-02', 'Pending', 5000000);
 
-INSERT INTO Contracts (customer_id, agent_id, product_id, start_date, status, premium_amount) VALUES (12, 10, 2, '2025-10-02', 'Pending', 5000000);
+-- Hợp đồng và Hoa hồng cho Agent 12 (user_id = 12)
+INSERT INTO `Contracts` (customer_id, agent_id, product_id, start_date, status, premium_amount) VALUES (5, 12, 2, '2025-06-20', 'Expired', 12000000);
+INSERT INTO `Contracts` (customer_id, agent_id, product_id, start_date, status, premium_amount) VALUES (14, 12, 1, '2025-08-25', 'Active', 18000000);
+INSERT INTO `Commissions` (contract_id, agent_id, policy_id, amount, status) VALUES (LAST_INSERT_ID(), 12, 1, 900000, 'Pending');
 
-INSERT INTO Contracts (customer_id, agent_id, product_id, start_date, status, premium_amount) VALUES (5, 12, 2, '2025-06-20', 'Expired', 12000000);
-INSERT INTO Contracts (customer_id, agent_id, product_id, start_date, status, premium_amount) VALUES (14, 12, 1, '2025-08-25', 'Active', 18000000);
-INSERT INTO Commissions (contract_id, agent_id, policy_id, amount, status) VALUES (LAST_INSERT_ID(), 12, 2, 900000, 'Pending');
+-- Hợp đồng và Hoa hồng cho Agent 14 (user_id = 14)
+INSERT INTO `Contracts` (customer_id, agent_id, product_id, start_date, status, premium_amount) VALUES (7, 14, 1, '2025-09-12', 'Active', 22000000);
+INSERT INTO `Commissions` (contract_id, agent_id, policy_id, amount, status) VALUES (LAST_INSERT_ID(), 14, 1, 1100000, 'Paid');
 
-INSERT INTO Contracts (customer_id, agent_id, product_id, start_date, status, premium_amount) VALUES (7, 14, 1, '2025-09-12', 'Active', 22000000);
-INSERT INTO Commissions (contract_id, agent_id, policy_id, amount, status) VALUES (LAST_INSERT_ID(), 14, 1, 1100000, 'Paid');
-
-INSERT INTO Contracts (customer_id, agent_id, product_id, start_date, status, premium_amount) VALUES (1, 1, 2, '2025-10-05', 'Active', 7000000);
-INSERT INTO Commissions (contract_id, agent_id, policy_id, amount, status) VALUES (LAST_INSERT_ID(), 1, 2, 350000, 'Pending');
-
-INSERT INTO Contracts (customer_id, agent_id, product_id, start_date, status, premium_amount) VALUES (10, 1, 1, '2025-10-10', 'Active', 12000000);
-INSERT INTO Commissions (contract_id, agent_id, policy_id, amount, status) VALUES (LAST_INSERT_ID(), 1, 1, 600000, 'Pending');
-
-
-<<<<<<< HEAD
-=======
 -- Thêm vài hợp đồng cho Agent 1 (user_id = 1) để test
 INSERT INTO `Contracts` (customer_id, agent_id, product_id, start_date, status, premium_amount) VALUES (1, 1, 2, '2025-10-05', 'Active', 7000000);
 INSERT INTO `Commissions` (contract_id, agent_id, policy_id, amount, status) VALUES (LAST_INSERT_ID(), 1, 1, 350000, 'Pending');
@@ -518,10 +417,71 @@ CREATE TABLE `Agent_Targets` (
   FOREIGN KEY (`agent_id`) REFERENCES `Users`(`user_id`) ON DELETE CASCADE
 );
 
-SET SQL_SAFE_UPDATES = 0;
-UPDATE users
-SET password_hash = SHA2(password_hash, 256);
-SET SQL_SAFE_UPDATES = 1;
+CREATE TABLE `interaction_types` (
+  `type_id` INT AUTO_INCREMENT PRIMARY KEY,
+  `type_name` VARCHAR(50) NOT NULL UNIQUE,
+  `icon_class` VARCHAR(50) DEFAULT 'fa-solid fa-star' -- Thêm icon cho đẹp
+);
+INSERT INTO `interaction_types` (type_name, icon_class) VALUES
+('Call', 'fa-solid fa-phone'),
+('Visit', 'fa-solid fa-person-walking-luggage'),
+('Email', 'fa-solid fa-envelope'),
+('Gift', 'fa-solid fa-gift'),
+('Note', 'fa-solid fa-clipboard');
 
+CREATE TABLE `customer_interactions` (
+  `interaction_id` INT AUTO_INCREMENT PRIMARY KEY,
+  `customer_id` INT NOT NULL,
+  `agent_id` INT NOT NULL,
+  `interaction_type_id` INT NOT NULL, -- Đã SỬA (thay vì ENUM)
+  `notes` TEXT,
+  `interaction_date` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  
+  FOREIGN KEY (`customer_id`) REFERENCES `Customers`(`customer_id`) ON DELETE CASCADE,
+  FOREIGN KEY (`agent_id`) REFERENCES `Users`(`user_id`) ON DELETE CASCADE,
+  FOREIGN KEY (`interaction_type_id`) REFERENCES `interaction_types`(`type_id`)
+);
 
->>>>>>> VuTT
+INSERT INTO `Products` (`product_name`, `description`, `category_id`, `base_price`) VALUES
+-- 5 SẢN PHẨM NHÂN THỌ (category_id = 1) --
+('An Tâm Hưu Trí', 'Giải pháp tài chính linh hoạt đảm bảo an nhàn khi về hưu.', 1, 15000000.00),
+('Vững Bước Tương Lai', 'Quỹ học vấn cho con, đảm bảo tương lai tươi sáng.', 1, 20000000.00),
+('Tâm An Bảo Vệ', 'Bảo vệ toàn diện trước rủi ro 100+ bệnh hiểm nghèo.', 1, 12000000.00),
+('Gia Đình Là Nhất', 'Bảo vệ trụ cột gia đình, đảm bảo tài chính vững vàng.', 1, 18000000.00),
+('Đầu Tư Linh Hoạt 360', 'Kết hợp bảo vệ rủi ro và đầu tư sinh lời hiệu quả.', 1, 25000000.00),
+
+-- 5 SẢN PHẨM SỨC KHỎE (category_id = 2) --
+('Sức Khỏe Bạch Kim', 'Quyền lợi nội trú và ngoại trú cao cấp tại các bệnh viện quốc tế.', 2, 8000000.00),
+('Bảo Vệ Ung Thư Toàn Diện', 'Chi trả ngay 100% số tiền bảo hiểm khi phát hiện bệnh ung thư.', 2, 5000000.00),
+('Chăm Sóc Răng Miệng', 'Gói bảo hiểm nha khoa toàn diện, bao gồm cạo vôi và trám răng.', 2, 3000000.00),
+('Tai Nạn 24/7', 'Bảo vệ toàn diện trước mọi rủi ro tai nạn cá nhân.', 2, 2000000.00),
+('Sức Khỏe Gia Đình Việt', 'Bảo vệ cho cả gia đình (vợ, chồng, con cái) chỉ trong 1 hợp đồng.', 2, 10000000.00);
+
+CREATE TABLE `Customer_Stages` (
+  `stage_id` INT PRIMARY KEY AUTO_INCREMENT,
+  `stage_name` VARCHAR(50) NOT NULL,
+  `stage_order` INT -- Để sắp xếp (ví dụ: 1-Lead, 2-Potential...)
+);
+
+INSERT INTO `Customer_Stages` (stage_name, stage_order) VALUES
+('Lead', 1),
+('Potential', 2),
+('Client', 3),
+('Loyal', 4);
+
+ALTER TABLE `Customers` DROP COLUMN `customer_type`; -- Xóa ENUM cũ
+ALTER TABLE `Customers` ADD COLUMN `stage_id` INT DEFAULT 1; -- Thêm cột stage_id mới
+ALTER TABLE `Customers` ADD CONSTRAINT `fk_customer_stage` FOREIGN KEY (`stage_id`) REFERENCES `Customer_Stages`(`stage_id`);
+
+-- Thêm cột "luật" thời hạn (mặc định 12 tháng)
+ALTER TABLE Products
+ADD COLUMN duration_months INT NOT NULL DEFAULT 12;
+
+-- Cập nhật "luật" cho 10 sản phẩm mẫu (ví dụ)
+-- (Gói Nhân thọ 10 năm, Sức khỏe 1 năm)
+UPDATE Products SET duration_months = 120 WHERE category_id = 1;
+UPDATE Products SET duration_months = 12 WHERE category_id = 2;
+
+ALTER TABLE customer_interactions
+MODIFY COLUMN interaction_date DATETIME NOT NULL;
