@@ -207,7 +207,7 @@
                                     for (Task task : personalTasks) { %>
                                 <li class="list-group-item d-flex justify-content-between align-items-center">
                                     <%-- Form Cập nhật (SỬA: Thêm 'source' input) --%>
-                                    <form action="<%=ctx%>/tasks" method="POST" class="d-flex align-items-center flex-grow-1 task-item-form">
+                                    <form action="<%=ctx%>/manager/dashboard" method="POST" class="d-flex align-items-center flex-grow-1 task-item-form">
                                         <input type="hidden" name="action" value="completeTask">
                                         <input type="hidden" name="taskId" value="<%= task.getTaskId() %>">
                                         <input type="checkbox" name="isCompleted" class="form-check-input me-2" onchange="this.form.submit()"
@@ -217,7 +217,7 @@
                                         </span>
                                     </form>
                                     <%-- Form Xóa (SỬA: Thêm 'source' input) --%>
-                                    <form action="<%=ctx%>/tasks" method="POST" class="task-item-form">
+                                    <form action="<%=ctx%>/manager/dashboard" method="POST" class="task-item-form">
                                         <input type="hidden" name="action" value="deleteTask">
                                         <input type="hidden" name="taskId" value="<%= task.getTaskId() %>">
                                         <button type="submit" class="btn btn-sm btn-link text-danger" title="Delete Task"
@@ -233,7 +233,7 @@
                         </div>
                         <div class="card-footer">
                             <%-- Form Thêm Task mới (SỬA: Thêm 'source' input) --%>
-                            <form action="<%=ctx%>/tasks" method="POST" class="d-flex gap-2">
+                            <form action="<%=ctx%>/manager/dashboard" method="POST" class="d-flex gap-2">
                                 <input type="hidden" name="action" value="addPersonalTask">
                                 <input type="text" class="form-control" name="taskTitle" placeholder="Add a new to-do..." required>
                                 <button type="submit" class="btn btn-primary flex-shrink-0">Add</button>

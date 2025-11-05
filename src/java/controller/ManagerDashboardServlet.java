@@ -7,7 +7,6 @@ package controller;
 
 import dao.ContractDao;
 import dao.UserDao;
-import dao.CustomerDao;   
 import dao.TaskDao;
 import entity.Task;
 import entity.AgentPerformanceDTO;
@@ -33,7 +32,6 @@ public class ManagerDashboardServlet extends HttpServlet {
 
     private ContractDao contractDao;
     private UserDao userDao;
-    private CustomerDao customerDao; 
     private TaskDao taskDao;
     private static final int ROLE_MANAGER = 2;
 
@@ -41,7 +39,6 @@ public class ManagerDashboardServlet extends HttpServlet {
     public void init() {
         contractDao = new ContractDao();
         userDao = new UserDao();
-        customerDao = new CustomerDao(); 
         taskDao = new TaskDao();
     }
 
@@ -63,25 +60,7 @@ public class ManagerDashboardServlet extends HttpServlet {
             BigDecimal teamPremiumThisMonth = contractDao.getTeamPremiumThisMonth(managerId);
             int expiringContractsCount = contractDao.countExpiringContractsByManagerId(managerId);
             int pendingContractsCount = contractDao.countPendingContractsByManagerId(managerId); 
-            
-            // ==========================================================
-            // "VÁ" MỤC TIÊU 3: KPI CARD 4 (Conversion Rate)
-            // ==========================================================
-            Map<String, Integer> stageCounts = customerDao.countTeamCustomersByStage(managerId);
-            int leads = stageCounts.getOrDefault("Lead", 0);
-            int potentials = stageCounts.getOrDefault("Potential", 0);
-            int clients = stageCounts.getOrDefault("Client", 0);
-            int loyals = stageCounts.getOrDefault("Loyal", 0);
-            
-            int teamTotalLeads = leads + potentials; // (Lead + Potential)
-            int teamTotalClients = clients + loyals; // (Client + Loyal)
-            double teamConversionRate = 0.0;
-            if (teamTotalLeads + teamTotalClients > 0) {
-                teamConversionRate = ((double) teamTotalClients / (teamTotalLeads + teamTotalClients)) * 100;
-            }
-            // ==========================================================
-
-            // 2. Lấy dữ liệu cho Bảng Agent Performance Matrix
+          // 2. Lấy dữ liệu cho Bảng Agent Performance Matrix
             List<AgentPerformanceDTO> teamPerformance = userDao.getTeamPerformance(managerId);
             
             // 3. Lấy dữ liệu cho Widget Team Leaderboard (Lấy top 5)
@@ -104,10 +83,7 @@ public class ManagerDashboardServlet extends HttpServlet {
             request.setAttribute("teamPremiumThisMonth", teamPremiumThisMonth);
             request.setAttribute("expiringContractsCount", expiringContractsCount);
             request.setAttribute("pendingContractsCount", pendingContractsCount);
-            request.setAttribute("teamConversionRate", teamConversionRate); // <-- "Sạch"
-            request.setAttribute("teamTotalClients", teamTotalClients); // <-- "Sạch"
-            request.setAttribute("teamTotalLeads", teamTotalLeads); // <-- "Sạch"
-
+ 
             // Gửi dữ liệu Bảng và Widget
             request.setAttribute("teamPerformanceList", teamPerformance); 
             request.setAttribute("leaderboardWidgetList", managerLeaderboard); 
@@ -135,7 +111,6 @@ public class ManagerDashboardServlet extends HttpServlet {
         }
 
         String action = request.getParameter("action");
-        String source = request.getParameter("source"); // "manager"
         
         try {
             switch (action) {
