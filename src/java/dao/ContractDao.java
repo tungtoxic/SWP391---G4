@@ -295,7 +295,7 @@ public List<ContractDTO> getPendingContractsByManagerId(int managerId) {
                 + "WHERE agent_id = ? AND status = 'Active' "
                 + "AND start_date >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH) "
                 + "GROUP BY month "
-                + "ORDER BY month ASC";
+                + "ORDER BY month DESC";
 
         try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -505,7 +505,7 @@ public List<ContractDTO> getPendingContractsByManagerId(int managerId) {
               AND c.status = 'Active'
               AND c.start_date >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH)
             GROUP BY month
-            ORDER BY month ASC;
+            ORDER BY month DESC;
         """;
 
         try (Connection conn = DBConnector.makeConnection(); 
