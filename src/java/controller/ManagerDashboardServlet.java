@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
-
+import java.util.ArrayList;
 /**
  *
  * @author Nguyễn Tùng
@@ -74,7 +74,9 @@ public class ManagerDashboardServlet extends HttpServlet {
             // ==========================================================
             List<Task> personalTasks = taskDao.getPersonalTasks(managerId);
             // ==========================================================
-            
+            Map<String, Double> salesData = contractDao.getTeamMonthlySalesData(managerId); // <-- Gọi hàm mới (Bước 1)
+            List<String> teamSalesLabels = new ArrayList<>(salesData.keySet());
+            List<Double> teamSalesData = new ArrayList<>(salesData.values());
             // 5. Gửi dữ liệu sang JSP
             request.setAttribute("currentUser", currentUser);
             request.setAttribute("activePage", "dashboard"); 
@@ -90,7 +92,8 @@ public class ManagerDashboardServlet extends HttpServlet {
             request.setAttribute("personalTasks", personalTasks); // <-- "Sạch"
 
             // (Mục tiêu 2: Biểu đồ sẽ để sau)
-            
+            request.setAttribute("teamSalesLabels", teamSalesLabels); // <-- "SẠCH"
+            request.setAttribute("teamSalesData", teamSalesData);   // <-- "SẠCH"    
             // Forward
             request.getRequestDispatcher("/ManagerDashboard.jsp").forward(request, response);
         } catch (Exception e) {

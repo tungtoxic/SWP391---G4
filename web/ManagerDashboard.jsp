@@ -276,16 +276,23 @@
                                 </ul>
                             </div>
                     </div>
-
-                    <div class="card mb-4"> <%-- Thêm mb-4 --%>
-                         <div class="card-header"><h5 class="mb-0"><i class="fas fa-chart-pie me-2"></i> Product Distribution</h5></div>
-                            <div class="card-body p-3 chart-250">
-                                <canvas id="productDistributionChart"></canvas> 
-                            </div>
-                    </div>
-
                 </div> <%-- Hết Cột Phải (col-lg-4) --%>
- 
+                <div class="card mb-4"> 
+
+                <div class="card mb-4">
+                    <div class="card-header"><h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i> Team Sales Trend </h5></div>
+                    <div class="card-body p-3 chart-250">
+                        <%-- SỬA: Đổi ID và kiểm tra dữ liệu "sạch" --%>
+                        <%
+                            List<String> teamSalesLabels = (List<String>) request.getAttribute("teamSalesLabels");
+                            if (teamSalesLabels == null || teamSalesLabels.isEmpty()) { 
+                        %>
+                            <p class="text-center text-muted mt-5">Không có dữ liệu doanh số.</p>
+                        <% } else { %>
+                            <canvas id="teamSalesChart"></canvas> 
+                        <% } %>
+                    </div>
+                </div>
             <div class="mt-4">
                 <small class="text-muted">Manager Dashboard Version 1.0</small>
             </div>
@@ -306,26 +313,49 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
     
-    <%-- Script vẽ biểu đồ --%>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Product Distribution Chart
-            const ctxProduct = document.getElementById('productDistributionChart');
-            if (ctxProduct) { 
-                new Chart(ctxProduct, {
-                    type: 'doughnut',
+            
+            // ==========================================================
+            // "VÁ" MỤC TIÊU 2: "THẮP SÁNG" (Light Up) BIỂU ĐỒ BAR CHART
+            // ==========================================================
+            
+            // 1. Lấy dữ liệu "sạch" từ Servlet (Bước 2)
+            const teamSalesLabels = <%= request.getAttribute("teamSalesLabels") %>;
+            const teamSalesData = <%= request.getAttribute("teamSalesData") %>;
+            // 2. Tìm <canvas>
+            const ctxSales = document.getElementById('teamSalesChart');
+            
+            // 3. "Vẽ" (Draw) Biểu đồ Bar Chart "sạch" (Clean)
+            if (ctxSales && teamSalesLabels.length > 0) { 
+                new Chart(ctxSales, {
+                    type: 'bar',
                     data: {
-                        labels: ['Bảo hiểm Nhân thọ', 'Bảo hiểm Sức khỏe'],
+                        labels: teamSalesLabels, // <-- Dữ liệu "sạch"
                         datasets: [{
-                            data: [45, 55], // Dữ liệu demo
-                            backgroundColor: ['#0d6efd', '#198754'],
+                            label: 'Team Revenue (VND)',
+                            data: teamSalesData, // <-- Dữ liệu "sạch"
+                            backgroundColor: 'rgba(0, 123, 255, 0.8)'
                         }]
                     },
                     options: { 
-                         maintainAspectRatio: false,
-                         responsive: true,
-                         plugins: { legend: { position: 'bottom' } }
-                     }
+                        maintainAspectRatio: false,
+                        responsive: true,
+                        plugins: { 
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return context.dataset.label + ': ' + new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(context.raw);
+                                    }
+                                }
+                            }
+                        },
+                         scales: {
+                            y: { beginAtZero: true, ticks: { callback: function(value) { return value / 1000000 + ' Tr'; } } },
+                            x: { grid: { display: false } }
+                        }
+                    }
                 });
             }
         });

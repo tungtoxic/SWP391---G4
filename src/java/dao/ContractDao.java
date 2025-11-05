@@ -487,5 +487,40 @@ public List<ContractDTO> getPendingContractsByManagerId(int managerId) {
         }
         return list;
     }
-    
+    /**
+     * HÀM MỚI (CHO MANAGER DASHBOARD - Ý TƯỞNG 2):
+     * Lấy dữ liệu doanh thu (Premium 'Active') 6 tháng gần nhất
+     * của TOÀN BỘ TEAM do Manager quản lý.
+     */
+    public Map<String, Double> getTeamMonthlySalesData(int managerId) {
+        // Dùng LinkedHashMap để giữ đúng thứ tự các tháng
+        Map<String, Double> salesData = new LinkedHashMap<>();
+        String sql = """
+            SELECT 
+                DATE_FORMAT(c.start_date, '%Y-%m') AS month, 
+                SUM(c.premium_amount) AS monthly_total
+            FROM Contracts c
+            JOIN Manager_Agent ma ON c.agent_id = ma.agent_id
+            WHERE ma.manager_id = ? 
+              AND c.status = 'Active'
+              AND c.start_date >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH)
+            GROUP BY month
+            ORDER BY month ASC;
+        """;
+
+        try (Connection conn = DBConnector.makeConnection(); 
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, managerId);
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    salesData.put(rs.getString("month"), rs.getDouble("monthly_total"));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return salesData;
+    }
 }
