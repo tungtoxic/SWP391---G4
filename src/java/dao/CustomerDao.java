@@ -183,4 +183,45 @@ public class CustomerDao {
         }
         return stageCounts;
     }
+    
+    /**
+     * HÀM MỚI (CHO MANAGER DASHBOARD):
+     * Đếm tất cả khách hàng (theo 4 Giai đoạn) của TOÀN BỘ TEAM.
+     */
+    public Map<String, Integer> countTeamCustomersByStage(int managerId) {
+        Map<String, Integer> stageCounts = new HashMap<>();
+        // Khởi tạo 4 Giai đoạn
+        stageCounts.put("Lead", 0);
+        stageCounts.put("Potential", 0);
+        stageCounts.put("Client", 0);
+        stageCounts.put("Loyal", 0);
+
+        // SQL: JOIN Users -> Manager_Agent -> Customers -> Customer_Stages
+        String sql = """
+            SELECT 
+                cs.stage_name, 
+                COUNT(c.customer_id) AS stage_count
+            FROM Customers c
+            JOIN Users u ON c.created_by = u.user_id
+            JOIN Manager_Agent ma ON u.user_id = ma.agent_id
+            JOIN Customer_Stages cs ON c.stage_id = cs.stage_id
+            WHERE ma.manager_id = ? AND u.role_id = 1
+            GROUP BY cs.stage_name;
+        """;
+
+        try (Connection conn = DBConnector.makeConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setInt(1, managerId);
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    stageCounts.put(rs.getString("stage_name"), rs.getInt("stage_count"));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return stageCounts;
+    }
 }

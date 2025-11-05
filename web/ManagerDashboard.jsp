@@ -198,53 +198,50 @@
                     </div>
 
                     <%-- Card 2: To-Do List (ĐÃ DI CHUYỂN VÀO ĐÂY) --%>
+                <div class="col-lg-15 mb-4">
                     <div class="card h-100">
-                        <div class="card-header">
-                            <h5 class="mb-0"><i class="fa fa-list-check me-2"></i> Personal To-Do List</h5>
-                        </div>
+                        <div class="card-header"><h5 class="mb-0"><i class="fa fa-list-check me-2"></i> Personal To-Do List</h5></div>
                         <div class="card-body p-0">
                              <ul class="list-group list-group-flush">
-                                <% if (personalTasks.isEmpty()) { %>
-                                    <li class="list-group-item text-muted text-center">Không có task cá nhân nào.</li>
-                                <% } else {
+                                <% if (personalTasks != null && !personalTasks.isEmpty()) {
                                     for (Task task : personalTasks) { %>
                                 <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    <%-- Form Cập nhật --%>
+                                    <%-- Form Cập nhật (SỬA: Thêm 'source' input) --%>
                                     <form action="<%=ctx%>/tasks" method="POST" class="d-flex align-items-center flex-grow-1 task-item-form">
                                         <input type="hidden" name="action" value="completeTask">
                                         <input type="hidden" name="taskId" value="<%= task.getTaskId() %>">
-                                        <input type="hidden" name="source" value="manager"> 
                                         <input type="checkbox" name="isCompleted" class="form-check-input me-2" onchange="this.form.submit()"
                                                <%= task.isCompleted() ? "checked" : "" %> value="on">
                                         <span class="<%= task.isCompleted() ? "task-title-completed" : "" %>">
                                             <%= task.getTitle() %>
                                         </span>
                                     </form>
-                                    <%-- Form Xóa --%>
+                                    <%-- Form Xóa (SỬA: Thêm 'source' input) --%>
                                     <form action="<%=ctx%>/tasks" method="POST" class="task-item-form">
                                         <input type="hidden" name="action" value="deleteTask">
                                         <input type="hidden" name="taskId" value="<%= task.getTaskId() %>">
-                                        <input type="hidden" name="source" value="manager">
                                         <button type="submit" class="btn btn-sm btn-link text-danger" title="Delete Task"
-                                                onclick="return confirm('Xóa task này?')">
+                                                onclick="return confirm('Delete this task?')">
                                             <i class="fa fa-trash"></i>
                                         </button>
                                     </form>
                                 </li>
-                                <% } } %>
-                            </ul>
+                                <% } } else { %>
+                                    <li class="list-group-item text-muted text-center">No personal tasks.</li>
+                                <% } %>
+                             </ul>
                         </div>
                         <div class="card-footer">
-                            <%-- Form Thêm --%>
+                            <%-- Form Thêm Task mới (SỬA: Thêm 'source' input) --%>
                             <form action="<%=ctx%>/tasks" method="POST" class="d-flex gap-2">
                                 <input type="hidden" name="action" value="addPersonalTask">
-                                <input type="hidden" name="source" value="manager">
-                                <input type="text" class="form-control" name="taskTitle" placeholder="Thêm to-do mới..." required>
-                                <button type="submit" class="btn btn-primary flex-shrink-0">Thêm</button>
+                                <input type="text" class="form-control" name="taskTitle" placeholder="Add a new to-do..." required>
+                                <button type="submit" class="btn btn-primary flex-shrink-0">Add</button>
                             </form>
                         </div>
                     </div>
-                    
+                </div>
+          
                 </div> <%-- Hết Cột Trái (col-lg-8) --%>
 
                 
