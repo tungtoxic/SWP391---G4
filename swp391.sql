@@ -416,3 +416,72 @@ CREATE TABLE `Agent_Targets` (
   -- Liên kết với bảng Users
   FOREIGN KEY (`agent_id`) REFERENCES `Users`(`user_id`) ON DELETE CASCADE
 );
+
+CREATE TABLE `interaction_types` (
+  `type_id` INT AUTO_INCREMENT PRIMARY KEY,
+  `type_name` VARCHAR(50) NOT NULL UNIQUE,
+  `icon_class` VARCHAR(50) DEFAULT 'fa-solid fa-star' -- Thêm icon cho đẹp
+);
+INSERT INTO `interaction_types` (type_name, icon_class) VALUES
+('Call', 'fa-solid fa-phone'),
+('Visit', 'fa-solid fa-person-walking-luggage'),
+('Email', 'fa-solid fa-envelope'),
+('Gift', 'fa-solid fa-gift'),
+('Note', 'fa-solid fa-clipboard');
+
+CREATE TABLE `customer_interactions` (
+  `interaction_id` INT AUTO_INCREMENT PRIMARY KEY,
+  `customer_id` INT NOT NULL,
+  `agent_id` INT NOT NULL,
+  `interaction_type_id` INT NOT NULL, -- Đã SỬA (thay vì ENUM)
+  `notes` TEXT,
+  `interaction_date` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  
+  FOREIGN KEY (`customer_id`) REFERENCES `Customers`(`customer_id`) ON DELETE CASCADE,
+  FOREIGN KEY (`agent_id`) REFERENCES `Users`(`user_id`) ON DELETE CASCADE,
+  FOREIGN KEY (`interaction_type_id`) REFERENCES `interaction_types`(`type_id`)
+);
+
+INSERT INTO `Products` (`product_name`, `description`, `category_id`, `base_price`) VALUES
+-- 5 SẢN PHẨM NHÂN THỌ (category_id = 1) --
+('An Tâm Hưu Trí', 'Giải pháp tài chính linh hoạt đảm bảo an nhàn khi về hưu.', 1, 15000000.00),
+('Vững Bước Tương Lai', 'Quỹ học vấn cho con, đảm bảo tương lai tươi sáng.', 1, 20000000.00),
+('Tâm An Bảo Vệ', 'Bảo vệ toàn diện trước rủi ro 100+ bệnh hiểm nghèo.', 1, 12000000.00),
+('Gia Đình Là Nhất', 'Bảo vệ trụ cột gia đình, đảm bảo tài chính vững vàng.', 1, 18000000.00),
+('Đầu Tư Linh Hoạt 360', 'Kết hợp bảo vệ rủi ro và đầu tư sinh lời hiệu quả.', 1, 25000000.00),
+
+-- 5 SẢN PHẨM SỨC KHỎE (category_id = 2) --
+('Sức Khỏe Bạch Kim', 'Quyền lợi nội trú và ngoại trú cao cấp tại các bệnh viện quốc tế.', 2, 8000000.00),
+('Bảo Vệ Ung Thư Toàn Diện', 'Chi trả ngay 100% số tiền bảo hiểm khi phát hiện bệnh ung thư.', 2, 5000000.00),
+('Chăm Sóc Răng Miệng', 'Gói bảo hiểm nha khoa toàn diện, bao gồm cạo vôi và trám răng.', 2, 3000000.00),
+('Tai Nạn 24/7', 'Bảo vệ toàn diện trước mọi rủi ro tai nạn cá nhân.', 2, 2000000.00),
+('Sức Khỏe Gia Đình Việt', 'Bảo vệ cho cả gia đình (vợ, chồng, con cái) chỉ trong 1 hợp đồng.', 2, 10000000.00);
+
+CREATE TABLE `Customer_Stages` (
+  `stage_id` INT PRIMARY KEY AUTO_INCREMENT,
+  `stage_name` VARCHAR(50) NOT NULL,
+  `stage_order` INT -- Để sắp xếp (ví dụ: 1-Lead, 2-Potential...)
+);
+
+INSERT INTO `Customer_Stages` (stage_name, stage_order) VALUES
+('Lead', 1),
+('Potential', 2),
+('Client', 3),
+('Loyal', 4);
+
+ALTER TABLE `Customers` DROP COLUMN `customer_type`; -- Xóa ENUM cũ
+ALTER TABLE `Customers` ADD COLUMN `stage_id` INT DEFAULT 1; -- Thêm cột stage_id mới
+ALTER TABLE `Customers` ADD CONSTRAINT `fk_customer_stage` FOREIGN KEY (`stage_id`) REFERENCES `Customer_Stages`(`stage_id`);
+
+-- Thêm cột "luật" thời hạn (mặc định 12 tháng)
+ALTER TABLE Products
+ADD COLUMN duration_months INT NOT NULL DEFAULT 12;
+
+-- Cập nhật "luật" cho 10 sản phẩm mẫu (ví dụ)
+-- (Gói Nhân thọ 10 năm, Sức khỏe 1 năm)
+UPDATE Products SET duration_months = 120 WHERE category_id = 1;
+UPDATE Products SET duration_months = 12 WHERE category_id = 2;
+
+ALTER TABLE customer_interactions
+MODIFY COLUMN interaction_date DATETIME NOT NULL;
