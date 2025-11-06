@@ -93,6 +93,7 @@ public class RegisterServlet extends HttpServlet {
                                         + ",\n\nMã đăng ký của bạn là: " + otpValue
                                         + "\nMã có hiệu lực trong 5 phút."
                         );
+                        System.out.printf("otp"+ otpValue);
                     } catch (Exception e) {
                         error = "Không gửi được OTP: " + e.getMessage();
                         e.printStackTrace();
