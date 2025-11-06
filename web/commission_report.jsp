@@ -10,13 +10,14 @@
 <%@ page import="entity.CommissionReportDTO" %>
 <%@ page import="java.text.DecimalFormat" %>
 <%@ page import="java.text.SimpleDateFormat" %>
+<%@ page import="java.math.BigDecimal" %>
 <%
     // Lấy context path
     String ctx = request.getContextPath();
     User currentUser = (User) request.getAttribute("currentUser");
     String activePage = (String) request.getAttribute("activePage");
     List<CommissionReportDTO> reportList = (List<CommissionReportDTO>) request.getAttribute("reportList");
-    Double totalCommission = (Double) request.getAttribute("totalCommission");
+    BigDecimal totalCommission = (BigDecimal) request.getAttribute("totalCommission");
     String startDate = (String) request.getAttribute("startDate");
     String endDate = (String) request.getAttribute("endDate");
 
@@ -30,7 +31,7 @@
         return;
     }
     if (reportList == null) reportList = new ArrayList<>();
-    if (totalCommission == null) totalCommission = 0.0;
+    if (totalCommission == null) totalCommission = BigDecimal.ZERO;
     if (startDate == null) startDate = "";
     if (endDate == null) endDate = "";
     if (activePage == null) activePage = "commission"; 

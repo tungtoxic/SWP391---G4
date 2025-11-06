@@ -73,15 +73,8 @@ public class TaskServlet extends HttpServlet {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        String source = request.getParameter("source");
-
-        // Nếu 'source' là 'manager', quay về Manager Dashboard
-        if ("manager".equals(source)) {
-            response.sendRedirect(request.getContextPath() + "/manager/dashboard");
-        } else {
-            // Mặc định (hoặc source="agent"), quay về Agent Dashboard
-            response.sendRedirect(request.getContextPath() + "/agent/dashboard");
-        }
+        
+        response.sendRedirect(getDashboardUrl(currentUser, request));
     }
 
     /**

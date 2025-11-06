@@ -117,29 +117,50 @@ public class ManagerContractServlet extends HttpServlet {
     /**
      * Xử lý logic khi Manager duyệt một hợp đồng.
      */
-    private void approveContract(HttpServletRequest request, HttpServletResponse response) 
+ private void approveContract(HttpServletRequest request, HttpServletResponse response) 
             throws Exception {
+        
         int contractId = Integer.parseInt(request.getParameter("contractId"));
         
-        // Bước 1: Cập nhật trạng thái hợp đồng thành "Active"
+        // --- BƯỚC 1: LẤY DỮ LIỆU ---
+        // Lấy thông tin HĐ TRƯỚC KHI duyệt (vì chúng ta cần ID và số tiền)
+        ContractDTO contract = contractDao.getContractById(contractId);
+        
+        if (contract == null) {
+            response.sendRedirect(request.getContextPath() + "/manager/contracts?message=errorNotFound");
+            return;
+        }
+
+        // --- BƯỚC 2: KIỂM TRA BẢO MẬT ---
+        // (Lấy currentUser từ session để kiểm tra quyền)
+        HttpSession session = request.getSession(false);
+        User currentUser = (User) session.getAttribute("user"); 
+        
+        // (Kiểm tra xem Agent của HĐ này có thuộc team của Manager này không)
+        // (Chúng ta dùng hàm isAgentManagedBy trong code của bạn)
+        if (!isAgentManagedBy(contract.getAgentId(), currentUser.getUserId())) {
+             response.sendRedirect(request.getContextPath() + "/manager/contracts?message=AuthError");
+             return;
+        }
+
+        // --- BƯỚC 3: THỰC THI NGHIỆP VỤ ---
+        // Cập nhật trạng thái hợp đồng thành "Active"
         boolean updateSuccess = contractDao.updateContractStatus(contractId, "Active");
         
-        // Bước 2: Tự động tạo hoa hồng nếu cập nhật thành công
+        // --- BƯỚC 4: KÍCH HOẠT TỰ ĐỘNG HÓA (FIX LỖI CỦA BẠN Ở ĐÂY) ---
+        // Servlet không cần tính toán. Giao toàn bộ nghiệp vụ cho DAO.
         if (updateSuccess) {
-            ContractDTO contract = contractDao.getContractById(contractId);
-            CommissionPolicy currentPolicy = policyDao.getCurrentPolicy();
-
-            if (contract != null && currentPolicy != null) {
-                // Tính hoa hồng dựa trên tỷ lệ động từ CSDL
-                BigDecimal premium = contract.getPremiumAmount();
-                BigDecimal rate = currentPolicy.getRate().divide(new BigDecimal("100")); // Chuyển 5.00 thành 0.05
-                BigDecimal commissionAmount = premium.multiply(rate);
-                
-                commissionDao.createCommissionForContract(contract, commissionAmount.doubleValue());
-            }
+            
+            // GỌI HÀM "SẠCH" MỚI (nhận 3 tham số, không phải 2)
+            commissionDao.createCommissionForContract(
+                contract.getContractId(),
+                contract.getAgentId(),
+                contract.getPremiumAmount() // Truyền thẳng BigDecimal, không .doubleValue()
+            );
         }
         
-        response.sendRedirect(request.getContextPath() + "/manager/contracts?message=approveSuccess");
+        // Chuyển hướng về trang Approval List (vì HĐ này đã biến mất khỏi đó)
+        response.sendRedirect(request.getContextPath() + "/manager/contracts?action=listPending&message=approveSuccess");
     }
     
     /**

@@ -295,7 +295,7 @@ public List<ContractDTO> getPendingContractsByManagerId(int managerId) {
                 + "WHERE agent_id = ? AND status = 'Active' "
                 + "AND start_date >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH) "
                 + "GROUP BY month "
-                + "ORDER BY month ASC";
+                + "ORDER BY month DESC";
 
         try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -445,5 +445,82 @@ public List<ContractDTO> getPendingContractsByManagerId(int managerId) {
             e.printStackTrace();
         }
         return 0;
+    }
+    /**
+     * Lấy TẤT CẢ hợp đồng của MỘT khách hàng (để hiển thị trong trang chi tiết).
+     * Sắp xếp mới nhất lên đầu.
+     */
+    public List<Contract> getContractsByCustomerId(int customerId) {
+        List<Contract> list = new ArrayList<>();
+        // Dùng JOIN để lấy Tên Sản phẩm (product_name)
+        String sql = "SELECT c.*, p.product_name " +
+                     "FROM Contracts c " +
+                     "JOIN Products p ON c.product_id = p.product_id " +
+                     "WHERE c.customer_id = ? " +
+                     "ORDER BY c.start_date DESC";
+        
+        try (Connection conn = DBConnector.makeConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setInt(1, customerId);
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Contract contract = new Contract();
+                    contract.setContractId(rs.getInt("contract_id"));
+                    contract.setCustomerId(rs.getInt("customer_id"));
+                    contract.setAgentId(rs.getInt("agent_id"));
+                    contract.setProductId(rs.getInt("product_id"));
+                    contract.setStartDate(rs.getDate("start_date"));
+                    contract.setEndDate(rs.getDate("end_date"));
+                    contract.setStatus(rs.getString("status"));
+                    contract.setPremiumAmount(rs.getBigDecimal("premium_amount"));
+                    
+                    // Thêm dữ liệu JOIN vào trường transient
+                    contract.setProductName(rs.getString("product_name"));
+                    
+                    list.add(contract);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+    /**
+     * HÀM MỚI (CHO MANAGER DASHBOARD - Ý TƯỞNG 2):
+     * Lấy dữ liệu doanh thu (Premium 'Active') 6 tháng gần nhất
+     * của TOÀN BỘ TEAM do Manager quản lý.
+     */
+    public Map<String, Double> getTeamMonthlySalesData(int managerId) {
+        // Dùng LinkedHashMap để giữ đúng thứ tự các tháng
+        Map<String, Double> salesData = new LinkedHashMap<>();
+        String sql = """
+            SELECT 
+                DATE_FORMAT(c.start_date, '%Y-%m') AS month, 
+                SUM(c.premium_amount) AS monthly_total
+            FROM Contracts c
+            JOIN Manager_Agent ma ON c.agent_id = ma.agent_id
+            WHERE ma.manager_id = ? 
+              AND c.status = 'Active'
+              AND c.start_date >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH)
+            GROUP BY month
+            ORDER BY month DESC;
+        """;
+
+        try (Connection conn = DBConnector.makeConnection(); 
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, managerId);
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    salesData.put(rs.getString("month"), rs.getDouble("monthly_total"));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return salesData;
     }
 }

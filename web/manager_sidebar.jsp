@@ -47,7 +47,7 @@
         <%-- ===== HẾT PHẦN SỬA LEADERBOARD ===== --%>
         
         <a class="nav-link text-white py-2 <%= "commPolicies".equals(activePage) ? "active" : "" %>" href="#"><i class="fas fa-file-invoice-dollar me-2"></i> Commission Policies</a>
-        <a class="nav-link text-white py-2 <%= "productMgmt".equals(activePage) ? "active" : "" %>" href="<%=ctx%>/productmanagement.jsp"><i class="fas fa-box me-2"></i> Product</a>
+        <a class="nav-link text-white py-2 <%= "productMgmt".equals(activePage) ? "active" : "" %>" href="<%=ctx%>/manager/products"><i class="fas fa-box me-2"></i> Product</a>
 
         <%-- Menu Contract (Giữ nguyên) --%>
          <% boolean isContractSectionActive = "all".equals(activePage) || "pending".equals(activePage); %>
@@ -65,7 +65,7 @@
             </a>
         </div>
 
-        <a class="nav-link text-white py-2 <%= "policies".equals(activePage) ? "active" : "" %>" href="#"><i class="fas fa-file-alt me-2"></i> Policies</a>
+        <a class="nav-link text-white py-2 <%= "policies".equals(activePage) ? "active" : "" %>" href="<%=ctx%>/manager/policies"><i class="fas fa-file-alt me-2"></i> Policies</a>
         <div class="mt-3 px-2">
             <a class="btn btn-danger w-100" href="<%=ctx%>/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </div>

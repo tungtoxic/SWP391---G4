@@ -12,31 +12,7 @@ import utility.DBConnector;
 
 public class TaskDao {
 
-    // ... (phương thức getTodaysFollowUps giữ nguyên) ...
-    public List<Task> getTodaysFollowUps(int userId) {
-        List<Task> tasks = new ArrayList<>();
-        String sql = "SELECT t.*, c.full_name as customer_name " +
-                     "FROM Tasks t " +
-                     "JOIN Customers c ON t.customer_id = c.customer_id " +
-                     "WHERE t.user_id = ? AND t.due_date = CURDATE() " +
-                     "AND t.is_completed = false " +
-                     "ORDER BY t.created_at ASC";
-        try (Connection conn = DBConnector.makeConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, userId);
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    Task task = mapRowToTask(rs);
-                    task.setCustomerName(rs.getString("customer_name"));
-                    tasks.add(task);
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return tasks;
-    }
-
+   
     /**
      * Lấy danh sách các Ghi chú cá nhân (To-do) của một user.
      * Lấy TẤT CẢ, sắp xếp theo: chưa hoàn thành lên trước.

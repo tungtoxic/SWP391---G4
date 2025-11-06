@@ -10,8 +10,6 @@ import java.util.Random;
 import utility.DBConnector;
 
 public class UserDao {
-
-    // ===== GIỮ NGUYÊN TỪ CODE CỦA BẠN =====
     /**
      * Kiểm tra thông tin đăng nhập.
      * @param username Tên đăng nhập

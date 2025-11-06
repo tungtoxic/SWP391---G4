@@ -34,28 +34,32 @@ public class AgentDashboardServlet extends HttpServlet {
     private CustomerDao customerDao;
     private CommissionDao commissionDao;
     private TaskDao taskDao;
+    private InteractionDao interactionDao;
 
     @Override
     public void init() {
-        // 2. Khởi tạo tất cả các DAO cần thiết
         userDao = new UserDao();
         contractDao = new ContractDao();
         customerDao = new CustomerDao();
         commissionDao = new CommissionDao();
         taskDao = new TaskDao();
+        interactionDao = new InteractionDao();
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
-        // 3. Kiểm tra quyền truy cập
         HttpSession session = request.getSession(false);
         User currentUser = (session != null) ? (User) session.getAttribute("user") : null;
         if (currentUser == null || currentUser.getRoleId() != ROLE_AGENT) {
             response.sendRedirect(request.getContextPath() + "/login.jsp");
             return;
         }
+        
+        // SỬA: Set activePage trong Servlet (an toàn hơn)
+        request.setAttribute("currentUser", currentUser);
+        request.setAttribute("activePage", "dashboard");
 
         try {
             int agentId = currentUser.getUserId();
@@ -64,19 +68,33 @@ public class AgentDashboardServlet extends HttpServlet {
             
             // --- KPIs ---
             BigDecimal pendingCommission = commissionDao.getPendingCommissionTotal(agentId);
-            int leadCount = customerDao.countLeadsByAgent(agentId);
-            int clientCount = customerDao.countClientsByAgent(agentId);
+            
+            // === SỬA LỖI (FIX LỖI CỦA BẠN) ===
+            // GỌI HÀM MỚI (chỉ 1 lần)
+            Map<String, Integer> stageCounts = customerDao.countCustomersByStage(agentId);
+
+            // TÍNH TOÁN CHO 4 KPI CARDS (Dựa trên 4 Giai đoạn)
+            // (Lấy giá trị, mặc định là 0 nếu không có)
+            int leads = stageCounts.getOrDefault("Lead", 0);
+            int potentials = stageCounts.getOrDefault("Potential", 0);
+            int clients = stageCounts.getOrDefault("Client", 0);
+            int loyals = stageCounts.getOrDefault("Loyal", 0);
+
+            // Gán biến cho JSP (cho 4 KPI Cards)
+            int leadCount = leads + potentials; // Card "Active Leads" = Lead + Potential
+            int clientCount = clients + loyals; // Card "Active Clients" = Client + Loyal
+            // (Biến conversionRate sẽ tự động tính đúng trong JSP)
+            // ===================================
             
             // --- Renewal Alerts ---
             List<ContractDTO> expiringContracts = contractDao.getExpiringContracts(agentId);
-            
+
             // --- Follow-ups & To-do List ---
-            List<Task> followUps = taskDao.getTodaysFollowUps(agentId);
-            List<Task> personalTasks = taskDao.getPersonalTasks(agentId); // Cho widget "To-do List" mới
-            
+            List<Interaction> followUps = interactionDao.getTodaysFollowUps(agentId);
+            List<Task> personalTasks = taskDao.getPersonalTasks(agentId);
+
             // --- Chart Data (Sales Performance) ---
             Map<String, Double> salesData = contractDao.getMonthlySalesData(agentId);
-            // Chuyển đổi Map sang 2 List để Chart.js có thể đọc
             List<String> salesChartLabels = new ArrayList<>(salesData.keySet());
             List<Double> salesChartValues = new ArrayList<>(salesData.values());
             
@@ -88,13 +106,20 @@ public class AgentDashboardServlet extends HttpServlet {
 
             // 5. Đặt tất cả dữ liệu vào request
             request.setAttribute("pendingCommission", pendingCommission);
-            request.setAttribute("leadCount", leadCount);
-            request.setAttribute("clientCount", clientCount);
+            request.setAttribute("leadCount", leadCount);     // (Đã tính lại)
+            request.setAttribute("clientCount", clientCount);   // (Đã tính lại)
+            
+            // THÊM MỚI: Gửi 4 con số "thô" cho Donut Chart
+            request.setAttribute("leads", leads);
+            request.setAttribute("potentials", potentials);
+            request.setAttribute("clients", clients); // "clients" này là stage "Client"
+            request.setAttribute("loyals", loyals);
+            
             request.setAttribute("expiringContracts", expiringContracts);
             request.setAttribute("followUps", followUps);
             request.setAttribute("personalTasks", personalTasks);
-            request.setAttribute("salesChartLabels", salesChartLabels); // Gửi labels cho biểu đồ
-            request.setAttribute("salesChartValues", salesChartValues); // Gửi data cho biểu đồ
+            request.setAttribute("salesChartLabels", salesChartLabels);
+            request.setAttribute("salesChartValues", salesChartValues);
             request.setAttribute("topAgents", topAgents);
 
             // 6. Chuyển tiếp đến trang JSP

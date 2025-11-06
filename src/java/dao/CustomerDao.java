@@ -1,23 +1,29 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
-
 package dao;
 
 import entity.Customer;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-
+import java.util.Map;
 import utility.DBConnector;
 
+/**
+ * PHIÊN BẢN ĐÃ TÁI CẤU TRÚC HOÀN CHỈNH (FIX LỖI stage_name)
+ */
 public class CustomerDao {
 
-    // ========== READ: LẤY DANH SÁCH KHÁCH HÀNG THEO AGENT ==========
+    /**
+     * SỬA LỖI: Đã THÊM JOIN với Customer_Stages
+     */
     public List<Customer> getAllCustomersByAgentId(int agentId) {
         List<Customer> list = new ArrayList<>();
-        String sql = "SELECT * FROM Customers WHERE created_by = ? AND status = 'Active' ORDER BY customer_id DESC";
+        // SỬA: Thêm JOIN, bỏ customer_type, thêm stage_id và stage_name
+        String sql = "SELECT c.*, s.stage_name " + // <-- SỬA
+                     "FROM Customers c " +
+                     "JOIN Customer_Stages s ON c.stage_id = s.stage_id " + // <-- SỬA
+                     "WHERE c.created_by = ? AND c.status = 'Active' " + 
+                     "ORDER BY c.customer_id DESC";
         
         try (Connection conn = DBConnector.makeConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -34,7 +40,8 @@ public class CustomerDao {
                     c.setAddress(rs.getString("address"));
                     c.setCreatedBy(rs.getInt("created_by"));
                     c.setCreatedAt(rs.getTimestamp("created_at"));
-                    c.setCustomerType(rs.getString("customer_type"));
+                    c.setStageId(rs.getInt("stage_id"));
+                    c.setStageName(rs.getString("stage_name")); // <-- Dòng 34 (giờ đã an toàn)
                     list.add(c);
                 }
             }
@@ -43,12 +50,18 @@ public class CustomerDao {
         }
         return list;
     }
-    // ========== READ: LẤY MỘT KHÁCH HÀNG THEO ID ==========
+
+    /**
+     * SỬA LỖI: Đã THÊM JOIN với Customer_Stages
+     */
     public Customer getCustomerById(int id) {
-        String sql = "SELECT * FROM Customers WHERE customer_id = ?";
+        String sql = "SELECT c.*, s.stage_name " +
+                     "FROM Customers c " +
+                     "JOIN Customer_Stages s ON c.stage_id = s.stage_id " +
+                     "WHERE c.customer_id = ?";
         try (Connection conn = DBConnector.makeConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-           
+            
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -61,8 +74,8 @@ public class CustomerDao {
                     c.setAddress(rs.getString("address"));
                     c.setCreatedBy(rs.getInt("created_by"));
                     c.setCreatedAt(rs.getTimestamp("created_at"));
-                    c.setCustomerType(rs.getString("customer_type"));
-                    c.setCreatedAt(rs.getTimestamp("created_at")); 
+                    c.setStageId(rs.getInt("stage_id"));
+                    c.setStageName(rs.getString("stage_name"));
                     return c;
                 }
             }
@@ -71,30 +84,36 @@ public class CustomerDao {
         }
         return null;
     }
-    // ========== CREATE: THÊM KHÁCH HÀNG MỚI ==========
+
+    /**
+     * SỬA LỖI: Dùng stage_id = 1 (Lead) thay vì customer_type
+     */
     public boolean insertCustomer(Customer c) {
-        String sql = "INSERT INTO Customers(full_name, date_of_birth, phone_number, email, address, created_by, customer_type) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        // SỬA: Bỏ customer_type, thêm stage_id
+        String sql = "INSERT INTO Customers(full_name, date_of_birth, phone_number, email, address, created_by, stage_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBConnector.makeConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
+            
             ps.setString(1, c.getFullName());
             ps.setDate(2, c.getDateOfBirth());
             ps.setString(3, c.getPhoneNumber());
             ps.setString(4, c.getEmail());
             ps.setString(5, c.getAddress());
             ps.setInt(6, c.getCreatedBy());
-            ps.setString(7, c.getCustomerType());
+            ps.setInt(7, 1); // Mặc định stage_id = 1 (Lead)
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
             e.printStackTrace();
         }
         return false;
     }
-    // ========== UPDATE: CẬP NHẬT THÔNG TIN KHÁCH HÀNG ==========
+
+    // updateCustomer (Giữ nguyên)
     public boolean updateCustomer(Customer c) {
-        // Lưu ý: Không cho phép cập nhật created_by
         String sql = "UPDATE Customers SET full_name=?, date_of_birth=?, phone_number=?, email=?, address=? WHERE customer_id=?";
         try (Connection conn = DBConnector.makeConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
+            
             ps.setString(1, c.getFullName());
             ps.setDate(2, c.getDateOfBirth());
             ps.setString(3, c.getPhoneNumber());
@@ -108,74 +127,101 @@ public class CustomerDao {
         return false;
     }
 
-
-    // ========== DELETE: XÓA KHÁCH HÀNG ==========
-public boolean deleteCustomer(int id) {
-    // String sql = "DELETE FROM Customers WHERE customer_id = ?"; // <-- Dòng cũ
-    String sql = "UPDATE Customers SET status = 'Inactive' WHERE customer_id = ?"; // <-- Dòng MỚI
-    try (Connection conn = DBConnector.makeConnection();
-         PreparedStatement ps = conn.prepareStatement(sql)) {
-        
-        ps.setInt(1, id);
-        return ps.executeUpdate() > 0;
-    } catch (Exception e) {
-        e.printStackTrace();
-    }
-    return false;
-}
-    // Thêm 2 phương thức này vào file dao/CustomerDao.java
-
-/**
- * Đếm số lượng khách hàng tiềm năng (Leads) của một Agent.
- */
-public int countLeadsByAgent(int agentId) {
-    String sql = "SELECT COUNT(*) FROM Customers WHERE created_by = ? AND customer_type = 'Lead'";
-    try (Connection conn = DBConnector.makeConnection();
-         PreparedStatement ps = conn.prepareStatement(sql)) {
-        
-        ps.setInt(1, agentId);
-        try (ResultSet rs = ps.executeQuery()) {
-            if (rs.next()) {
-                return rs.getInt(1);
-            }
-        }
-    } catch (Exception e) {
-        e.printStackTrace();
-    }
-    return 0;
-    }
-
     /**
-     * Đếm số lượng khách hàng đã chốt (Clients) của một Agent.
+     * SỬA LỖI: Dùng Soft Delete (CSDL của bạn có cột 'status')
      */
-    public int countClientsByAgent(int agentId) {
-        String sql = "SELECT COUNT(*) FROM Customers WHERE created_by = ? AND customer_type = 'Client'";
-        try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setInt(1, agentId);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(1);
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return 0;
-
-    }
-
-    public boolean updateCustomerType(int customerId, String customerType, int agentId) {
-        String sql = "UPDATE Customers SET customer_type = ? WHERE customer_id = ? AND created_by = ?";
-        try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setString(1, customerType);
-            ps.setInt(2, customerId);
-            ps.setInt(3, agentId); // Đảm bảo agent chỉ update được khách của mình
+    public boolean deleteCustomer(int id) {
+        // CSDL của bạn có cột status ENUM('Active', 'Inactive'), chúng ta nên dùng nó.
+        String sql = "UPDATE Customers SET status = 'Inactive' WHERE customer_id = ?"; 
+        try (Connection conn = DBConnector.makeConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, id);
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
             e.printStackTrace();
         }
         return false;
+    }
+
+    // --- CÁC HÀM "SẠCH" MÀ BẠN ĐÃ THÊM (GIỮ NGUYÊN) ---
+
+    public boolean updateCustomerStage(int customerId, int stageId, int agentId) {
+        String sql = "UPDATE Customers SET stage_id = ? WHERE customer_id = ? AND created_by = ?";
+        try (Connection conn = DBConnector.makeConnection(); 
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, stageId);
+            ps.setInt(2, customerId);
+            ps.setInt(3, agentId);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public Map<String, Integer> countCustomersByStage(int agentId) {
+        Map<String, Integer> stageCounts = new HashMap<>();
+        // Sắp xếp theo stage_order để giữ thứ tự (Lead, Potential, Client...)
+        String sql = "SELECT s.stage_name, COUNT(c.customer_id) as count " +
+                     "FROM Customers c " +
+                     "JOIN Customer_Stages s ON c.stage_id = s.stage_id " +
+                     "WHERE c.created_by = ? AND c.status = 'Active' " +
+                     "GROUP BY s.stage_id, s.stage_name, s.stage_order " +
+                     "ORDER BY s.stage_order"; 
+
+        try (Connection conn = DBConnector.makeConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setInt(1, agentId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    stageCounts.put(rs.getString("stage_name"), rs.getInt("count"));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return stageCounts;
+    }
+    
+    /**
+     * HÀM MỚI (CHO MANAGER DASHBOARD):
+     * Đếm tất cả khách hàng (theo 4 Giai đoạn) của TOÀN BỘ TEAM.
+     */
+    public Map<String, Integer> countTeamCustomersByStage(int managerId) {
+        Map<String, Integer> stageCounts = new HashMap<>();
+        // Khởi tạo 4 Giai đoạn
+        stageCounts.put("Lead", 0);
+        stageCounts.put("Potential", 0);
+        stageCounts.put("Client", 0);
+        stageCounts.put("Loyal", 0);
+
+        // SQL: JOIN Users -> Manager_Agent -> Customers -> Customer_Stages
+        String sql = """
+            SELECT 
+                cs.stage_name, 
+                COUNT(c.customer_id) AS stage_count
+            FROM Customers c
+            JOIN Users u ON c.created_by = u.user_id
+            JOIN Manager_Agent ma ON u.user_id = ma.agent_id
+            JOIN Customer_Stages cs ON c.stage_id = cs.stage_id
+            WHERE ma.manager_id = ? AND u.role_id = 1
+            GROUP BY cs.stage_name;
+        """;
+
+        try (Connection conn = DBConnector.makeConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setInt(1, managerId);
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    stageCounts.put(rs.getString("stage_name"), rs.getInt("stage_count"));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return stageCounts;
     }
 }

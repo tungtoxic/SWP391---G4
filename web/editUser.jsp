@@ -1,3 +1,9 @@
+<%-- 
+    Document   : editUser
+    Created on : Oct 5, 2025, 11:49:32 AM
+    Author     : hoang
+--%>
+
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="entity.User" %>
 <%@ page import="entity.Role" %>
@@ -17,7 +23,7 @@
     </head>
     <body class="container mt-4">
 
-        <h2>✏️ Edit User</h2>
+        <h2>✏️ Chỉnh sửa Người Dùng</h2>
         <form action="<%= request.getContextPath() %>/admin/management" method="post">
             <input type="hidden" name="action" value="edit"/>
             <input type="hidden" name="userId" value="<%= user.getUserId() %>"/>
@@ -28,7 +34,7 @@
             </div>
 
             <div class="mb-3">
-                <label class="form-label">Full Name:</label>
+                <label class="form-label">Họ tên:</label>
                 <input type="text" name="fullName" value="<%= user.getFullName() %>" class="form-control"/>
             </div>
 
@@ -38,12 +44,12 @@
             </div>
 
             <div class="mb-3">
-                <label class="form-label">Phone Number:</label>
+                <label class="form-label">Số điện thoại:</label>
                 <input type="text" name="phoneNumber" value="<%= user.getPhoneNumber() %>" class="form-control"/>
             </div>
 
             <div class="mb-3">
-                <label class="form-label">Role:</label>
+                <label class="form-label">Vai trò:</label>
                 <select name="role_id" class="form-select">
                     <% for(Role r : roles) { %>
                     <option value="<%= r.getRoleId() %>" <%= (r.getRoleId()==user.getRoleId() ? "selected" : "") %> >
@@ -54,15 +60,15 @@
             </div>
 
             <div class="mb-3">
-                <label class="form-label">Status:</label>
+                <label class="form-label">Trạng thái:</label>
                 <select name="status" class="form-select">
                     <option value="Active" <%= "Active".equals(user.getStatus()) ? "selected" : "" %>>Active</option>
                     <option value="Inactive" <%= "Inactive".equals(user.getStatus()) ? "selected" : "" %>>Inactive</option>
                 </select>
             </div>
 
-            <button type="submit" class="btn btn-primary">Update</button>
-            <a href="<%= request.getContextPath() %>/usermanagement.jsp" class="btn btn-secondary">Return</a>
+            <button type="submit" class="btn btn-primary">Cập nhật</button>
+            <a href="<%= request.getContextPath() %>/usermanagement.jsp" class="btn btn-secondary">Quay lại</a>
         </form>
 
     </body>

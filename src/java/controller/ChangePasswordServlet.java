@@ -72,8 +72,8 @@ public class ChangePasswordServlet extends HttpServlet {
                 request.setAttribute("error", "Mật khẩu cũ không đúng!");
             }
         } catch (Exception e) {
-            e.printStackTrace(); 
-            request.setAttribute("error", "Có lỗi xảy ra: " + e.getMessage()); 
+            e.printStackTrace(); // in stacktrace lên console/tomcat logs
+            request.setAttribute("error", "Có lỗi xảy ra: " + e.getMessage()); // tạm hiện lỗi chi tiết cho debug
         }
         request.getRequestDispatcher("changePassword.jsp").forward(request, response);
     }

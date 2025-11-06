@@ -1,25 +1,43 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 package entity;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 
+/**
+ *
+ * @author Nguyễn Tùng
+ */
 public class Product {
+    
     private int productId;
     private String productName;
-    private double basePrice;
-    private int categoryId;
+    private String description; // Cột này có trong CSDL của bạn
+    private int categoryId;     // Giữ lại vì nó có trong CSDL
+    private BigDecimal basePrice; // Dùng BigDecimal cho kiểu DECIMAL
     private Timestamp createdAt;
-    private Timestamp updateAt;
-    public Product() {}
+    private Timestamp updatedAt;
+    private int durationMonths;
 
-    public Product(int productId, String productName, double basePrice, int categoryId, Timestamp createdAt, Timestamp updateAt) {
-        this.productId = productId;
-        this.productName = productName;
-        this.basePrice = basePrice;
-        this.categoryId = categoryId;
-        this.createdAt = createdAt;
-        this.updateAt = updateAt;
+    // Constructors
+    public Product() {
     }
 
+    public Product(int productId, String productName, String description, int categoryId, BigDecimal basePrice, Timestamp createdAt, Timestamp updatedAt, int durationMonths) {
+        this.productId = productId;
+        this.productName = productName;
+        this.description = description;
+        this.categoryId = categoryId;
+        this.basePrice = basePrice;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.durationMonths = durationMonths;
+    }
+
+    
     public int getProductId() {
         return productId;
     }
@@ -36,12 +54,12 @@ public class Product {
         this.productName = productName;
     }
 
-    public double getBasePrice() {
-        return basePrice;
+    public String getDescription() {
+        return description;
     }
 
-    public void setBasePrice(double basePrice) {
-        this.basePrice = basePrice;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public int getCategoryId() {
@@ -52,6 +70,14 @@ public class Product {
         this.categoryId = categoryId;
     }
 
+    public BigDecimal getBasePrice() {
+        return basePrice;
+    }
+
+    public void setBasePrice(BigDecimal basePrice) {
+        this.basePrice = basePrice;
+    }
+
     public Timestamp getCreatedAt() {
         return createdAt;
     }
@@ -60,12 +86,20 @@ public class Product {
         this.createdAt = createdAt;
     }
 
-    public Timestamp getUpdateAt() {
-        return updateAt;
+    public Timestamp getUpdatedAt() {
+        return updatedAt;
     }
 
-    public void setUpdateAt(Timestamp updateAt) {
-        this.updateAt = updateAt;
+    public void setUpdatedAt(Timestamp updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
+    public int getDurationMonths() {
+        return durationMonths;
+    }
+
+    public void setDurationMonths(int durationMonths) {
+        this.durationMonths = durationMonths;
+    }
+    
 }

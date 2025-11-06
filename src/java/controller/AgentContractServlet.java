@@ -10,7 +10,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-
+import java.time.LocalDate;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.Date;
@@ -110,7 +110,6 @@ public class AgentContractServlet extends HttpServlet {
             throws Exception {
         List<ContractDTO> contractList = contractDao.getContractsByAgentId(currentUser.getUserId());
         request.setAttribute("contractList", contractList);
-        request.setAttribute("activePage", "contracts");
         request.getRequestDispatcher("/agent_contract_list.jsp").forward(request, response);
     }
 
@@ -123,29 +122,53 @@ public class AgentContractServlet extends HttpServlet {
 
         request.setAttribute("customerList", customerList);
         request.setAttribute("productList", productList);
-        request.setAttribute("activePage", "contracts");
         // (Không cần set currentUser nữa vì đã làm ở doGet)
         request.getRequestDispatcher("/agent_add_contract.jsp").forward(request, response);
     }
 
     // MỚI: Xử lý logic thêm mới
-    private void insertContract(HttpServletRequest request, HttpServletResponse response, User currentUser)
+private void insertContract(HttpServletRequest request, HttpServletResponse response, User currentUser)
             throws Exception {
+
+        // 1. Lấy 3 input "sạch" từ Agent
         int customerId = Integer.parseInt(request.getParameter("customerId"));
         int productId = Integer.parseInt(request.getParameter("productId"));
-        Date startDate = Date.valueOf(request.getParameter("startDate"));
-        BigDecimal premiumAmount = new BigDecimal(request.getParameter("premiumAmount"));
+        Date startDate = Date.valueOf(request.getParameter("startDate")); // java.sql.Date
 
+        // 2. Lấy "Cái khuôn" (Product) để lấy "luật"
+        Product product = productDao.getProductById(productId);
+
+        // 3. Xử lý lỗi nếu không tìm thấy "khuôn"
+        if (product == null) {
+            // Nếu "khuôn" không tồn tại, quay lại form với thông báo lỗi
+            request.setAttribute("errorMessage", "Lỗi: Sản phẩm không tồn tại.");
+            showAddForm(request, response, currentUser); // Tải lại form
+            return;
+        }
+
+        // 4. TỰ ĐỘNG HÓA (Automation) - Áp dụng "luật" từ "khuôn"
+        BigDecimal premiumAmount = product.getBasePrice(); // <-- Tự động lấy giá
+        int durationMonths = product.getDurationMonths(); // <-- Tự động lấy thời hạn
+
+        // Tính toán ngày kết thúc (endDate)
+        LocalDate localEndDate = startDate.toLocalDate().plusMonths(durationMonths);
+        Date endDate = Date.valueOf(localEndDate); // Chuyển về java.sql.Date
+
+        // 5. Tạo "Cái bánh" (Contract) đã được "chuẩn hóa"
         Contract newContract = new Contract();
         newContract.setCustomerId(customerId);
         newContract.setProductId(productId);
         newContract.setStartDate(startDate);
-        newContract.setPremiumAmount(premiumAmount);
         newContract.setAgentId(currentUser.getUserId());
-        newContract.setStatus("Pending"); // Hợp đồng mới luôn ở trạng thái Pending
+        newContract.setStatus("Pending"); // Hợp đồng mới luôn là Pending
 
+        // 6. Set 2 trường TỰ ĐỘNG TÍNH TOÁN
+        newContract.setPremiumAmount(premiumAmount);
+        newContract.setEndDate(endDate);
+
+        // 7. Lưu vào CSDL
         contractDao.insertContract(newContract);
-        response.sendRedirect(request.getContextPath() + "/agent/contracts");
+        response.sendRedirect(request.getContextPath() + "/agent/contracts?message=AddSuccess");
     }
 
     private void showEditForm(HttpServletRequest request, HttpServletResponse response, User currentUser)
@@ -161,7 +184,6 @@ public class AgentContractServlet extends HttpServlet {
             request.setAttribute("contract", existingContract);
             request.setAttribute("customerList", customerList);
             request.setAttribute("productList", productList);
-            request.setAttribute("activePage", "contracts");
             // (Không cần set currentUser nữa vì đã làm ở doGet)
             request.getRequestDispatcher("/agent_edit_contract.jsp").forward(request, response);
         } else {
@@ -174,45 +196,59 @@ public class AgentContractServlet extends HttpServlet {
             throws Exception {
 
         int contractId = Integer.parseInt(request.getParameter("contractId"));
-        System.out.println("--- DEBUG: Lấy được contractId = " + contractId);
 
-        // Bảo mật: Kiểm tra quyền sở hữu trước khi cập nhật
+        // Bảo mật: Kiểm tra quyền sở hữu TRƯỚC KHI làm bất cứ điều gì
         ContractDTO existingContract = contractDao.getContractById(contractId);
         if (existingContract == null || existingContract.getAgentId() != currentUser.getUserId() || !"Pending".equals(existingContract.getStatus())) {
             response.sendRedirect(request.getContextPath() + "/agent/contracts?message=AuthError");
             return;
         }
 
-        // Lấy thông tin từ form
+        // 1. Lấy 3 input "sạch" từ Agent
         int customerId = Integer.parseInt(request.getParameter("customerId"));
         int productId = Integer.parseInt(request.getParameter("productId"));
         Date startDate = Date.valueOf(request.getParameter("startDate"));
-        BigDecimal premiumAmount = new BigDecimal(request.getParameter("premiumAmount"));
 
+        // 2. Lấy "Cái khuôn" (Product) để lấy "luật"
+        Product product = productDao.getProductById(productId);
+
+        // 3. Xử lý lỗi nếu không tìm thấy "khuôn"
+        if (product == null) {
+            request.setAttribute("error", "Lỗi: Sản phẩm không tồn tại.");
+            showEditForm(request, response, currentUser); // Tải lại form edit
+            return;
+        }
+
+        // 4. TỰ ĐỘNG HÓA (Automation) - Áp dụng "luật" từ "khuôn"
+        BigDecimal premiumAmount = product.getBasePrice(); // <-- Tự động lấy giá
+        int durationMonths = product.getDurationMonths(); // <-- Tự động lấy thời hạn
+        
+        // Tính toán ngày kết thúc (endDate)
+        LocalDate localEndDate = startDate.toLocalDate().plusMonths(durationMonths);
+        Date endDate = Date.valueOf(localEndDate); // Chuyển về java.sql.Date
+
+        // 5. Tạo "Cái bánh" (Contract) đã được "chuẩn hóa"
         Contract contractToUpdate = new Contract();
-        contractToUpdate.setContractId(contractId);
+        contractToUpdate.setContractId(contractId); // ID của HĐ cũ
         contractToUpdate.setCustomerId(customerId);
         contractToUpdate.setProductId(productId);
         contractToUpdate.setStartDate(startDate);
-        contractToUpdate.setPremiumAmount(premiumAmount);
         contractToUpdate.setAgentId(currentUser.getUserId());
-        contractToUpdate.setStatus("Pending");
+        contractToUpdate.setStatus("Pending"); // Vẫn là Pending
 
+        // 6. Set 2 trường TỰ ĐỘNG TÍNH TOÁN
+        contractToUpdate.setPremiumAmount(premiumAmount);
+        contractToUpdate.setEndDate(endDate);
+
+        // 7. Cập nhật CSDL
         boolean success = contractDao.updateContract(contractToUpdate);
 
         if (success) {
             response.sendRedirect(request.getContextPath() + "/agent/contracts?message=UpdateSuccess");
         } else {
             // Nếu lỗi, setAttribute lỗi và forward lại
-            // (currentUser đã được set ở đầu doPost)
             request.setAttribute("error", "Cập nhật thất bại, vui lòng thử lại.");
-            
-            // Cần set lại các attribute này vì chúng ta đang forward, không phải redirect
-            request.setAttribute("contract", existingContract); // Gửi lại thông tin cũ
-            request.setAttribute("customerList", customerDao.getAllCustomersByAgentId(currentUser.getUserId()));
-            request.setAttribute("productList", productDao.getAllProducts());
-            
-            request.getRequestDispatcher("/agent_edit_contract.jsp").forward(request, response);
+            showEditForm(request, response, currentUser);
         }
     }
 

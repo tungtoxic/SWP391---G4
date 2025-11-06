@@ -62,6 +62,7 @@ public class RegisterServlet extends HttpServlet {
             if (error == null) {
                 String hashedPassword = PasswordUtils.hashPassword(password);
                 int roleId = userDAO.getRoleIdByName(roleName);
+
                 if (roleId == -1) {
                     error = "Vai trò không hợp lệ!";
                 } else {
@@ -92,6 +93,7 @@ public class RegisterServlet extends HttpServlet {
                                         + ",\n\nMã đăng ký của bạn là: " + otpValue
                                         + "\nMã có hiệu lực trong 5 phút."
                         );
+                        System.out.printf("otp"+ otpValue);
                     } catch (Exception e) {
                         error = "Không gửi được OTP: " + e.getMessage();
                         e.printStackTrace();

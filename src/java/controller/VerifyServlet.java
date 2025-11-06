@@ -33,7 +33,7 @@ public class VerifyServlet extends HttpServlet {
             return;
         }
 
-    
+        // 🔹 Kiểm tra OTP hợp lệ và chưa hết hạn (5 phút)
         long diff = System.currentTimeMillis() - otpTime;
         if (otp.equals(inputOtp) && diff <= 5 * 60 * 1000) {
             if ("register".equals(authType)) {

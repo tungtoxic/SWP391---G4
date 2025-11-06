@@ -39,3 +39,6 @@ web/src/conf/META-INF/context.xml
 /nbproject
 *.sql
 /nbproject
+/lib
+*.jar
+*.jar

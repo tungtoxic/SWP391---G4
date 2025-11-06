@@ -5,10 +5,10 @@
 
 package controller;
 
-import dao.*; 
-import entity.*;
 import dao.ContractDao;
 import dao.UserDao;
+import dao.TaskDao;
+import entity.Task;
 import entity.AgentPerformanceDTO;
 import entity.User;
 import jakarta.servlet.ServletException;
@@ -21,7 +21,8 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
-
+import java.util.Map;
+import java.util.ArrayList;
 /**
  *
  * @author Nguyễn Tùng
@@ -31,8 +32,9 @@ public class ManagerDashboardServlet extends HttpServlet {
 
     private ContractDao contractDao;
     private UserDao userDao;
-    private static final int ROLE_MANAGER = 2;
     private TaskDao taskDao;
+    private static final int ROLE_MANAGER = 2;
+
     @Override
     public void init() {
         contractDao = new ContractDao();
@@ -57,55 +59,92 @@ public class ManagerDashboardServlet extends HttpServlet {
             // 1. Lấy dữ liệu cho các KPI Cards (Dùng hàm DAO mới)
             BigDecimal teamPremiumThisMonth = contractDao.getTeamPremiumThisMonth(managerId);
             int expiringContractsCount = contractDao.countExpiringContractsByManagerId(managerId);
-            int pendingContractsCount = contractDao.countPendingContractsByManagerId(managerId); // Thêm KPI này
-            // Tận dụng hàm đã có trong UserDao (hoặc có thể tạo hàm count riêng nếu muốn)
+            int pendingContractsCount = contractDao.countPendingContractsByManagerId(managerId); 
+          // 2. Lấy dữ liệu cho Bảng Agent Performance Matrix
             List<AgentPerformanceDTO> teamPerformance = userDao.getTeamPerformance(managerId);
             
-            // Tính toán KPI Conversion Rate (Ví dụ, cần thêm hàm DAO)
-            // Tạm thời để fix cứng hoặc tính toán đơn giản nếu có
-            // int totalLeads = ...; // Cần hàm DAO đếm leads của team
-            // int newContracts = ...; // Cần hàm DAO đếm HĐ mới của team
-            // double conversionRate = (totalLeads > 0) ? ((double) newContracts / totalLeads) * 100 : 0.0;
-            
-            // 2. Lấy dữ liệu cho Bảng Agent Performance Matrix
-            // (Đã lấy ở trên: teamPerformance)
-
             // 3. Lấy dữ liệu cho Widget Team Leaderboard (Lấy top 5)
             List<AgentPerformanceDTO> managerLeaderboard = userDao.getManagerLeaderboard();
             if (managerLeaderboard.size() > 5) {
-                managerLeaderboard = managerLeaderboard.subList(0, 5); // Chỉ lấy 5 người đầu
+                managerLeaderboard = managerLeaderboard.subList(0, 5); 
             }
-
-            // 4. (Tương lai) Lấy dữ liệu cho Biểu đồ Product Distribution
-            // Map<String, Double> productDistribution = ... // Cần hàm DAO
-            List<Task> personalTasks = taskDao.getPersonalTasks(managerId); // Dùng managerId
             
+            // ==========================================================
+            // "VÁ" MỤC TIÊU 1: WIDGET (Personal To-Do List)
+            // ==========================================================
+            List<Task> personalTasks = taskDao.getPersonalTasks(managerId);
+            // ==========================================================
+            Map<String, Double> salesData = contractDao.getTeamMonthlySalesData(managerId); // <-- Gọi hàm mới (Bước 1)
+            List<String> teamSalesLabels = new ArrayList<>(salesData.keySet());
+            List<Double> teamSalesData = new ArrayList<>(salesData.values());
             // 5. Gửi dữ liệu sang JSP
-            request.setAttribute("currentUser", currentUser); // Gửi currentUser
-            request.setAttribute("activePage", "dashboard"); // Đặt activePage
+            request.setAttribute("currentUser", currentUser);
+            request.setAttribute("activePage", "dashboard"); 
 
             // Gửi dữ liệu KPI Cards
             request.setAttribute("teamPremiumThisMonth", teamPremiumThisMonth);
             request.setAttribute("expiringContractsCount", expiringContractsCount);
-            request.setAttribute("pendingContractsCount", pendingContractsCount); // Gửi số HĐ chờ duyệt
-            // request.setAttribute("teamConversionRate", conversionRate); // Gửi khi đã có
-            // request.setAttribute("teamNewContracts", newContracts); // Gửi khi đã có
-            // request.setAttribute("teamTotalLeads", totalLeads); // Gửi khi đã có
-
+            request.setAttribute("pendingContractsCount", pendingContractsCount);
+ 
             // Gửi dữ liệu Bảng và Widget
-            request.setAttribute("teamPerformanceList", teamPerformance); // Dùng cho bảng Matrix
-            request.setAttribute("leaderboardWidgetList", managerLeaderboard); // Dùng cho widget Leaderboard
+            request.setAttribute("teamPerformanceList", teamPerformance); 
+            request.setAttribute("leaderboardWidgetList", managerLeaderboard); 
+            request.setAttribute("personalTasks", personalTasks); // <-- "Sạch"
 
-            // Gửi dữ liệu Biểu đồ
-            // request.setAttribute("productLabels", ...); // Gửi khi đã có
-            // request.setAttribute("productData", ...); // Gửi khi đã có
-            request.setAttribute("personalTasks", personalTasks);
+            // (Mục tiêu 2: Biểu đồ sẽ để sau)
+            request.setAttribute("teamSalesLabels", teamSalesLabels); // <-- "SẠCH"
+            request.setAttribute("teamSalesData", teamSalesData);   // <-- "SẠCH"    
             // Forward
             request.getRequestDispatcher("/ManagerDashboard.jsp").forward(request, response);
-
         } catch (Exception e) {
             e.printStackTrace();
             throw new ServletException("Lỗi khi tải Manager Dashboard", e);
+        }
+    }
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        
+        request.setCharacterEncoding("UTF-8");
+        HttpSession session = request.getSession(false);
+        User currentUser = (session != null) ? (User) session.getAttribute("user") : null;
+        if (currentUser == null || currentUser.getRoleId() != ROLE_MANAGER) {
+            response.sendRedirect(request.getContextPath() + "/login.jsp");
+            return;
+        }
+
+        String action = request.getParameter("action");
+        
+        try {
+            switch (action) {
+                case "addPersonalTask":
+                    String taskTitle = request.getParameter("taskTitle");
+                    Task newTask = new Task();
+                    newTask.setUserId(currentUser.getUserId());
+                    newTask.setTitle(taskTitle);
+                    newTask.setCompleted(false);
+                    // (customerId và dueDate là NULL)
+                    taskDao.insertTask(newTask);
+                    break;
+                    
+                case "completeTask":
+                    int taskIdToComplete = Integer.parseInt(request.getParameter("taskId"));
+                    boolean isCompleted = "on".equals(request.getParameter("isCompleted"));
+                    taskDao.updateTaskStatus(taskIdToComplete, currentUser.getUserId(), isCompleted);
+                    break;
+                    
+                case "deleteTask":
+                    int taskIdToDelete = Integer.parseInt(request.getParameter("taskId"));
+                    taskDao.deleteTask(taskIdToDelete, currentUser.getUserId());
+                    break;
+            }
+            
+            // "Vá" (Patch) thành công: Chuyển hướng "an toàn" (safely)
+            response.sendRedirect(request.getContextPath() + "/manager/dashboard");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new ServletException("Lỗi khi xử lý POST request ở ManagerDashboard", e);
         }
     }
 }
