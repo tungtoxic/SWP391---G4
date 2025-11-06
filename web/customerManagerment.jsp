@@ -113,21 +113,7 @@
                                             <i class="fa fa-trash"></i>
                                         </a>
                                         
-                                        <div class="btn-group d-inline-block ms-1">
-                                            <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Chuyển Giai đoạn">
-                                                <i class="fa fa-sync-alt"></i>
-                                            </button>
-                                            <ul class="dropdown-menu">
-                                                <%-- Dùng vòng lặp động (thay vì "fix cứng") --%>
-                                                <% for (CustomerStage stage : stageList) { %>
-                                                    <li><a class="dropdown-item" 
-                                                           href="<%=ctx%>/agent/customers?action=updateStage&id=<%=customer.getCustomerId()%>&stageId=<%=stage.getStageId()%>">
-                                                           <%= stage.getStageName() %>
-                                                        </a>
-                                                    </li>
-                                                <% } %>
-                                            </ul>
-                                        </div>
+                                        
                                     </td>
                                 </tr>
                                 <%
