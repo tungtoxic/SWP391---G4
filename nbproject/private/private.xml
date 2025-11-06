@@ -5,6 +5,7 @@
         <group>
             <file>file:/D:/SWP/project/SWP391---G4/src/java/controller/RegisterServlet.java</file>
             <file>file:/D:/SWP/project/SWP391---G4/src/java/controller/ManagerDashboardServlet.java</file>
+            <file>file:/D:/SWP/project/SWP391---G4/src/java/controller/CustomerServlet.java</file>
             <file>file:/D:/SWP/project/SWP391---G4/src/java/dao/ContractDao.java</file>
         </group>
     </open-files>
