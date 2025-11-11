@@ -267,30 +267,33 @@ private void insertContract(HttpServletRequest request, HttpServletResponse resp
             response.sendRedirect(request.getContextPath() + "/agent/contracts?message=AuthError");
         }
     }
-    private void viewContractDetail(HttpServletRequest request, HttpServletResponse response, User currentUser)
-        throws ServletException, IOException {
-    try {
-        int contractId = Integer.parseInt(request.getParameter("id"));
-        ContractDTO contract = contractDao.getContractById(contractId); // Giả định bạn dùng DTO
-
-        // BẢO MẬT: Đảm bảo Agent chỉ xem được HĐ của mình
-        if (contract != null && contract.getAgentId() == currentUser.getUserId()) {
-
-            // Lấy thêm thông tin Khách hàng
-            Customer customer = customerDao.getCustomerById(contract.getCustomerId());
-
-            request.setAttribute("contract", contract);
-            request.setAttribute("customer", customer); // Gửi cả thông tin khách hàng
-            request.setAttribute("currentUser", currentUser);
-            request.setAttribute("activePage", "contracts"); // Giữ sidebar active
-
-            request.getRequestDispatcher("/agent_contract_detail.jsp").forward(request, response);
-        } else {
-            // Nếu cố xem HĐ của người khác
-            response.sendRedirect(request.getContextPath() + "/agent/contracts?message=AuthError");
+        private void viewContractDetail(HttpServletRequest request, HttpServletResponse response, User currentUser)
+            throws Exception {
+        int contractId = -1;
+        try {
+             contractId = Integer.parseInt(request.getParameter("id"));
+        } catch (NumberFormatException e) {
+             // Xử lý ID không hợp lệ - chuyển hướng hoặc báo lỗi
+             response.sendRedirect(request.getContextPath() + "/manager/contracts?message=invalidId");
+             return;
         }
-    } catch (Exception e) {
-        throw new ServletException(e);
-    }
+
+        ContractDTO contract = contractDao.getContractById(contractId);
+
+        // Kiểm tra bảo mật: Đảm bảo hợp đồng tồn tại VÀ agent tạo hợp đồng đó thuộc quản lý của manager này
+
+        Customer customerDetail = null;
+        if (contract != null) { // Chỉ lấy KH nếu HĐ tồn tại
+            customerDetail = customerDao.getCustomerById(contract.getCustomerId()); // Không cần chặn ở đây, JSP sẽ xử lý nếu customerDetail là null
+        }
+        // Đặt attribute cho trang chi tiết
+        request.setAttribute("contractDetail", contract);
+        request.setAttribute("customerDetail", customerDetail);
+        // Đặt activePage là "detail" hoặc giữ nguyên trang list ("all"/"pending")? Tạm dùng "detail".
+        request.setAttribute("activePage", "detail");
+        // currentUser đã được set ở doGet
+
+        // Forward đến trang JSP chi tiết mới
+        request.getRequestDispatcher("/agent_contract_detail.jsp").forward(request, response);
 }
 }

@@ -51,7 +51,7 @@
             <i class="fas fa-users me-2"></i> Customer
         </a>
         
-        <a class="nav-link text-white py-2 <%= "policies".equals(activePage) ? "active" : "" %>" href="#"> <%-- Sửa link # sau --%>
+        <a class="nav-link text-white py-2 <%= "policies".equals(activePage) ? "active" : "" %>" href="<%=ctx%>/agent/policies"> 
             <i class="fas fa-file-alt me-2"></i> Policies
         </a>
         

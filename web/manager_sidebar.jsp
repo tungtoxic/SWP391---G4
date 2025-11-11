@@ -46,7 +46,7 @@
         </div>
         <%-- ===== HẾT PHẦN SỬA LEADERBOARD ===== --%>
         
-        <a class="nav-link text-white py-2 <%= "commPolicies".equals(activePage) ? "active" : "" %>" href="#"><i class="fas fa-file-invoice-dollar me-2"></i> Commission Policies</a>
+        <a class="nav-link text-white py-2 <%= "commPolicies".equals(activePage) ? "active" : "" %>" href="<%=ctx%>/manager/policies"><i class="fas fa-file-invoice-dollar me-2"></i> Commission Policies</a>
         <a class="nav-link text-white py-2 <%= "productMgmt".equals(activePage) ? "active" : "" %>" href="<%=ctx%>/manager/products"><i class="fas fa-box me-2"></i> Product</a>
 
         <%-- Menu Contract (Giữ nguyên) --%>

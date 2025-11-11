@@ -45,15 +45,15 @@
 </head>
 <body>
 
-    <%@ include file="manager_navbar.jsp" %>
-    <%@ include file="manager_sidebar.jsp" %>
+    <%@ include file="agent_navbar.jsp" %>
+    <%@ include file="agent_sidebar.jsp" %>
 
     <main class="main-content">
         <div class="container-fluid">
             <div class="d-flex justify-content-between align-items-center mb-3">
                  <h1 class="mb-0">Chi tiết Hợp đồng: #<%= contract.getContractId() %></h1>
                  <%-- Nút quay lại danh sách --%>
-                 <a href="<%= ctx %>/manager/contracts?action=listAll" class="btn btn-outline-secondary">
+                 <a href="<%= ctx %>/agent/contracts?action=listAll" class="btn btn-outline-secondary">
                      <i class="fas fa-arrow-left me-1"></i> Quay lại Danh sách
                  </a>
             </div>
