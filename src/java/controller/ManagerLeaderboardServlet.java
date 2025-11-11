@@ -52,6 +52,7 @@ public class ManagerLeaderboardServlet extends HttpServlet {
 
             // Đặt danh sách vào request
             request.setAttribute("managerLeaderboard", managerLeaderboard);
+                             request.setAttribute("activePage", "leaderboard");
 
             // Chuyển tiếp đến trang JSP
             request.getRequestDispatcher("/manager_leaderboard.jsp").forward(request, response);

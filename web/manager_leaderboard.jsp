@@ -12,8 +12,14 @@
 <%
     String ctx = request.getContextPath();
     User currentUser = (User) session.getAttribute("user");
+    String activePage = (String) request.getAttribute("activePage");
     List<AgentPerformanceDTO> leaderboardList = (List<AgentPerformanceDTO>) request.getAttribute("managerLeaderboard");
     DecimalFormat currencyFormat = new DecimalFormat("###,###,##0 'VNĐ'");
+if (currentUser == null) {
+        response.sendRedirect(ctx + "/login.jsp");
+        return;
+    }
+    if (activePage == null) activePage = "leaderboard";
 %>
 <!DOCTYPE html>
 <html>
@@ -25,35 +31,10 @@
     <link rel="stylesheet" href="<%= ctx %>/css/layout.css" />
 </head>
 <body>
+    <%@ include file="manager_navbar.jsp" %>
+    <%@ include file="manager_sidebar.jsp" %>
+
     
-    <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom fixed-top">
-        <div class="container-fluid">
-            <a class="navbar-brand fw-bold" href="#">Manager Portal</a>
-            <ul class="navbar-nav d-flex flex-row align-items-center">
-                <li class="nav-item me-3"><a class="nav-link" href="#">Dashboard</a></li>
-                <li class="nav-item"><a class="nav-link" href="<%=ctx%>/logout"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
-            </ul>
-        </div>
-    </nav>
-
-    <aside class="sidebar bg-primary text-white">
-        <div class="sidebar-top p-3">
-              <div class="d-flex align-items-center mb-3">
-                  <div class="avatar rounded-circle bg-white me-2" style="width:36px;height:36px;"></div>
-                  <div>
-                      <div class="fw-bold"><%= currentUser != null ? currentUser.getFullName() : "Manager" %></div>
-                      <div style="font-size:.85rem;opacity:.9">Manager</div>
-                  </div>
-              </div>
-        </div>
-        <nav class="nav flex-column px-2">
-            <a class="nav-link text-white py-2" href="#">Dashboard</a>
-            <a class="nav-link text-white active py-2" href="<%=ctx%>/leaderboard/managers">Leaderboard</a>
-            <a class="nav-link text-white py-2" href="<%=ctx%>/manager/contracts">Contract Approval</a>
-            <a class="nav-link text-white py-2" href="<%=ctx%>/manager/performance">Agent Performance</a>
-        </nav>
-    </aside>
-
     <main class="main-content">
         <div class="container-fluid">
             <h1 class="mb-4"><i class="fas fa-sitemap me-2"></i> Manager Leaderboard</h1>
@@ -99,5 +80,7 @@
             </div>
         </div>
     </main>
+                                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
 </html>
