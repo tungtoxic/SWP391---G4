@@ -28,7 +28,7 @@ import java.util.List;
 /**
  * Servlet MỚI: Quản lý CRUD cho Commission Policies (nghiệp vụ của Manager).
  */
-@WebServlet(name = "CommissionPolicyServlet", urlPatterns = {"/manager/policies"})
+@WebServlet(name = "CommissionPolicyServlet", urlPatterns = {"/manager/policiesss"})
 public class CommissionPolicyServlet extends HttpServlet {
 
     private CommissionPolicyDao policyDao;
