@@ -59,7 +59,9 @@ public class AgentContractServlet extends HttpServlet {
                 case "delete": // THÊM MỚI
                     deleteContract(request, response, currentUser);
                     break;
-
+                case "viewDetail":
+                    viewContractDetail(request, response, currentUser);
+                    break;
                 default:
                     listContracts(request, response, currentUser);
                     break;
@@ -265,4 +267,30 @@ private void insertContract(HttpServletRequest request, HttpServletResponse resp
             response.sendRedirect(request.getContextPath() + "/agent/contracts?message=AuthError");
         }
     }
+    private void viewContractDetail(HttpServletRequest request, HttpServletResponse response, User currentUser)
+        throws ServletException, IOException {
+    try {
+        int contractId = Integer.parseInt(request.getParameter("id"));
+        ContractDTO contract = contractDao.getContractById(contractId); // Giả định bạn dùng DTO
+
+        // BẢO MẬT: Đảm bảo Agent chỉ xem được HĐ của mình
+        if (contract != null && contract.getAgentId() == currentUser.getUserId()) {
+
+            // Lấy thêm thông tin Khách hàng
+            Customer customer = customerDao.getCustomerById(contract.getCustomerId());
+
+            request.setAttribute("contract", contract);
+            request.setAttribute("customer", customer); // Gửi cả thông tin khách hàng
+            request.setAttribute("currentUser", currentUser);
+            request.setAttribute("activePage", "contracts"); // Giữ sidebar active
+
+            request.getRequestDispatcher("/agent_contract_detail.jsp").forward(request, response);
+        } else {
+            // Nếu cố xem HĐ của người khác
+            response.sendRedirect(request.getContextPath() + "/agent/contracts?message=AuthError");
+        }
+    } catch (Exception e) {
+        throw new ServletException(e);
+    }
+}
 }

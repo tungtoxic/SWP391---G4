@@ -75,7 +75,7 @@
                                             </a>
                                         <% } else { %>
                                             <%-- Có thể để trống hoặc hiển thị nút xem chi tiết --%>
-                                            <a href="#" class="btn btn-sm btn-info" title="View Details"><i class="fa fa-eye"></i></a>
+                                            <a href="<%=ctx%>/agent/contracts?action=viewDetail&id=<%= c.getContractId() %>" class="btn btn-sm btn-info" title="View Details"><i class="fa fa-eye"></i></a>
                                         <% } %>
                                     </td>
                                 </tr>
