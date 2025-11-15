@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
- */
 package controller;
 
 import dao.UserDao;
@@ -10,11 +6,16 @@ import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;
-import java.sql.SQLException;
-import java.util.Random;
+// import java.sql.SQLException; // (Không (Not) "cần" (needed))
+// import java.util.Random; // (KHÔNG (NO) "OTP")
 import java.util.regex.Pattern;
-import utility.*;
+import utility.*; // (Cần (Need) "PasswordUtils" VÀ "VerifyRecaptcha")
 
+/**
+ * ĐÃ "VÁ" (PATCHED) (Phiên bản "Lai" (Hybrid))
+ * (Đã GỠ BỎ (REMOVED) "OTP" (Xác thực 2 bước))
+ * (ĐÃ GIỮ LẠI (KEPT) "Captcha" (Xác thực))
+ */
 @WebServlet("/register")
 public class RegisterServlet extends HttpServlet {
 
@@ -25,6 +26,7 @@ public class RegisterServlet extends HttpServlet {
             throws ServletException, IOException {
         req.setCharacterEncoding("UTF-8");
 
+        // 1. Lấy (Get) "Dữ liệu" (Data) (GIỮ LẠI (KEPT) "Captcha" (Xác thực))
         String username = req.getParameter("username");
         String fullName = req.getParameter("fullName");
         String email = req.getParameter("email");
@@ -32,24 +34,24 @@ public class RegisterServlet extends HttpServlet {
         String confirmPassword = req.getParameter("confirmPassword");
         String phoneNumber = req.getParameter("phoneNumber");
         String roleName = req.getParameter("role");
-        String gRecaptchaResponse = req.getParameter("g-recaptcha-response");
+        String gRecaptchaResponse = req.getParameter("g-recaptcha-response"); // (GIỮ LẠI (KEPT))
 
         String error = null;
 
         try {
-            // ✅ Validate dữ liệu
+            // 2. "Validate" (Xác thực) (GIỮ LẠI (KEPT) "Captcha" (Xác thực))
             boolean captchaValid = VerifyRecaptcha.verify(gRecaptchaResponse);
             if (!captchaValid) {
                 error = "Captcha không hợp lệ.";
             } else if (username == null || username.trim().length() < 3) {
                 error = "Username phải >= 3 ký tự";
-            } else if (userDAO.checkUsernameExists(username)) {
+            } else if (userDAO.checkUsernameExists(username)) { //
                 error = "Username đã tồn tại";
             } else if (fullName == null || fullName.trim().length() < 3) {
                 error = "Full name phải >= 3 ký tự";
             } else if (!Pattern.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$", email)) {
                 error = "Email không hợp lệ";
-            } else if (userDAO.checkEmailExists(email)) {
+            } else if (userDAO.checkEmailExists(email)) { //
                 error = "Email đã tồn tại";
             } else if (password == null || password.length() < 6) {
                 error = "Mật khẩu phải >= 6 ký tự";
@@ -57,14 +59,17 @@ public class RegisterServlet extends HttpServlet {
                 error = "Mật khẩu nhập lại không khớp";
             } else if (!Pattern.matches("^\\d{9,11}$", phoneNumber)) {
                 error = "Số điện thoại phải 9-11 chữ số";
+            } else if (userDAO.isPhoneExists(phoneNumber)){ // (Bổ sung (Added) "check" (kiểm tra) "trùng" (duplicate) SĐT)
+                 error = "Số điện thoại đã tồn tại";
             }
 
+            // 3. "Xử lý" (Process) (Nếu (If) "vượt qua" (passed) "validate" (xác thực))
             if (error == null) {
                 String hashedPassword = PasswordUtils.hashPassword(password);
-                int roleId = userDAO.getRoleIdByName(roleName);
+                int roleId = userDAO.getRoleIdByName(roleName); //
 
-                if (roleId == -1) {
-                    error = "Vai trò không hợp lệ!";
+                if (roleId == -1 || roleId == 3) { // (GỠ BỎ (REMOVED) "Admin" (Quản trị viên))
+                    error = "Vai trò không hợp lệ (Chỉ (Only) Agent/Manager)!";
                 } else {
                     User user = new User();
                     user.setUsername(username);
@@ -73,36 +78,25 @@ public class RegisterServlet extends HttpServlet {
                     user.setEmail(email);
                     user.setPhoneNumber(phoneNumber);
                     user.setRoleId(roleId);
-                    user.setStatus("Active");
+                    user.setStatus("Active"); 
+                    user.setIsFirstLogin(true); 
+                    
+                    // (GỠ BỎ (REMOVED) "Toàn bộ" (Entire) "Block" (Khối) "Sinh OTP" (Generate OTP))
+                    // (GỠ BỎ (REMOVED) "Toàn bộ" (Entire) "Block" (Khối) "Gửi Email" (Send Email))
+                    // (GỠ BỎ (REMOVED) "forward" (Chuyển tiếp) "đến" (to) "verify.jsp")
 
-                    // ✅ Sinh OTP
-                    int otpValue = 100000 + new Random().nextInt(900000);
+                    // === "VÁ" (PATCH): "CHÈN" (INSERT) "TRỰC TIẾP" (DIRECTLY) ===
+                    boolean success = userDAO.insertUser(user); //
 
-                    HttpSession session = req.getSession();
-                    session.setAttribute("tempUser", user);
-                    session.setAttribute("otp", String.valueOf(otpValue));
-                    session.setAttribute("otpTime", System.currentTimeMillis());
-                    session.setAttribute("authType", "register");
-
-                    // ✅ Gửi OTP qua email
-                    try {
-                        EmailUtil.sendEmail(
-                                user.getEmail(),
-                                "Mã đăng ký",   // 👈 đổi tiêu đề
-                                "Xin chào " + user.getFullName()
-                                        + ",\n\nMã đăng ký của bạn là: " + otpValue
-                                        + "\nMã có hiệu lực trong 5 phút."
-                        );
-                        System.out.printf("otp"+ otpValue);
-                    } catch (Exception e) {
-                        error = "Không gửi được OTP: " + e.getMessage();
-                        e.printStackTrace();
+                    if (success) {
+                        HttpSession session = req.getSession();
+                        session.setAttribute("registerMessage", "Đăng ký thành công! Vui lòng đăng nhập.");
+                        resp.sendRedirect(req.getContextPath() + "/login.jsp");
+                        return; // (DỪNG (STOP))
+                    } else {
+                        error = "Lỗi CSDL (Database Error): Không thể (Could not) 'tạo' (create) User.";
                     }
-
-                    if (error == null) {
-                        req.getRequestDispatcher("verify.jsp").forward(req, resp);
-                        return;
-                    }
+                    // ===================================
                 }
             }
 
@@ -111,6 +105,7 @@ public class RegisterServlet extends HttpServlet {
             error = "Lỗi hệ thống: " + e.getMessage();
         }
 
+        // 4. "Fallback" (Phương án dự phòng)
         req.setAttribute("error", error);
         req.getRequestDispatcher("register.jsp").forward(req, resp);
     }
