@@ -27,7 +27,7 @@
             <i class="fas fa-chart-line me-2"></i> Dashboard
         </a>
         
-        <a class="nav-link text-white py-2 <%= "profile".equals(activePage) ? "active" : "" %>" href="<%=ctx%>/profile.jsp">
+        <a class="nav-link text-white py-2 <%= "profile".equals(activePage) ? "active" : "" %>" href="<%=ctx%>/profile">
             <i class="fas fa-user me-2"></i> Profile
         </a>
         

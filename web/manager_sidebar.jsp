@@ -20,7 +20,7 @@
 
     <nav class="nav flex-column px-2">
         <a class="nav-link text-white py-2 <%= "dashboard".equals(activePage) ? "active" : "" %>" href="<%=ctx%>/manager/dashboard"><i class="fas fa-chart-line me-2"></i> Dashboard</a>
-        <a class="nav-link text-white py-2 <%= "profile".equals(activePage) ? "active" : "" %>" href="<%=ctx%>/profile.jsp"><i class="fas fa-user me-2"></i> Profile</a>
+        <a class="nav-link text-white py-2 <%= "profile".equals(activePage) ? "active" : "" %>" href="<%=ctx%>/profile"><i class="fas fa-user me-2"></i> Profile</a>
         <a class="nav-link text-white py-2 <%= "performance".equals(activePage) ? "active" : "" %>" href="<%=ctx%>/manager/performance"><i class="fas fa-users-cog me-2"></i> Team Performance</a>
 
         <%-- ===== MENU LEADERBOARD XỔ XUỐNG (ĐÃ SỬA) ===== --%>
