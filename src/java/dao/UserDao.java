@@ -10,8 +10,11 @@ import java.util.Random;
 import utility.DBConnector;
 
 public class UserDao {
-    // ... (Hàm login()... giữ nguyên)
-    public User login(String username, String password) {
+    // ... (Tất cả các hàm "di sản" (legacy) (từ login() đến registerUser()) 
+    //      được GIỮ NGUYÊN (UNCHANGED).
+    //      (Tôi "thu gọn" (collapse) chúng ở đây cho "dễ đọc" (readability)).
+    
+    public User login(String username, String password) { /* (Giữ nguyên code) */ 
         String sql = "SELECT * FROM Users WHERE username = ? AND password_hash = ? AND status ='Active'";
         try (Connection conn = DBConnector.makeConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -42,9 +45,7 @@ public class UserDao {
         }
         return null;
     }
-
-    // ... (Hàm checkEmailExists()... giữ nguyên)
-    public boolean checkEmailExists(String email) {
+    public boolean checkEmailExists(String email) { /* (Giữ nguyên code) */ 
         String sql = "SELECT user_id FROM Users WHERE email = ?";
         try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, email);
@@ -56,9 +57,7 @@ public class UserDao {
         }
         return false;
     }
-
-    // ... (Hàm checkUsernameExists()... giữ nguyên)
-    public boolean checkUsernameExists(String username) {
+    public boolean checkUsernameExists(String username) { /* (Giữ nguyên code) */ 
         String sql = "SELECT user_id FROM Users WHERE username = ?";
         try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, username);
@@ -70,9 +69,7 @@ public class UserDao {
         }
         return false;
     }
-
-    // ... (Hàm isUsernameExists()... giữ nguyên)
-    public boolean isUsernameExists(String username) throws SQLException {
+    public boolean isUsernameExists(String username) throws SQLException { /* (Giữ nguyên code) */ 
         String sql = "SELECT COUNT(*) FROM Users WHERE username = ?";
         try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, username);
@@ -84,9 +81,7 @@ public class UserDao {
         }
         return false;
     }
-    
-    // ... (Hàm isPhoneExists()... giữ nguyên)
-    public boolean isPhoneExists(String phoneNumber) throws SQLException {
+    public boolean isPhoneExists(String phoneNumber) throws SQLException { /* (Giữ nguyên code) */ 
         String sql = "SELECT COUNT(*) FROM Users WHERE phone_number = ?";
         try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, phoneNumber);
@@ -98,9 +93,7 @@ public class UserDao {
         }
         return false;
     }
-
-    // ... (Hàm insertUser()... giữ nguyên)
-    public boolean insertUser(User user) throws SQLException {
+    public boolean insertUser(User user) throws SQLException { /* (Giữ nguyên code) */ 
         String sql = "INSERT INTO users (username, password_hash, full_name, email, phone_number, role_id, status, is_first_login) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, user.getUsername());
@@ -114,9 +107,7 @@ public class UserDao {
             return ps.executeUpdate() > 0;
         }
     }
-
-    // ... (Hàm getRoleIdByName()... giữ nguyên)
-    public int getRoleIdByName(String roleName) throws SQLException {
+    public int getRoleIdByName(String roleName) throws SQLException { /* (Giữ nguyên code) */ 
         String sql = "SELECT role_id FROM Roles WHERE role_name = ?";
         try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, roleName);
@@ -128,9 +119,7 @@ public class UserDao {
         }
         return -1; 
     }
-    
-    // ... (Hàm getAllUsers()... giữ nguyên)
-    public List<User> getAllUsers(String roleIdFilter) throws SQLException {
+    public List<User> getAllUsers(String roleIdFilter) throws SQLException { /* (Giữ nguyên code) */ 
         List<User> userList = new ArrayList<>();
         StringBuilder sql = new StringBuilder("SELECT u.*, r.role_name FROM Users u JOIN Roles r ON u.role_id = r.role_id");
         List<Object> params = new ArrayList<>();
@@ -162,9 +151,7 @@ public class UserDao {
         }
         return userList;
     }
-
-    // ... (Hàm getRoleNameById()... giữ nguyên)
-    public String getRoleNameById(int roleId) throws SQLException {
+    public String getRoleNameById(int roleId) throws SQLException { /* (Giữ nguyên code) */ 
         String sql = "SELECT role_name FROM Roles WHERE role_id = ?";
         try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, roleId);
@@ -176,9 +163,7 @@ public class UserDao {
         }
         return "Unknown";
     }
-
-    // ... (Hàm getUserById()... giữ nguyên)
-    public User getUserById(int id) throws SQLException {
+    public User getUserById(int id) throws SQLException { /* (Giữ nguyên code) */ 
         String sql = "SELECT u.*, r.role_name FROM Users u JOIN Roles r ON u.role_id = r.role_id WHERE u.user_id = ?";
         try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
@@ -194,9 +179,7 @@ public class UserDao {
         }
         return null;
     }
-    
-    // ... (Hàm getUsersByRoleId()... giữ nguyên)
-    public List<User> getUsersByRoleId(int roleId) throws SQLException {
+    public List<User> getUsersByRoleId(int roleId) throws SQLException { /* (Giữ nguyên code) */ 
         List<User> users = new ArrayList<>();
         String sql = """
             SELECT u.*, r.role_name
@@ -219,9 +202,7 @@ public class UserDao {
         }
         return users;
     }
-
-    // ... (Hàm updateUser()... giữ nguyên)
-    public boolean updateUser(User user) throws SQLException {
+    public boolean updateUser(User user) throws SQLException { /* (Giữ nguyên code) */ 
         String sql = "UPDATE Users SET username=?, password_hash=?, full_name=?, email=?, phone_number=?, role_id=?, status=?, is_first_login=? WHERE user_id=?";
         try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, user.getUsername());
@@ -236,27 +217,21 @@ public class UserDao {
             return ps.executeUpdate() > 0;
         }
     }
-    
-    // ... (Hàm activateUserById()... giữ nguyên)
-    public boolean activateUserById(int id) throws SQLException {
+    public boolean activateUserById(int id) throws SQLException { /* (Giữ nguyên code) */ 
         String sql = "UPDATE Users SET status = 'Active' WHERE user_id = ?";
         try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             return ps.executeUpdate() > 0;
         }
     }
-
-    // ... (Hàm deactivateUserById()... giữ nguyên)
-    public boolean deactivateUserById(int id) throws SQLException {
+    public boolean deactivateUserById(int id) throws SQLException { /* (Giữ nguyên code) */ 
         String sql = "UPDATE Users SET status = 'Inactive' WHERE user_id = ?";
         try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             return ps.executeUpdate() > 0;
         }
     }
-
-    // ... (Hàm getContractCountByAgent()... giữ nguyên)
-    public int getContractCountByAgent(int agentId) {
+    public int getContractCountByAgent(int agentId) { /* (Giữ nguyên code) */ 
         String sql = "SELECT COUNT(*) FROM Contracts WHERE agent_id = ?";
         try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, agentId);
@@ -270,9 +245,7 @@ public class UserDao {
         }
         return 0;
     }
-
-    // ... (Hàm getTotalCommissionByAgent()... giữ nguyên)
-    public double getTotalCommissionByAgent(int agentId) {
+    public double getTotalCommissionByAgent(int agentId) { /* (Giữ nguyên code) */ 
         String sql = "SELECT IFNULL(SUM(amount), 0.00) FROM Commissions WHERE agent_id = ?";
         try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, agentId);
@@ -286,9 +259,7 @@ public class UserDao {
         }
         return 0.0;
     }
-
-    // ... (Hàm generateTempPassword()... giữ nguyên)
-    public static String generateTempPassword(int length) {
+    public static String generateTempPassword(int length) { /* (Giữ nguyên code) */ 
         String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"; 
         StringBuilder sb = new StringBuilder();
         Random random = new Random();
@@ -297,9 +268,7 @@ public class UserDao {
         }
         return sb.toString();
     }
-    
-    // ... (Hàm createUser()... giữ nguyên)
-    public boolean createUser(User user) throws SQLException {
+    public boolean createUser(User user) throws SQLException { /* (Giữ nguyên code) */ 
         String sql = "INSERT INTO Users (username, password_hash, full_name, email, phone_number, role_id, status, is_first_login) "
                 + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -314,9 +283,7 @@ public class UserDao {
             return ps.executeUpdate() > 0;
         }
     }
-    
-    // ... (Hàm deleteUser()... giữ nguyên)
-    public boolean deleteUser(int userId) throws SQLException {
+    public boolean deleteUser(int userId) throws SQLException { /* (Giữ nguyên code) */ 
         String sql = "DELETE FROM Users WHERE user_id=?";
         try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, userId);
@@ -327,9 +294,7 @@ public class UserDao {
             throw e; 
         }
     }
-    
-    // ... (Hàm updatePassword()... giữ nguyên)
-    public boolean updatePassword(int userId, String newPasswordHash) {
+    public boolean updatePassword(int userId, String newPasswordHash) { /* (Giữ nguyên code) */ 
         String sql = "UPDATE Users SET password_hash = ?, is_first_login = false WHERE user_id = ?";
         try (Connection con = DBConnector.makeConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, newPasswordHash);
@@ -340,9 +305,7 @@ public class UserDao {
             return false;
         }
     }
-
-    // ... (Hàm registerUser()... giữ nguyên)
-    public boolean registerUser(User user) throws SQLException {
+    public boolean registerUser(User user) throws SQLException { /* (Giữ nguyên code) */ 
         String sql = "INSERT INTO Users (full_name, email, phone_number, role_id, status, is_first_login) "
                 + "VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -358,22 +321,20 @@ public class UserDao {
 
     /**
      * Lấy hiệu suất của các Agent trong team của Manager.
-     * === ĐÃ "VÁ" (PATCHED) LỖI SQL (GROUP BY) ===
+     * === ĐÃ "VÁ" (PATCHED) (Thêm "baseline_target") ===
      */
     public List<AgentPerformanceDTO> getTeamPerformance(int managerId) {
         List<AgentPerformanceDTO> teamPerformance = new ArrayList<>();
         
-        // === BƯỚC "VÁ" (PATCH) SQL ===
-        // (1) Dùng MAX(t.target_amount) để "tổng hợp" (aggregate) Target
-        // (2) XÓA (REMOVE) "t.target_amount" khỏi "GROUP BY"
-        // (3) Sửa COUNT (đếm) sang COUNT(DISTINCT ...) để tránh đếm trùng HĐ
+        // === BƯỚC 3: "VÁ" (PATCH) SQL (Thêm "baseline_target") ===
         String sql = """
             SELECT
                 u.user_id,
                 u.full_name,
                 IFNULL(SUM(CASE WHEN c.status = 'Active' THEN c.premium_amount ELSE 0 END), 0) AS total_premium,
                 COUNT(DISTINCT CASE WHEN c.status = 'Active' THEN c.contract_id ELSE NULL END) AS contracts_count,
-                IFNULL(MAX(t.target_amount), 0.00) AS target_amount 
+                IFNULL(MAX(t.target_amount), 0.00) AS target_amount,
+                IFNULL(MAX(t.baseline_target), 0.00) AS baseline_target 
             FROM Users u
             JOIN Manager_Agent ma ON u.user_id = ma.agent_id
             LEFT JOIN Contracts c ON u.user_id = c.agent_id
@@ -384,7 +345,7 @@ public class UserDao {
             GROUP BY u.user_id, u.full_name
             ORDER BY total_premium DESC;
         """; 
-        // ============================
+        // ==================================================
 
         try (Connection conn = DBConnector.makeConnection(); 
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -392,7 +353,6 @@ public class UserDao {
             ps.setInt(1, managerId);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    // (1) Tạo DTO (Code cũ của bạn - đã TỐT)
                     AgentPerformanceDTO dto = new AgentPerformanceDTO(
                             rs.getInt("user_id"),
                             rs.getString("full_name"),
@@ -400,18 +360,21 @@ public class UserDao {
                             rs.getInt("contracts_count")
                     );
                     
-                    // (2) Set Target (Code cũ của bạn - đã TỐT)
                     double targetAmount = rs.getDouble("target_amount");
-                    dto.setTargetAmount(targetAmount);
+                    double baselineTarget = rs.getDouble("baseline_target"); // (Lấy "Baseline")
                     
-                    // (3) Tính % Vượt (Over-Achievement) (Code cũ của bạn - đã TỐT)
+                    dto.setTargetAmount(targetAmount);
+                    dto.setBaselineTarget(baselineTarget); // (Set "Baseline")
+                    
+                    // === BƯỚC 3: TÍNH % VƯỢT (OVER-ACHIEVEMENT) (DỰA TRÊN "BASELINE") ===
                     double overAchievementRate = 0.0;
-                    if (targetAmount > 0 && dto.getTotalPremium() > targetAmount) {
-                        overAchievementRate = ((dto.getTotalPremium() - targetAmount) / targetAmount) * 100;
+                    // (Lưu ý: "baselineTarget" (Target "Gốc") được dùng ở đây)
+                    if (baselineTarget > 0 && dto.getTotalPremium() > baselineTarget) {
+                        overAchievementRate = ((dto.getTotalPremium() - baselineTarget) / baselineTarget) * 100;
                     }
                     dto.setOverAchievementRate(overAchievementRate); 
+                    // ==========================================================
                     
-                    // (4) Thêm (Add) DTO vào List
                     teamPerformance.add(dto);
                 }
             }
@@ -422,8 +385,7 @@ public class UserDao {
     }
 
     // ... (Hàm getAllAgentsPerformance()... giữ nguyên)
-    // (Chúng ta cũng "vá" (patch) SQL ở đây cho "đồng bộ" (consistent))
-    public List<AgentPerformanceDTO> getAllAgentsPerformance() {
+    public List<AgentPerformanceDTO> getAllAgentsPerformance() { /* (Giữ nguyên code) */ 
         List<AgentPerformanceDTO> allAgents = new ArrayList<>();
         int agentRoleId = 1; 
         String sql = """
@@ -458,22 +420,27 @@ public class UserDao {
         return allAgents;
     }
     
-    // ... (Hàm setAgentTarget()... giữ nguyên)
+    /**
+     * === ĐÃ "VÁ" (PATCHED) (Thêm "baseline_target" (Chỉ INSERT, KHÔNG (NEVER) UPDATE)) ===
+     */
     public boolean setAgentTarget(int agentId, BigDecimal targetAmount, int month, int year) {
         String sql = """
-            INSERT INTO Agent_Targets (agent_id, target_amount, target_month, target_year)
-            VALUES (?, ?, ?, ?)
+            INSERT INTO Agent_Targets (agent_id, target_amount, target_month, target_year, baseline_target)
+            VALUES (?, ?, ?, ?, ?)
             ON DUPLICATE KEY UPDATE
-                target_amount = VALUES(target_amount);
+                target_amount = VALUES(target_amount); 
         """;
+        // (Lưu ý: "baseline_target" KHÔNG (NOT) nằm trong "ON DUPLICATE KEY UPDATE")
+        // (Nó chỉ được "set" (đặt) 1 LẦN (ONCE) khi "INSERT" (chèn))
         
         try (Connection conn = DBConnector.makeConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             
             ps.setInt(1, agentId);
-            ps.setBigDecimal(2, targetAmount);
+            ps.setBigDecimal(2, targetAmount); // (Target "Hiện tại" (Current))
             ps.setInt(3, month);
             ps.setInt(4, year);
+            ps.setBigDecimal(5, targetAmount); // (Target "Cơ sở" (Baseline) (dùng "cùng" (same) giá trị))
             
             return ps.executeUpdate() > 0; 
             
@@ -490,8 +457,7 @@ public class UserDao {
     }
     
     // ... (Hàm getManagerLeaderboard()... giữ nguyên)
-    // (Chúng ta cũng "vá" (patch) SQL ở đây cho "đồng bộ" (consistent))
-    public List<AgentPerformanceDTO> getManagerLeaderboard() {
+    public List<AgentPerformanceDTO> getManagerLeaderboard() { /* (Giữ nguyên code) */ 
         List<AgentPerformanceDTO> leaderboard = new ArrayList<>();
         String sql = """
             SELECT
@@ -523,7 +489,7 @@ public class UserDao {
     }
 
     // ... (Hàm getAgentsByManagerId()... giữ nguyên)
-    public List<User> getAgentsByManagerId(int managerId) {
+    public List<User> getAgentsByManagerId(int managerId) { /* (Giữ nguyên code) */ 
         List<User> agentList = new ArrayList<>();
         String sql = "SELECT u.*, r.role_name " + 
                      "FROM Users u " +
@@ -546,7 +512,7 @@ public class UserDao {
     }
 
     // ... (Hàm getUsersByStatus()... giữ nguyên)
-    public List<User> getUsersByStatus(String status) throws SQLException {
+    public List<User> getUsersByStatus(String status) throws SQLException { /* (Giữ nguyên code) */ 
         List<User> list = new ArrayList<>();
         String sql = "SELECT u.*, r.role_name FROM Users u "
                 + "JOIN Roles r ON u.role_id = r.role_id "
@@ -567,7 +533,7 @@ public class UserDao {
     }
 
     // ... (Hàm updateAgent()... giữ nguyên)
-    public boolean updateAgent(User user) throws SQLException {
+    public boolean updateAgent(User user) throws SQLException { /* (Giữ nguyên code) */ 
         String sql = "UPDATE users SET full_name=?, email=?, phone_number=? WHERE user_id =? AND role_id = 1"; 
         try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, user.getFullName());
@@ -579,7 +545,7 @@ public class UserDao {
     }
     
     // ... (Hàm mapRowToUser()... giữ nguyên)
-    private User mapRowToUser(ResultSet rs) throws SQLException {
+    private User mapRowToUser(ResultSet rs) throws SQLException { /* (Giữ nguyên code) */ 
         User user = new User();
         user.setUserId(rs.getInt("user_id"));
         user.setUsername(rs.getString("username"));
@@ -604,7 +570,7 @@ public class UserDao {
     }
 
     // ... (Hàm isAgentManagedBy()... giữ nguyên)
-    public boolean isAgentManagedBy(int agentId, int managerId) {
+    public boolean isAgentManagedBy(int agentId, int managerId) { /* (Giữ nguyên code) */ 
         String sql = "SELECT COUNT(*) FROM Manager_Agent WHERE manager_id = ? AND agent_id = ?";
         try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, managerId);
@@ -621,16 +587,23 @@ public class UserDao {
         return false; 
     }
     
-    // ... (Hàm setTeamTarget()... giữ nguyên)
+    /**
+     * === ĐÃ "VÁ" (PATCHED) (Thêm "baseline_target" (Chỉ INSERT, KHÔNG (NEVER) UPDATE)) ===
+     */
     public boolean setTeamTarget(int managerId, BigDecimal targetAmount, int month, int year) {
+        // (Logic `setTeamTarget` "gốc" (original) của bạn đã "thông minh" (smart)
+        //  hơn logic `Controller` của tôi. 
+        //  Chúng ta sẽ "vá" (patch) logic `SQL` của bạn.)
+        
         String sql = """
-            INSERT INTO Agent_Targets (agent_id, target_amount, target_month, target_year)
+            INSERT INTO Agent_Targets (agent_id, target_amount, target_month, target_year, baseline_target)
             (
                 SELECT 
                     agent_id, 
                     ? AS target_amount, 
                     ? AS target_month, 
-                    ? AS target_year 
+                    ? AS target_year,
+                    ? AS baseline_target 
                 FROM 
                     Manager_Agent 
                 WHERE 
@@ -639,14 +612,16 @@ public class UserDao {
             ON DUPLICATE KEY UPDATE
                 target_amount = VALUES(target_amount);
         """;
+        // (Lưu ý: "baseline_target" KHÔNG (NOT) nằm trong "ON DUPLICATE KEY UPDATE")
         
         try (Connection conn = DBConnector.makeConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             
-            ps.setBigDecimal(1, targetAmount); 
+            ps.setBigDecimal(1, targetAmount); // (Target "Hiện tại" (Current))
             ps.setInt(2, month);
             ps.setInt(3, year);
-            ps.setInt(4, managerId);
+            ps.setBigDecimal(4, targetAmount); // (Target "Cơ sở" (Baseline))
+            ps.setInt(5, managerId);
             
             return ps.executeUpdate() > 0; 
             
