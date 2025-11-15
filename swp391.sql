@@ -759,3 +759,17 @@ INSERT INTO `Commissions` (contract_id, agent_id, policy_id, amount, status) VAL
 (LAST_INSERT_ID()-3, 17, 1, (3000000.00 * 0.05), 'Paid'),
 (LAST_INSERT_ID()-2, 17, 1, (12000000.00 * 0.05), 'Paid'),
 (LAST_INSERT_ID()-1, 17, 1, (3000000.00 * 0.05), 'Pending');
+
+ALTER TABLE Agent_Targets
+ADD COLUMN baseline_target DECIMAL(15, 2) DEFAULT 0.00;
+
+/* BƯỚC 1: "TẮT" (OFF) Chế độ An toàn (Safe Mode) (chỉ cho "phiên" (session) này) */
+SET SQL_SAFE_UPDATES = 0;
+
+/* BƯỚC 2: "CHẠY" (RUN) Lệnh "Vá" (Patch) GỐC (Original) của chúng ta (Bây giờ nó sẽ "qua" (pass)) */
+UPDATE Agent_Targets 
+SET baseline_target = target_amount 
+WHERE baseline_target = 0.00 OR baseline_target IS NULL;
+
+/* BƯỚC 3: "BẬT" (ON) lại Chế độ An toàn (Safe Mode) (để "bảo vệ" (protect) các "lần sau" (future)) */
+SET SQL_SAFE_UPDATES = 1;
