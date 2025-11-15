@@ -485,3 +485,277 @@ UPDATE Products SET duration_months = 12 WHERE category_id = 2;
 
 ALTER TABLE customer_interactions
 MODIFY COLUMN interaction_date DATETIME NOT NULL;
+
+INSERT INTO `Contracts` (customer_id, agent_id, product_id, start_date, end_date, status, premium_amount) 
+VALUES (4, 11, 3, '2025-05-01', '2035-05-01', 'Active', 12000000.00);
+INSERT INTO `Commissions` (contract_id, agent_id, policy_id, amount, status) 
+VALUES (LAST_INSERT_ID(), 11, 1, (12000000.00 * 0.05), 'Paid');
+
+-- 2. "Thắp sáng" (Light up) Agent 6 (user_id = 13)
+-- (Sử dụng Khách hàng 6 ('Nguyễn Thị Lan') và Sản phẩm 4 ('Gia Đình Là Nhất'))
+INSERT INTO `Contracts` (customer_id, agent_id, product_id, start_date, end_date, status, premium_amount) 
+VALUES (6, 13, 4, '2025-06-01', '2035-06-01', 'Pending', 18000000.00);
+-- (Không có Commission vì HĐ này là 'Pending')
+
+-- 3. "Thắp sáng" (Light up) Agent 8 (user_id = 15)
+-- (Sử dụng Khách hàng 8 ('Bùi Thu Thảo') và Sản phẩm 6 ('Sức Khỏe Bạch Kim'))
+INSERT INTO `Contracts` (customer_id, agent_id, product_id, start_date, end_date, status, premium_amount) 
+VALUES (8, 15, 6, '2025-07-01', '2026-07-01', 'Active', 8000000.00);
+INSERT INTO `Commissions` (contract_id, agent_id, policy_id, amount, status) 
+VALUES (LAST_INSERT_ID(), 15, 1, (8000000.00 * 0.05), 'Pending');
+
+-- 4. "Thắp sáng" (Light up) Agent 9 (user_id = 16)
+-- (Sử dụng Khách hàng 9 ('Lý Minh Tuấn') và Sản phẩm 7 ('Bảo Vệ Ung Thư Toàn Diện'))
+INSERT INTO `Contracts` (customer_id, agent_id, product_id, start_date, end_date, status, premium_amount) 
+VALUES (9, 16, 7, '2025-08-01', '2026-08-01', 'Active', 5000000.00);
+INSERT INTO `Commissions` (contract_id, agent_id, policy_id, amount, status) 
+VALUES (LAST_INSERT_ID(), 16, 1, (5000000.00 * 0.05), 'Paid');
+
+-- 5. "Thắp sáng" (Light up) Agent 10 (user_id = 17) (Agent 'Pending')
+-- (Tạo 1 HĐ 'Pending' cho Agent 'Pending' (user_id 17), sử dụng Khách hàng 18 ('Phan Thị Tuyết'))
+INSERT INTO `Contracts` (customer_id, agent_id, product_id, start_date, end_date, status, premium_amount) 
+VALUES (18, 17, 8, '2025-09-01', '2026-09-01', 'Pending', 3000000.00);
+
+USE `swp391`;
+
+-- =====================================================================
+-- SCRIPT BỔ SUNG 2 (BACKFILL)
+-- MỤC TIÊU: "Lấp đầy" (Backfill) quá khứ (Tháng 5, 6, 7, 9) cho 
+-- Agent 1 (ID 1) và Agent 2 (ID 4) để "thắp sáng" (light up) Bar Chart.
+-- =====================================================================
+
+-- 1. "Vá" (Patch) Quá khứ cho Agent 1 (user_id = 1)
+-- (Sử dụng Khách hàng 1 ('Lê Minh Anh') và Sản phẩm 1 ('Gói nhân thọ An Tâm' - 15Tr, 120 tháng))
+INSERT INTO `Contracts` (customer_id, agent_id, product_id, start_date, end_date, status, premium_amount) 
+VALUES (1, 1, 1, '2025-05-10', '2035-05-10', 'Active', 15000000.00);
+INSERT INTO `Commissions` (contract_id, agent_id, policy_id, amount, status) 
+VALUES (LAST_INSERT_ID(), 1, 1, (15000000.00 * 0.05), 'Paid');
+
+-- (Sử dụng Khách hàng 10 ('Mai Thị Phương') và Sản phẩm 6 ('Sức Khỏe Bạch Kim' - 8Tr, 12 tháng))
+INSERT INTO `Contracts` (customer_id, agent_id, product_id, start_date, end_date, status, premium_amount) 
+VALUES (10, 1, 6, '2025-07-20', '2026-07-20', 'Active', 8000000.00);
+INSERT INTO `Commissions` (contract_id, agent_id, policy_id, amount, status) 
+VALUES (LAST_INSERT_ID(), 1, 1, (8000000.00 * 0.05), 'Paid');
+
+
+-- 2. "Vá" (Patch) Quá khứ cho Agent 2 (user_id = 4)
+-- (Sử dụng Khách hàng 2 ('Trần Ngọc Bích') và Sản phẩm 7 ('Bảo Vệ Ung Thư' - 5Tr, 12 tháng))
+INSERT INTO `Contracts` (customer_id, agent_id, product_id, start_date, end_date, status, premium_amount) 
+VALUES (2, 4, 7, '2025-06-15', '2026-06-15', 'Active', 5000000.00);
+INSERT INTO `Commissions` (contract_id, agent_id, policy_id, amount, status) 
+VALUES (LAST_INSERT_ID(), 4, 1, (5000000.00 * 0.05), 'Paid');
+
+-- (Sử dụng Khách hàng 11 ('Trịnh Quang Vinh') và Sản phẩm 5 ('Đầu Tư Linh Hoạt 360' - 25Tr, 120 tháng))
+-- (Script Lượt 55 đã chèn HĐ cho CUST 11 vào T9/2025, nhưng chúng ta thêm 1 HĐ nữa cho T9)
+INSERT INTO `Contracts` (customer_id, agent_id, product_id, start_date, end_date, status, premium_amount) 
+VALUES (11, 4, 5, '2025-09-02', '2035-09-02', 'Active', 25000000.00);
+INSERT INTO `Commissions` (contract_id, agent_id, policy_id, amount, status) 
+VALUES (LAST_INSERT_ID(), 4, 1, (25000000.00 * 0.05), 'Paid');
+
+
+USE `swp391`;
+
+-- =====================================================================
+-- SCRIPT BỔ SUNG 3 (SCALE UP)
+-- MỤC TIÊU: "Bơm" (Inject) 10 Hợp đồng (Contracts) "sạch" (clean)
+-- cho mỗi Agent "câm" (ID 10-17) để "thắp sáng" (light up)
+-- Leaderboard và Bar Chart (Doanh số Team).
+-- =====================================================================
+
+-- ---------------------------------------------------------------------
+-- BƯỚC 1: "VÁ" (PATCH) LỖ HỔNG (THE GAP)
+-- Agent 10 (user_id = 17) 100% "câm" (silent) (không có Khách hàng).
+-- Chúng ta phải "bơm" (inject) Khách hàng cho nó TRƯỚC (FIRST).
+-- ---------------------------------------------------------------------
+
+INSERT INTO `Customers` (full_name, date_of_birth, phone_number, email, address, created_by, stage_id) 
+VALUES
+('Khách Agent 17 (A)', '1990-01-01', '0917000111', 'khach17a@mail.com', '17A Address, Hanoi', 17, 1),
+('Khách Agent 17 (B)', '1991-02-02', '0917000222', 'khach17b@mail.com', '17B Address, Hanoi', 17, 2),
+('Khách Agent 17 (C)', '1992-03-03', '0917000333', 'khach17c@mail.com', '17C Address, Hanoi', 17, 3),
+('Khách Agent 17 (D)', '1993-04-04', '0917000444', 'khach17d@mail.com', '17D Address, Hanoi', 17, 1);
+
+-- "Chốt" (Lock in) 4 ID Khách hàng (Customer ID) "mới" (new) này
+SET @cust17A = (SELECT customer_id FROM Customers WHERE email = 'khach17a@mail.com');
+SET @cust17C = (SELECT customer_id FROM Customers WHERE email = 'khach17c@mail.com');
+
+-- ---------------------------------------------------------------------
+-- BƯỚC 2: "BƠM" (INJECT) HỢP ĐỒNG (CONTRACTS)
+-- (Sử dụng ID Khách hàng (Customer ID) và ID Sản phẩm (Product ID) 
+-- đã có 100% (existing) từ "SCRIPT MASTER")
+-- ---------------------------------------------------------------------
+
+-- === AGENT 3 (ID 10) ===
+-- (Sử dụng Khách 3 & 12 | Sản phẩm 1 (15Tr/120m) & 6 (8Tr/12m))
+INSERT INTO `Contracts` (customer_id, agent_id, product_id, start_date, end_date, status, premium_amount) VALUES 
+(3, 10, 1, '2025-05-05', '2035-05-05', 'Active', 15000000.00),
+(12, 10, 6, '2025-05-15', '2026-05-15', 'Active', 8000000.00),
+(3, 10, 1, '2025-06-05', '2035-06-05', 'Active', 15000000.00),
+(12, 10, 6, '2025-06-15', '2026-06-15', 'Active', 8000000.00),
+(3, 10, 1, '2025-07-05', '2035-07-05', 'Expired', 15000000.00),
+(12, 10, 6, '2025-08-15', '2026-08-15', 'Active', 8000000.00),
+(3, 10, 1, '2025-09-05', '2035-09-05', 'Cancelled', 15000000.00),
+(12, 10, 6, '2025-11-01', '2026-11-01', 'Pending', 8000000.00);
+-- (Thêm Hoa hồng (Commissions) cho 6 HĐ 'Active'/'Expired'/'Cancelled')
+INSERT INTO `Commissions` (contract_id, agent_id, policy_id, amount, status) VALUES 
+(LAST_INSERT_ID()-7, 10, 1, (15000000.00 * 0.05), 'Paid'),
+(LAST_INSERT_ID()-6, 10, 1, (8000000.00 * 0.05), 'Paid'),
+(LAST_INSERT_ID()-5, 10, 1, (15000000.00 * 0.05), 'Paid'),
+(LAST_INSERT_ID()-4, 10, 1, (8000000.00 * 0.05), 'Pending'),
+(LAST_INSERT_ID()-3, 10, 1, (15000000.00 * 0.05), 'Cancelled'),
+(LAST_INSERT_ID()-2, 10, 1, (8000000.00 * 0.05), 'Pending');
+
+-- === AGENT 4 (ID 11) ===
+-- (Sử dụng Khách 4 & 13 | Sản phẩm 2 (20Tr/120m) & 7 (5Tr/12m))
+INSERT INTO `Contracts` (customer_id, agent_id, product_id, start_date, end_date, status, premium_amount) VALUES 
+(4, 11, 2, '2025-05-06', '2035-05-06', 'Active', 20000000.00),
+(13, 11, 7, '2025-05-16', '2026-05-16', 'Active', 5000000.00),
+(4, 11, 2, '2025-06-06', '2035-06-06', 'Active', 20000000.00),
+(13, 11, 7, '2025-06-16', '2026-06-16', 'Active', 5000000.00),
+(4, 11, 2, '2025-07-06', '2035-07-06', 'Active', 20000000.00),
+(13, 11, 7, '2025-08-16', '2026-08-16', 'Active', 5000000.00),
+(4, 11, 2, '2025-09-06', '2035-09-06', 'Active', 20000000.00),
+(13, 11, 7, '2025-10-16', '2026-10-16', 'Active', 5000000.00),
+(4, 11, 2, '2025-11-01', '2035-11-01', 'Pending', 20000000.00);
+-- (Thêm Hoa hồng (Commissions) cho 8 HĐ 'Active')
+INSERT INTO `Commissions` (contract_id, agent_id, policy_id, amount, status) VALUES 
+(LAST_INSERT_ID()-8, 11, 1, (20000000.00 * 0.05), 'Paid'),
+(LAST_INSERT_ID()-7, 11, 1, (5000000.00 * 0.05), 'Paid'),
+(LAST_INSERT_ID()-6, 11, 1, (20000000.00 * 0.05), 'Pending'),
+(LAST_INSERT_ID()-5, 11, 1, (5000000.00 * 0.05), 'Pending'),
+(LAST_INSERT_ID()-4, 11, 1, (20000000.00 * 0.05), 'Paid'),
+(LAST_INSERT_ID()-3, 11, 1, (5000000.00 * 0.05), 'Paid'),
+(LAST_INSERT_ID()-2, 11, 1, (20000000.00 * 0.05), 'Pending'),
+(LAST_INSERT_ID()-1, 11, 1, (5000000.00 * 0.05), 'Paid');
+
+-- === AGENT 5 (ID 12) ===
+-- (Sử dụng Khách 5 & 14 | Sản phẩm 3 (12Tr/120m) & 8 (3Tr/12m))
+INSERT INTO `Contracts` (customer_id, agent_id, product_id, start_date, end_date, status, premium_amount) VALUES 
+(5, 12, 3, '2025-05-07', '2035-05-07', 'Active', 12000000.00),
+(14, 12, 8, '2025-05-17', '2026-05-17', 'Active', 3000000.00),
+(5, 12, 3, '2025-06-07', '2035-06-07', 'Active', 12000000.00),
+(14, 12, 8, '2025-06-17', '2026-06-17', 'Active', 3000000.00),
+(5, 12, 3, '2025-07-07', '2035-07-07', 'Active', 12000000.00),
+(14, 12, 8, '2025-08-17', '2026-08-17', 'Active', 3000000.00),
+(5, 12, 3, '2025-09-07', '2035-09-07', 'Active', 12000000.00),
+(14, 12, 8, '2025-10-17', '2026-10-17', 'Pending', 3000000.00);
+-- (Thêm Hoa hồng (Commissions) cho 7 HĐ 'Active')
+INSERT INTO `Commissions` (contract_id, agent_id, policy_id, amount, status) VALUES 
+(LAST_INSERT_ID()-7, 12, 1, (12000000.00 * 0.05), 'Paid'),
+(LAST_INSERT_ID()-6, 12, 1, (3000000.00 * 0.05), 'Paid'),
+(LAST_INSERT_ID()-5, 12, 1, (12000000.00 * 0.05), 'Paid'),
+(LAST_INSERT_ID()-4, 12, 1, (3000000.00 * 0.05), 'Pending'),
+(LAST_INSERT_ID()-3, 12, 1, (12000000.00 * 0.05), 'Paid'),
+(LAST_INSERT_ID()-2, 12, 1, (3000000.00 * 0.05), 'Pending'),
+(LAST_INSERT_ID()-1, 12, 1, (12000000.00 * 0.05), 'Paid');
+
+-- === AGENT 6 (ID 13) ===
+-- (Sử dụng Khách 6 & 15 | Sản phẩm 4 (18Tr/120m) & 9 (2Tr/12m))
+INSERT INTO `Contracts` (customer_id, agent_id, product_id, start_date, end_date, status, premium_amount) VALUES 
+(6, 13, 4, '2025-05-08', '2035-05-08', 'Active', 18000000.00),
+(15, 13, 9, '2025-05-18', '2026-05-18', 'Active', 2000000.00),
+(6, 13, 4, '2025-06-08', '2035-06-08', 'Active', 18000000.00),
+(15, 13, 9, '2025-06-18', '2026-06-18', 'Active', 2000000.00),
+(6, 13, 4, '2025-07-08', '2035-07-08', 'Active', 18000000.00),
+(15, 13, 9, '2025-08-18', '2026-08-18', 'Active', 2000000.00),
+(6, 13, 4, '2025-09-08', '2035-09-08', 'Active', 18000000.00),
+(15, 13, 9, '2025-10-18', '2026-10-18', 'Active', 2000000.00),
+(6, 13, 4, '2025-11-02', '2035-11-02', 'Pending', 18000000.00);
+-- (Thêm Hoa hồng (Commissions) cho 8 HĐ 'Active')
+INSERT INTO `Commissions` (contract_id, agent_id, policy_id, amount, status) VALUES 
+(LAST_INSERT_ID()-8, 13, 1, (18000000.00 * 0.05), 'Paid'),
+(LAST_INSERT_ID()-7, 13, 1, (2000000.00 * 0.05), 'Pending'),
+(LAST_INSERT_ID()-6, 13, 1, (18000000.00 * 0.05), 'Paid'),
+(LAST_INSERT_ID()-5, 13, 1, (2000000.00 * 0.05), 'Paid'),
+(LAST_INSERT_ID()-4, 13, 1, (18000000.00 * 0.05), 'Pending'),
+(LAST_INSERT_ID()-3, 13, 1, (2000000.00 * 0.05), 'Paid'),
+(LAST_INSERT_ID()-2, 13, 1, (18000000.00 * 0.05), 'Paid'),
+(LAST_INSERT_ID()-1, 13, 1, (2000000.00 * 0.05), 'Pending');
+
+-- === AGENT 7 (ID 14) ===
+-- (Sử dụng Khách 7 & 16 | Sản phẩm 5 (25Tr/120m) & 10 (10Tr/12m))
+INSERT INTO `Contracts` (customer_id, agent_id, product_id, start_date, end_date, status, premium_amount) VALUES 
+(7, 14, 5, '2025-05-09', '2035-05-09', 'Active', 25000000.00),
+(16, 14, 10, '2025-05-19', '2026-05-19', 'Active', 10000000.00),
+(7, 14, 5, '2025-06-09', '2035-06-09', 'Active', 25000000.00),
+(16, 14, 10, '2025-06-19', '2026-06-19', 'Active', 10000000.00),
+(7, 14, 5, '2025-07-09', '2035-07-09', 'Active', 25000000.00),
+(16, 14, 10, '2025-08-19', '2026-08-19', 'Active', 10000000.00),
+(7, 14, 5, '2025-09-09', '2035-09-09', 'Active', 25000000.00),
+(16, 14, 10, '2025-10-19', '2026-10-19', 'Pending', 10000000.00);
+-- (Thêm Hoa hồng (Commissions) cho 7 HĐ 'Active')
+INSERT INTO `Commissions` (contract_id, agent_id, policy_id, amount, status) VALUES 
+(LAST_INSERT_ID()-7, 14, 1, (25000000.00 * 0.05), 'Paid'),
+(LAST_INSERT_ID()-6, 14, 1, (10000000.00 * 0.05), 'Paid'),
+(LAST_INSERT_ID()-5, 14, 1, (25000000.00 * 0.05), 'Pending'),
+(LAST_INSERT_ID()-4, 14, 1, (10000000.00 * 0.05), 'Paid'),
+(LAST_INSERT_ID()-3, 14, 1, (25000000.00 * 0.05), 'Pending'),
+(LAST_INSERT_ID()-2, 14, 1, (10000000.00 * 0.05), 'Paid'),
+(LAST_INSERT_ID()-1, 14, 1, (25000000.00 * 0.05), 'Paid');
+
+-- === AGENT 8 (ID 15) ===
+-- (Sử dụng Khách 8 & 17 | Sản phẩm 1 (15Tr/120m) & 6 (8Tr/12m))
+INSERT INTO `Contracts` (customer_id, agent_id, product_id, start_date, end_date, status, premium_amount) VALUES 
+(8, 15, 1, '2025-05-10', '2035-05-10', 'Active', 15000000.00),
+(17, 15, 6, '2025-05-20', '2026-05-20', 'Active', 8000000.00),
+(8, 15, 1, '2025-06-10', '2035-06-10', 'Active', 15000000.00),
+(17, 15, 6, '2025-06-20', '2026-06-20', 'Active', 8000000.00),
+(8, 15, 1, '2025-07-10', '2035-07-10', 'Active', 15000000.00),
+(17, 15, 6, '2025-08-20', '2026-08-20', 'Active', 8000000.00),
+(8, 15, 1, '2025-09-10', '2035-09-10', 'Active', 15000000.00),
+(17, 15, 6, '2025-10-20', '2026-10-20', 'Pending', 8000000.00);
+-- (Thêm Hoa hồng (Commissions) cho 7 HĐ 'Active')
+INSERT INTO `Commissions` (contract_id, agent_id, policy_id, amount, status) VALUES 
+(LAST_INSERT_ID()-7, 15, 1, (15000000.00 * 0.05), 'Paid'),
+(LAST_INSERT_ID()-6, 15, 1, (8000000.00 * 0.05), 'Paid'),
+(LAST_INSERT_ID()-5, 15, 1, (15000000.00 * 0.05), 'Paid'),
+(LAST_INSERT_ID()-4, 15, 1, (8000000.00 * 0.05), 'Pending'),
+(LAST_INSERT_ID()-3, 15, 1, (15000000.00 * 0.05), 'Paid'),
+(LAST_INSERT_ID()-2, 15, 1, (8000000.00 * 0.05), 'Pending'),
+(LAST_INSERT_ID()-1, 15, 1, (15000000.00 * 0.05), 'Paid');
+
+-- === AGENT 9 (ID 16) ===
+-- (Sử dụng Khách 9 & 18 | Sản phẩm 2 (20Tr/120m) & 7 (5Tr/12m))
+INSERT INTO `Contracts` (customer_id, agent_id, product_id, start_date, end_date, status, premium_amount) VALUES 
+(9, 16, 2, '2025-05-11', '2035-05-11', 'Active', 20000000.00),
+(18, 16, 7, '2025-05-21', '2026-05-21', 'Active', 5000000.00),
+(9, 16, 2, '2025-06-11', '2035-06-11', 'Active', 20000000.00),
+(18, 16, 7, '2025-06-21', '2026-06-21', 'Active', 5000000.00),
+(9, 16, 2, '2025-07-11', '2035-07-11', 'Active', 20000000.00),
+(18, 16, 7, '2025-08-21', '2026-08-21', 'Active', 5000000.00),
+(9, 16, 2, '2025-09-11', '2035-09-11', 'Active', 20000000.00),
+(18, 16, 7, '2025-10-21', '2026-10-21', 'Active', 5000000.00),
+(9, 16, 2, '2025-11-03', '2035-11-03', 'Pending', 20000000.00);
+-- (Thêm Hoa hồng (Commissions) cho 8 HĐ 'Active')
+INSERT INTO `Commissions` (contract_id, agent_id, policy_id, amount, status) VALUES 
+(LAST_INSERT_ID()-8, 16, 1, (20000000.00 * 0.05), 'Paid'),
+(LAST_INSERT_ID()-7, 16, 1, (5000000.00 * 0.05), 'Pending'),
+(LAST_INSERT_ID()-6, 16, 1, (20000000.00 * 0.05), 'Paid'),
+(LAST_INSERT_ID()-5, 16, 1, (5000000.00 * 0.05), 'Paid'),
+(LAST_INSERT_ID()-4, 16, 1, (20000000.00 * 0.05), 'Pending'),
+(LAST_INSERT_ID()-3, 16, 1, (5000000.00 * 0.05), 'Paid'),
+(LAST_INSERT_ID()-2, 16, 1, (20000000.00 * 0.05), 'Paid'),
+(LAST_INSERT_ID()-1, 16, 1, (5000000.00 * 0.05), 'Pending');
+
+-- === AGENT 10 (ID 17) ===
+-- (Sử dụng Khách @cust17A & @cust17C | Sản phẩm 3 (12Tr/120m) & 8 (3Tr/12m))
+INSERT INTO `Contracts` (customer_id, agent_id, product_id, start_date, end_date, status, premium_amount) VALUES 
+(@cust17A, 17, 3, '2025-05-12', '2035-05-12', 'Active', 12000000.00),
+(@cust17C, 17, 8, '2025-05-22', '2026-05-22', 'Active', 3000000.00),
+(@cust17A, 17, 3, '2025-06-12', '2035-06-12', 'Active', 12000000.00),
+(@cust17C, 17, 8, '2025-06-22', '2026-06-22', 'Active', 3000000.00),
+(@cust17A, 17, 3, '2025-07-12', '2035-07-12', 'Active', 12000000.00),
+(@cust17C, 17, 8, '2025-08-22', '2026-08-22', 'Active', 3000000.00),
+(@cust17A, 17, 3, '2025-09-12', '2035-09-12', 'Active', 12000000.00),
+(@cust17C, 17, 8, '2025-10-22', '2026-10-22', 'Active', 3000000.00),
+(@cust17A, 17, 3, '2025-11-04', '2035-11-04', 'Pending', 12000000.00);
+-- (Thêm Hoa hồng (Commissions) cho 8 HĐ 'Active')
+INSERT INTO `Commissions` (contract_id, agent_id, policy_id, amount, status) VALUES 
+(LAST_INSERT_ID()-8, 17, 1, (12000000.00 * 0.05), 'Paid'),
+(LAST_INSERT_ID()-7, 17, 1, (3000000.00 * 0.05), 'Pending'),
+(LAST_INSERT_ID()-6, 17, 1, (12000000.00 * 0.05), 'Paid'),
+(LAST_INSERT_ID()-5, 17, 1, (3000000.00 * 0.05), 'Paid'),
+(LAST_INSERT_ID()-4, 17, 1, (12000000.00 * 0.05), 'Pending'),
+(LAST_INSERT_ID()-3, 17, 1, (3000000.00 * 0.05), 'Paid'),
+(LAST_INSERT_ID()-2, 17, 1, (12000000.00 * 0.05), 'Paid'),
+(LAST_INSERT_ID()-1, 17, 1, (3000000.00 * 0.05), 'Pending');
