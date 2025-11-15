@@ -109,10 +109,6 @@
                                             <i class="fa fa-edit"></i>
                                         </a>
                                         
-                                        <a href="<%=ctx%>/agent/customers?action=delete&id=<%= customer.getCustomerId() %>" class="btn btn-sm btn-danger" title="Xóa" onclick="return confirm('Bạn có chắc chắn muốn xóa khách hàng này không?');">
-                                            <i class="fa fa-trash"></i>
-                                        </a>
-                                        
                                         
                                     </td>
                                 </tr>

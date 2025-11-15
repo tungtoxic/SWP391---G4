@@ -71,7 +71,7 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="productId" class="form-label">2. Chọn Sản phẩm ("Cái khuôn")</label>
+                            <label for="productId" class="form-label">2. Chọn Sản phẩm </label>
                             <%-- ========================================================== --%>
                             <%-- BƯỚC 2.1: THÊM "onchange" VÀ "data-" ATTRIBUTES (LUẬT) --%>
                             <%-- ========================================================== --%>
@@ -103,7 +103,7 @@
                             <%-- THAY THẾ BẰNG 2 BOX HIỂN THỊ "LUẬT" (CHỈ ĐỌC) --%>
                             <div class="col-md-6 mb-3">
                                 <div class="rule-box h-100">
-                                    <span class="rule-label">PHÍ BẢO HIỂM (TỰ ĐỘNG)</span>
+                                    <span class="rule-label">PHÍ BẢO HIỂM </span>
                                     <div id="product-price-display" class="rule-display text-success">
                                         -- Vui lòng chọn sản phẩm --
                                     </div>
@@ -113,7 +113,7 @@
 
                         <div class="mb-3">
                             <div class="rule-box">
-                                <span class="rule-label">THỜI HẠN HỢP ĐỒNG (TỰ ĐỘNG)</span>
+                                <span class="rule-label">THỜI HẠN HỢP ĐỒNG </span>
                                 <div id="product-duration-display" class="rule-display text-primary">
                                     -- Vui lòng chọn sản phẩm --
                                 </div>

@@ -153,7 +153,6 @@
                                             <th>Agent Name</th>
                                             <th class="text-end">Premium (Active)</th>
                                             <th class="text-center">HĐ (Active)</th>
-                                            <th class="text-center">Conversion (Demo)</th>
                                             <th>Target (Tháng <%= java.time.LocalDate.now().getMonthValue() %>)</th> <%-- Sửa Target động --%>
                                         </tr>
                                     </thead>
@@ -177,7 +176,6 @@
                                                 <td class="fw-bold"><%= agent.getAgentName() %></td>
                                                 <td class="text-end text-success fw-bold"><%= currencyFormat.format(agent.getTotalPremium()) %></td>
                                                 <td class="text-center"><%= agent.getContractsCount() %></td>
-                                                <td class="text-center">N/A</td> 
                                                 <td>
                                                     <div class="performance-gauge" title="Target: <%= currencyFormat.format(target) %>">
                                                         <div class="performance-bar <%= barClass %>" style="width: <%= progress %>%;"></div>

@@ -427,8 +427,9 @@ public class UserDao {
     /**
      * Lấy hiệu suất của các Agent trong team của Manager.
      */
-    public List<AgentPerformanceDTO> getTeamPerformance(int managerId) {
+public List<AgentPerformanceDTO> getTeamPerformance(int managerId) {
         List<AgentPerformanceDTO> teamPerformance = new ArrayList<>();
+        // (SQL của bạn đã TỐT, giữ nguyên)
         String sql = """
             SELECT
                 u.user_id,
@@ -440,24 +441,37 @@ public class UserDao {
             JOIN Manager_Agent ma ON u.user_id = ma.agent_id
             LEFT JOIN Contracts c ON u.user_id = c.agent_id
             LEFT JOIN Agent_Targets t ON u.user_id = t.agent_id
-                                    AND t.target_month = MONTH(CURDATE())
-                                    AND t.target_year = YEAR(CURDATE())
+                        AND t.target_month = MONTH(CURDATE())
+                        AND t.target_year = YEAR(CURDATE())
             WHERE ma.manager_id = ? AND u.role_id = 1
             GROUP BY u.user_id, u.full_name, t.target_amount
             ORDER BY total_premium DESC;
-        """; // Sửa lại SUM và COUNT chỉ tính HĐ 'Active'
+        """;
 
-        try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = DBConnector.makeConnection(); 
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
             ps.setInt(1, managerId);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     AgentPerformanceDTO dto = new AgentPerformanceDTO(
                             rs.getInt("user_id"),
                             rs.getString("full_name"),
-                            rs.getDouble("total_premium"), // Cẩn thận với double
+                            rs.getDouble("total_premium"),
                             rs.getInt("contracts_count")
                     );
-                    dto.setTargetAmount(rs.getDouble("target_amount"));
+                    
+                    double targetAmount = rs.getDouble("target_amount");
+                    dto.setTargetAmount(targetAmount);
+                    
+                    // === BƯỚC 2: TÍNH OVER-ACHIEVEMENT RATE (LOGIC CỦA BẠN) ===
+                    double overAchievementRate = 0.0;
+                    if (targetAmount > 0 && dto.getTotalPremium() > targetAmount) {
+                        overAchievementRate = ((dto.getTotalPremium() - targetAmount) / targetAmount) * 100;
+                    }
+                    dto.setOverAchievementRate(overAchievementRate);
+                    // =======================================================
+                    
                     teamPerformance.add(dto);
                 }
             }
