@@ -10,21 +10,13 @@ import java.util.Random;
 import utility.DBConnector;
 
 public class UserDao {
-    /**
-     * Kiểm tra thông tin đăng nhập.
-     * @param username Tên đăng nhập
-     * @param password Mật khẩu (chưa hash)
-     * @return Đối tượng User nếu hợp lệ và Active, null nếu không.
-     */
+    // ... (Hàm login()... giữ nguyên)
     public User login(String username, String password) {
-        // Cần kiểm tra status = 'Active' trong SQL
         String sql = "SELECT * FROM Users WHERE username = ? AND password_hash = ? AND status ='Active'";
         try (Connection conn = DBConnector.makeConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-
             ps.setString(1, username);
-            ps.setString(2, password); // Giả định password chưa hash khi truyền vào
-
+            ps.setString(2, password);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     User user = new User();
@@ -33,14 +25,12 @@ public class UserDao {
                     user.setFullName(rs.getString("full_name"));
                     user.setEmail(rs.getString("email"));
                     user.setPhoneNumber(rs.getString("phone_number"));
-                    user.setPasswordHash(rs.getString("password_hash")); // Lấy hash từ DB
+                    user.setPasswordHash(rs.getString("password_hash")); 
                     user.setStatus(rs.getString("status"));
                     user.setRoleId(rs.getInt("role_id"));
-                    // Lấy thêm is_first_login nếu cần cho logic đổi pass lần đầu
                     try {
-                         user.setIsFirstLogin(rs.getBoolean("is_first_login"));
+                        user.setIsFirstLogin(rs.getBoolean("is_first_login"));
                     } catch (SQLException e) {
-                        // Bỏ qua nếu cột không tồn tại hoặc có lỗi
                         System.err.println("Warning: Could not read is_first_login for user " + username);
                     }
                     return user;
@@ -53,15 +43,13 @@ public class UserDao {
         return null;
     }
 
-    /**
-     * Kiểm tra email đã tồn tại chưa (dùng rs.next()).
-     */
+    // ... (Hàm checkEmailExists()... giữ nguyên)
     public boolean checkEmailExists(String email) {
         String sql = "SELECT user_id FROM Users WHERE email = ?";
         try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, email);
             try (ResultSet rs = ps.executeQuery()) {
-                return rs.next(); // Trả về true nếu có kết quả
+                return rs.next(); 
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -69,9 +57,7 @@ public class UserDao {
         return false;
     }
 
-    /**
-     * Kiểm tra username đã tồn tại chưa (dùng rs.next()).
-     */
+    // ... (Hàm checkUsernameExists()... giữ nguyên)
     public boolean checkUsernameExists(String username) {
         String sql = "SELECT user_id FROM Users WHERE username = ?";
         try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -85,9 +71,7 @@ public class UserDao {
         return false;
     }
 
-    /**
-     * Kiểm tra username đã tồn tại chưa (dùng COUNT(*)).
-     */
+    // ... (Hàm isUsernameExists()... giữ nguyên)
     public boolean isUsernameExists(String username) throws SQLException {
         String sql = "SELECT COUNT(*) FROM Users WHERE username = ?";
         try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -100,10 +84,8 @@ public class UserDao {
         }
         return false;
     }
-
-    /**
-     * Kiểm tra số điện thoại đã tồn tại chưa (dùng COUNT(*)).
-     */
+    
+    // ... (Hàm isPhoneExists()... giữ nguyên)
     public boolean isPhoneExists(String phoneNumber) throws SQLException {
         String sql = "SELECT COUNT(*) FROM Users WHERE phone_number = ?";
         try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -117,28 +99,23 @@ public class UserDao {
         return false;
     }
 
-    /**
-     * Thêm một user mới vào DB (phiên bản đầy đủ thông tin ban đầu).
-     */
+    // ... (Hàm insertUser()... giữ nguyên)
     public boolean insertUser(User user) throws SQLException {
-        // Cần thêm is_first_login vào câu SQL nếu cột này tồn tại và quan trọng
         String sql = "INSERT INTO users (username, password_hash, full_name, email, phone_number, role_id, status, is_first_login) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, user.getUsername());
-            ps.setString(2, user.getPasswordHash()); // Dùng getPasswordHash()
+            ps.setString(2, user.getPasswordHash());
             ps.setString(3, user.getFullName());
             ps.setString(4, user.getEmail());
             ps.setString(5, user.getPhoneNumber());
             ps.setInt(6, user.getRoleId());
             ps.setString(7, user.getStatus());
-            ps.setBoolean(8, user.getIsFirstLogin()); // Thêm is_first_login
+            ps.setBoolean(8, user.getIsFirstLogin());
             return ps.executeUpdate() > 0;
         }
     }
 
-    /**
-     * Lấy role_id dựa vào role_name.
-     */
+    // ... (Hàm getRoleIdByName()... giữ nguyên)
     public int getRoleIdByName(String roleName) throws SQLException {
         String sql = "SELECT role_id FROM Roles WHERE role_name = ?";
         try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -149,55 +126,44 @@ public class UserDao {
                 }
             }
         }
-        return -1; // Role không tồn tại
+        return -1; 
     }
-
-    /**
-     * Lấy danh sách tất cả Users, có thể lọc theo role_id. Bao gồm cả role_name.
-     * @param roleIdFilter ID của role cần lọc (String), hoặc null/rỗng để lấy tất cả.
-     */
+    
+    // ... (Hàm getAllUsers()... giữ nguyên)
     public List<User> getAllUsers(String roleIdFilter) throws SQLException {
         List<User> userList = new ArrayList<>();
         StringBuilder sql = new StringBuilder("SELECT u.*, r.role_name FROM Users u JOIN Roles r ON u.role_id = r.role_id");
         List<Object> params = new ArrayList<>();
-
         if (roleIdFilter != null && !roleIdFilter.isEmpty()) {
             try {
-                 int roleId = Integer.parseInt(roleIdFilter);
-                 sql.append(" WHERE u.role_id = ?");
-                 params.add(roleId);
+                int roleId = Integer.parseInt(roleIdFilter);
+                sql.append(" WHERE u.role_id = ?");
+                params.add(roleId);
             } catch (NumberFormatException e) {
-                 System.err.println("Lỗi: roleIdFilter không hợp lệ: " + roleIdFilter);
-                 // Có thể chọn trả về danh sách rỗng hoặc bỏ qua bộ lọc
+                System.err.println("Lỗi: roleIdFilter không hợp lệ: " + roleIdFilter);
             }
         }
         sql.append(" ORDER BY u.user_id ASC");
-
         try (Connection conn = DBConnector.makeConnection();
              PreparedStatement ps = conn.prepareStatement(sql.toString())) {
-
             for (int i = 0; i < params.size(); i++) {
                 ps.setObject(i + 1, params.get(i));
             }
-
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    User user = mapRowToUser(rs); // Dùng hàm map riêng cho gọn
+                    User user = mapRowToUser(rs); 
                     userList.add(user);
                 }
             }
         } catch (SQLException e) {
-             System.err.println("Lỗi khi lấy danh sách users với filter: " + roleIdFilter);
-             e.printStackTrace();
-             // Ném lại lỗi hoặc trả về danh sách rỗng tùy logic mong muốn
-             throw e;
+            System.err.println("Lỗi khi lấy danh sách users với filter: " + roleIdFilter);
+            e.printStackTrace();
+            throw e;
         }
         return userList;
     }
 
-    /**
-     * Lấy role_name dựa vào role_id.
-     */
+    // ... (Hàm getRoleNameById()... giữ nguyên)
     public String getRoleNameById(int roleId) throws SQLException {
         String sql = "SELECT role_name FROM Roles WHERE role_id = ?";
         try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -211,32 +177,27 @@ public class UserDao {
         return "Unknown";
     }
 
-    /**
-     * Lấy thông tin chi tiết User theo ID, bao gồm role_name.
-     */
+    // ... (Hàm getUserById()... giữ nguyên)
     public User getUserById(int id) throws SQLException {
         String sql = "SELECT u.*, r.role_name FROM Users u JOIN Roles r ON u.role_id = r.role_id WHERE u.user_id = ?";
         try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    return mapRowToUser(rs); // Dùng hàm map
+                    return mapRowToUser(rs);
                 }
             }
         } catch (SQLException e) {
-             System.err.println("Lỗi khi lấy user theo ID: " + id);
-             e.printStackTrace();
-             throw e;
+            System.err.println("Lỗi khi lấy user theo ID: " + id);
+            e.printStackTrace();
+            throw e;
         }
         return null;
     }
-
-    /**
-     * Lấy danh sách Users theo role_id cụ thể.
-     */
+    
+    // ... (Hàm getUsersByRoleId()... giữ nguyên)
     public List<User> getUsersByRoleId(int roleId) throws SQLException {
         List<User> users = new ArrayList<>();
-        // Dùng text block cho SQL rõ ràng hơn
         String sql = """
             SELECT u.*, r.role_name
             FROM Users u
@@ -248,20 +209,18 @@ public class UserDao {
             ps.setInt(1, roleId);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    users.add(mapRowToUser(rs)); // Dùng hàm map
+                    users.add(mapRowToUser(rs)); 
                 }
             }
         } catch (SQLException e) {
-             System.err.println("Lỗi khi lấy user theo Role ID: " + roleId);
-             e.printStackTrace();
-             throw e;
+            System.err.println("Lỗi khi lấy user theo Role ID: " + roleId);
+            e.printStackTrace();
+            throw e;
         }
         return users;
     }
 
-    /**
-     * Cập nhật toàn bộ thông tin User (dùng cho Admin).
-     */
+    // ... (Hàm updateUser()... giữ nguyên)
     public boolean updateUser(User user) throws SQLException {
         String sql = "UPDATE Users SET username=?, password_hash=?, full_name=?, email=?, phone_number=?, role_id=?, status=?, is_first_login=? WHERE user_id=?";
         try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -272,15 +231,13 @@ public class UserDao {
             ps.setString(5, user.getPhoneNumber());
             ps.setInt(6, user.getRoleId());
             ps.setString(7, user.getStatus());
-            ps.setBoolean(8, user.getIsFirstLogin()); // Thêm is_first_login
+            ps.setBoolean(8, user.getIsFirstLogin());
             ps.setInt(9, user.getUserId());
             return ps.executeUpdate() > 0;
         }
     }
-
-    /**
-     * Kích hoạt tài khoản User.
-     */
+    
+    // ... (Hàm activateUserById()... giữ nguyên)
     public boolean activateUserById(int id) throws SQLException {
         String sql = "UPDATE Users SET status = 'Active' WHERE user_id = ?";
         try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -289,9 +246,7 @@ public class UserDao {
         }
     }
 
-    /**
-     * Vô hiệu hóa tài khoản User.
-     */
+    // ... (Hàm deactivateUserById()... giữ nguyên)
     public boolean deactivateUserById(int id) throws SQLException {
         String sql = "UPDATE Users SET status = 'Inactive' WHERE user_id = ?";
         try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -300,9 +255,7 @@ public class UserDao {
         }
     }
 
-    /**
-     * Đếm số hợp đồng của một Agent.
-     */
+    // ... (Hàm getContractCountByAgent()... giữ nguyên)
     public int getContractCountByAgent(int agentId) {
         String sql = "SELECT COUNT(*) FROM Contracts WHERE agent_id = ?";
         try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -318,18 +271,14 @@ public class UserDao {
         return 0;
     }
 
-    /**
-     * Lấy tổng hoa hồng (tất cả trạng thái) của một Agent.
-     */
+    // ... (Hàm getTotalCommissionByAgent()... giữ nguyên)
     public double getTotalCommissionByAgent(int agentId) {
-        // Nên dùng BigDecimal để tính tiền
         String sql = "SELECT IFNULL(SUM(amount), 0.00) FROM Commissions WHERE agent_id = ?";
         try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, agentId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    return rs.getDouble(1); // Cẩn thận với độ chính xác của double
-                    // return rs.getBigDecimal(1); // Nếu trả về BigDecimal
+                    return rs.getDouble(1);
                 }
             }
         } catch (SQLException e) {
@@ -338,11 +287,9 @@ public class UserDao {
         return 0.0;
     }
 
-    /**
-     * Tạo mật khẩu tạm ngẫu nhiên.
-     */
+    // ... (Hàm generateTempPassword()... giữ nguyên)
     public static String generateTempPassword(int length) {
-        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"; // Bỏ ký tự đặc biệt cho dễ gõ
+        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"; 
         StringBuilder sb = new StringBuilder();
         Random random = new Random();
         for (int i = 0; i < length; i++) {
@@ -350,18 +297,14 @@ public class UserDao {
         }
         return sb.toString();
     }
-
-    /**
-     * Tạo User mới (thường dùng cho Admin tạo tài khoản).
-     * Đã bao gồm is_first_login.
-     */
+    
+    // ... (Hàm createUser()... giữ nguyên)
     public boolean createUser(User user) throws SQLException {
-        // Giống hệt insertUser, có thể gộp lại hoặc bỏ 1 trong 2 nếu logic y hệt
-         String sql = "INSERT INTO Users (username, password_hash, full_name, email, phone_number, role_id, status, is_first_login) "
-                 + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Users (username, password_hash, full_name, email, phone_number, role_id, status, is_first_login) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, user.getUsername());
-            ps.setString(2, user.getPasswordHash()); // Sửa: Dùng getPasswordHash()
+            ps.setString(2, user.getPasswordHash()); 
             ps.setString(3, user.getFullName());
             ps.setString(4, user.getEmail());
             ps.setString(5, user.getPhoneNumber());
@@ -371,29 +314,22 @@ public class UserDao {
             return ps.executeUpdate() > 0;
         }
     }
-
-    /**
-     * Xóa User theo ID.
-     */
+    
+    // ... (Hàm deleteUser()... giữ nguyên)
     public boolean deleteUser(int userId) throws SQLException {
-        // Lưu ý: Cần xử lý các ràng buộc khóa ngoại (ví dụ: xóa agent khỏi Manager_Agent?)
-        // Hoặc chỉ nên deactivate thay vì xóa cứng?
         String sql = "DELETE FROM Users WHERE user_id=?";
         try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, userId);
             return ps.executeUpdate() > 0;
-        } catch (SQLException e){
+        } catch (SQLException e) {
             System.err.println("Lỗi khi xóa user ID: " + userId + ". Có thể do ràng buộc khóa ngoại.");
             e.printStackTrace();
-            throw e; // Ném lại lỗi để báo hiệu xóa thất bại
+            throw e; 
         }
     }
-
-    /**
-     * Cập nhật mật khẩu (đã hash) cho User.
-     */
+    
+    // ... (Hàm updatePassword()... giữ nguyên)
     public boolean updatePassword(int userId, String newPasswordHash) {
-        // Nên thêm điều kiện is_first_login = false sau khi đổi pass lần đầu
         String sql = "UPDATE Users SET password_hash = ?, is_first_login = false WHERE user_id = ?";
         try (Connection con = DBConnector.makeConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, newPasswordHash);
@@ -405,38 +341,39 @@ public class UserDao {
         }
     }
 
-    /**
-     * Đăng ký User mới (thường dùng cho chức năng tự đăng ký nếu có).
-     * User sẽ ở trạng thái Pending hoặc Inactive chờ duyệt.
-     */
+    // ... (Hàm registerUser()... giữ nguyên)
     public boolean registerUser(User user) throws SQLException {
-        // Khác insertUser/createUser: không cần username/password ban đầu, status là Pending/Inactive
         String sql = "INSERT INTO Users (full_name, email, phone_number, role_id, status, is_first_login) "
-                 + "VALUES (?, ?, ?, ?, ?, ?)";
+                + "VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, user.getFullName());
             ps.setString(2, user.getEmail());
             ps.setString(3, user.getPhoneNumber());
             ps.setInt(4, user.getRoleId());
-            ps.setString(5, user.getStatus()); // Ví dụ: "Pending" hoặc "Inactive"
-            ps.setBoolean(6, user.getIsFirstLogin()); // Thường là true
+            ps.setString(5, user.getStatus());
+            ps.setBoolean(6, user.getIsFirstLogin());
             return ps.executeUpdate() > 0;
         }
     }
 
     /**
      * Lấy hiệu suất của các Agent trong team của Manager.
+     * === ĐÃ "VÁ" (PATCHED) LỖI SQL (GROUP BY) ===
      */
-public List<AgentPerformanceDTO> getTeamPerformance(int managerId) {
+    public List<AgentPerformanceDTO> getTeamPerformance(int managerId) {
         List<AgentPerformanceDTO> teamPerformance = new ArrayList<>();
-        // (SQL của bạn đã TỐT, giữ nguyên)
+        
+        // === BƯỚC "VÁ" (PATCH) SQL ===
+        // (1) Dùng MAX(t.target_amount) để "tổng hợp" (aggregate) Target
+        // (2) XÓA (REMOVE) "t.target_amount" khỏi "GROUP BY"
+        // (3) Sửa COUNT (đếm) sang COUNT(DISTINCT ...) để tránh đếm trùng HĐ
         String sql = """
             SELECT
                 u.user_id,
                 u.full_name,
                 IFNULL(SUM(CASE WHEN c.status = 'Active' THEN c.premium_amount ELSE 0 END), 0) AS total_premium,
-                COUNT(CASE WHEN c.status = 'Active' THEN c.contract_id ELSE NULL END) AS contracts_count,
-                IFNULL(t.target_amount, 0.00) AS target_amount 
+                COUNT(DISTINCT CASE WHEN c.status = 'Active' THEN c.contract_id ELSE NULL END) AS contracts_count,
+                IFNULL(MAX(t.target_amount), 0.00) AS target_amount 
             FROM Users u
             JOIN Manager_Agent ma ON u.user_id = ma.agent_id
             LEFT JOIN Contracts c ON u.user_id = c.agent_id
@@ -444,9 +381,10 @@ public List<AgentPerformanceDTO> getTeamPerformance(int managerId) {
                         AND t.target_month = MONTH(CURDATE())
                         AND t.target_year = YEAR(CURDATE())
             WHERE ma.manager_id = ? AND u.role_id = 1
-            GROUP BY u.user_id, u.full_name, t.target_amount
+            GROUP BY u.user_id, u.full_name
             ORDER BY total_premium DESC;
-        """;
+        """; 
+        // ============================
 
         try (Connection conn = DBConnector.makeConnection(); 
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -454,24 +392,26 @@ public List<AgentPerformanceDTO> getTeamPerformance(int managerId) {
             ps.setInt(1, managerId);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
+                    // (1) Tạo DTO (Code cũ của bạn - đã TỐT)
                     AgentPerformanceDTO dto = new AgentPerformanceDTO(
                             rs.getInt("user_id"),
                             rs.getString("full_name"),
-                            rs.getDouble("total_premium"),
+                            rs.getDouble("total_premium"), 
                             rs.getInt("contracts_count")
                     );
                     
+                    // (2) Set Target (Code cũ của bạn - đã TỐT)
                     double targetAmount = rs.getDouble("target_amount");
                     dto.setTargetAmount(targetAmount);
                     
-                    // === BƯỚC 2: TÍNH OVER-ACHIEVEMENT RATE (LOGIC CỦA BẠN) ===
+                    // (3) Tính % Vượt (Over-Achievement) (Code cũ của bạn - đã TỐT)
                     double overAchievementRate = 0.0;
                     if (targetAmount > 0 && dto.getTotalPremium() > targetAmount) {
                         overAchievementRate = ((dto.getTotalPremium() - targetAmount) / targetAmount) * 100;
                     }
-                    dto.setOverAchievementRate(overAchievementRate);
-                    // =======================================================
+                    dto.setOverAchievementRate(overAchievementRate); 
                     
+                    // (4) Thêm (Add) DTO vào List
                     teamPerformance.add(dto);
                 }
             }
@@ -481,26 +421,23 @@ public List<AgentPerformanceDTO> getTeamPerformance(int managerId) {
         return teamPerformance;
     }
 
-    /**
-     * Lấy hiệu suất của TẤT CẢ Agent.
-     */
+    // ... (Hàm getAllAgentsPerformance()... giữ nguyên)
+    // (Chúng ta cũng "vá" (patch) SQL ở đây cho "đồng bộ" (consistent))
     public List<AgentPerformanceDTO> getAllAgentsPerformance() {
         List<AgentPerformanceDTO> allAgents = new ArrayList<>();
-        int agentRoleId = 1; // Giả định role_id của Agent là 1
-
+        int agentRoleId = 1; 
         String sql = """
             SELECT
                 u.user_id,
                 u.full_name,
                 IFNULL(SUM(CASE WHEN c.status = 'Active' THEN c.premium_amount ELSE 0 END), 0) AS total_premium,
-                COUNT(CASE WHEN c.status = 'Active' THEN c.contract_id ELSE NULL END) AS contracts_count
+                COUNT(DISTINCT CASE WHEN c.status = 'Active' THEN c.contract_id ELSE NULL END) AS contracts_count
             FROM Users u
             LEFT JOIN Contracts c ON u.user_id = c.agent_id
             WHERE u.role_id = ?
             GROUP BY u.user_id, u.full_name
             ORDER BY total_premium DESC;
-        """; // Sửa lại SUM và COUNT chỉ tính HĐ 'Active'
-
+        """; 
         try (Connection conn = DBConnector.makeConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, agentRoleId);
@@ -520,18 +457,9 @@ public List<AgentPerformanceDTO> getTeamPerformance(int managerId) {
         }
         return allAgents;
     }
-    /**
-     * Thêm mới hoặc cập nhật Target cho Agent theo tháng/năm.
-     * Sử dụng cú pháp INSERT ... ON DUPLICATE KEY UPDATE.
-     * @param agentId ID của Agent
-     * @param targetAmount Số tiền target
-     * @param month Tháng (1-12)
-     * @param year Năm (ví dụ: 2025)
-     * @return true nếu thực thi thành công, false nếu thất bại.
-     */
+    
+    // ... (Hàm setAgentTarget()... giữ nguyên)
     public boolean setAgentTarget(int agentId, BigDecimal targetAmount, int month, int year) {
-        // Cú pháp này sẽ tự động UPDATE nếu đã tồn tại bản ghi (agent_id, target_month, target_year)
-        // hoặc INSERT mới nếu chưa có.
         String sql = """
             INSERT INTO Agent_Targets (agent_id, target_amount, target_month, target_year)
             VALUES (?, ?, ?, ?)
@@ -547,7 +475,7 @@ public List<AgentPerformanceDTO> getTeamPerformance(int managerId) {
             ps.setInt(3, month);
             ps.setInt(4, year);
             
-            return ps.executeUpdate() > 0; // Trả về true nếu (1) insert thành công hoặc (2) update thành công
+            return ps.executeUpdate() > 0; 
             
         } catch (SQLException e) {
             System.err.println("Lỗi khi set target cho agent ID: " + agentId);
@@ -556,16 +484,13 @@ public List<AgentPerformanceDTO> getTeamPerformance(int managerId) {
         }
     }
 
-    /**
-     * Lấy danh sách xếp hạng Agent (giống getAllAgentsPerformance).
-     */
+    // ... (Hàm getAgentLeaderboard()... giữ nguyên)
     public List<AgentPerformanceDTO> getAgentLeaderboard() {
         return getAllAgentsPerformance();
     }
-
-    /**
-     * Lấy danh sách xếp hạng Manager dựa trên tổng doanh thu team.
-     */
+    
+    // ... (Hàm getManagerLeaderboard()... giữ nguyên)
+    // (Chúng ta cũng "vá" (patch) SQL ở đây cho "đồng bộ" (consistent))
     public List<AgentPerformanceDTO> getManagerLeaderboard() {
         List<AgentPerformanceDTO> leaderboard = new ArrayList<>();
         String sql = """
@@ -579,8 +504,7 @@ public List<AgentPerformanceDTO> getTeamPerformance(int managerId) {
             WHERE m.role_id = 2
             GROUP BY m.user_id, m.full_name
             ORDER BY total_team_premium DESC;
-        """; // Sửa lại SUM chỉ tính HĐ 'Active'
-
+        """; 
         try (Connection conn = DBConnector.makeConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
@@ -589,7 +513,7 @@ public List<AgentPerformanceDTO> getTeamPerformance(int managerId) {
                         rs.getInt("user_id"),
                         rs.getString("full_name"),
                         rs.getDouble("total_team_premium"),
-                        0 // contracts_count không liên quan ở đây
+                        0 
                 ));
             }
         } catch (Exception e) {
@@ -598,23 +522,20 @@ public List<AgentPerformanceDTO> getTeamPerformance(int managerId) {
         return leaderboard;
     }
 
-    /**
-     * Lấy danh sách Agents theo Manager ID (dùng cho kiểm tra quyền).
-     */
+    // ... (Hàm getAgentsByManagerId()... giữ nguyên)
     public List<User> getAgentsByManagerId(int managerId) {
         List<User> agentList = new ArrayList<>();
-        String sql = "SELECT u.*, r.role_name " + // Lấy thêm role_name
+        String sql = "SELECT u.*, r.role_name " + 
                      "FROM Users u " +
                      "JOIN Manager_Agent ma ON u.user_id = ma.agent_id " +
-                     "JOIN Roles r ON u.role_id = r.role_id " + // Join thêm Roles
+                     "JOIN Roles r ON u.role_id = r.role_id " + 
                      "WHERE ma.manager_id = ? AND u.role_id = 1";
-
         try (Connection conn = DBConnector.makeConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, managerId);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    agentList.add(mapRowToUser(rs)); // Dùng hàm map
+                    agentList.add(mapRowToUser(rs)); 
                 }
             }
         } catch (SQLException e) {
@@ -624,39 +545,30 @@ public List<AgentPerformanceDTO> getTeamPerformance(int managerId) {
         return agentList;
     }
 
-
-    
-    /**
-     * Lấy danh sách Users theo Status cụ thể.
-     */
+    // ... (Hàm getUsersByStatus()... giữ nguyên)
     public List<User> getUsersByStatus(String status) throws SQLException {
         List<User> list = new ArrayList<>();
         String sql = "SELECT u.*, r.role_name FROM Users u "
-                   + "JOIN Roles r ON u.role_id = r.role_id "
-                   + "WHERE u.status = ? ORDER BY u.user_id ASC";
+                + "JOIN Roles r ON u.role_id = r.role_id "
+                + "WHERE u.status = ? ORDER BY u.user_id ASC";
         try (Connection con = DBConnector.makeConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, status);
-            try(ResultSet rs = ps.executeQuery()){
+            try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    list.add(mapRowToUser(rs)); // Dùng hàm map
+                    list.add(mapRowToUser(rs));
                 }
             }
         } catch (SQLException e) {
-             System.err.println("Lỗi khi lấy user theo Status: " + status);
-             e.printStackTrace();
-             throw e;
+            System.err.println("Lỗi khi lấy user theo Status: " + status);
+            e.printStackTrace();
+            throw e;
         }
         return list;
     }
 
-
-    // ===== BỔ SUNG TỪ CODE THANH HE (Hữu ích cho sửa thông tin Agent) =====
-    /**
-     * Cập nhật thông tin cơ bản của Agent (không bao gồm username, pass, role, status).
-     */
+    // ... (Hàm updateAgent()... giữ nguyên)
     public boolean updateAgent(User user) throws SQLException {
-        // Chỉ cập nhật full_name, email, phone_number
-        String sql = "UPDATE users SET full_name=?, email=?, phone_number=? WHERE user_id =? AND role_id = 1"; // Thêm AND role_id = 1
+        String sql = "UPDATE users SET full_name=?, email=?, phone_number=? WHERE user_id =? AND role_id = 1"; 
         try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, user.getFullName());
             ps.setString(2, user.getEmail());
@@ -665,13 +577,8 @@ public List<AgentPerformanceDTO> getTeamPerformance(int managerId) {
             return ps.executeUpdate() > 0;
         }
     }
-
-
-    // ===== HÀM MAP RIÊNG (Tránh lặp code) =====
-    /**
-     * Ánh xạ một dòng ResultSet sang đối tượng User.
-     * Bao gồm cả role_name.
-     */
+    
+    // ... (Hàm mapRowToUser()... giữ nguyên)
     private User mapRowToUser(ResultSet rs) throws SQLException {
         User user = new User();
         user.setUserId(rs.getInt("user_id"));
@@ -679,102 +586,74 @@ public List<AgentPerformanceDTO> getTeamPerformance(int managerId) {
         user.setFullName(rs.getString("full_name"));
         user.setEmail(rs.getString("email"));
         user.setPhoneNumber(rs.getString("phone_number"));
-        // Lấy password hash cẩn thận, chỉ khi thực sự cần (ví dụ: đổi mật khẩu)
-        // user.setPasswordHash(rs.getString("password_hash"));
         user.setRoleId(rs.getInt("role_id"));
         user.setStatus(rs.getString("status"));
-        // Lấy is_first_login nếu có trong câu SELECT
         try {
-             user.setIsFirstLogin(rs.getBoolean("is_first_login"));
-        } catch (SQLException e) { /* Bỏ qua nếu cột không có */ }
-        // Lấy createdAt/updatedAt nếu có trong câu SELECT
+            user.setIsFirstLogin(rs.getBoolean("is_first_login"));
+        } catch (SQLException e) { /* Bỏ qua */ }
         try {
-             user.setCreatedAt(rs.getTimestamp("created_at"));
-        } catch (SQLException e) {
-            /* Bỏ qua */ }
+            user.setCreatedAt(rs.getTimestamp("created_at"));
+        } catch (SQLException e) { /* Bỏ qua */ }
         try {
             user.setUpdatedAt(rs.getTimestamp("updated_at"));
-        } catch (SQLException e) {
-            /* Bỏ qua */ }
-        // Lấy role_name nếu có trong câu SELECT (thường là có khi JOIN)
+        } catch (SQLException e) { /* Bỏ qua */ }
         try {
             user.setRoleName(rs.getString("role_name"));
-        } catch (SQLException e) {
-            /* Bỏ qua nếu câu SELECT không có */ }
+        } catch (SQLException e) { /* Bỏ qua */ }
         return user;
     }
 
-    /**
-     * Kiểm tra xem một Agent có thuộc quyền quản lý của một Manager hay không.
-     *
-     * @param agentId ID của Agent cần kiểm tra
-     * @param managerId ID của Manager
-     * @return true nếu Agent thuộc Manager, false nếu không hoặc có lỗi.
-     */
+    // ... (Hàm isAgentManagedBy()... giữ nguyên)
     public boolean isAgentManagedBy(int agentId, int managerId) {
         String sql = "SELECT COUNT(*) FROM Manager_Agent WHERE manager_id = ? AND agent_id = ?";
-
         try (Connection conn = DBConnector.makeConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-
             ps.setInt(1, managerId);
             ps.setInt(2, agentId);
-
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    return rs.getInt(1) > 0; // Trả về true nếu có 1 bản ghi (có tồn tại)
+                    return rs.getInt(1) > 0;
                 }
             }
         } catch (SQLException e) {
             System.err.println("Lỗi khi kiểm tra isAgentManagedBy: " + e.getMessage());
             e.printStackTrace();
         }
-        return false; // Trả về false nếu có lỗi hoặc không tìm thấy
+        return false; 
     }
-    /**
- * Đặt/Cập nhật một mức Target chung cho TẤT CẢ Agent
- * thuộc quyền quản lý của một Manager cho tháng/năm cụ thể.
- * @param managerId ID của Manager
- * @param targetAmount Số tiền target chung
- * @param month Tháng (1-12)
- * @param year Năm (ví dụ: 2025)
- * @return true nếu thực thi thành công, false nếu thất bại.
- */
-public boolean setTeamTarget(int managerId, BigDecimal targetAmount, int month, int year) {
-    // SQL này dùng INSERT ... SELECT ... ON DUPLICATE KEY UPDATE
-    // 1. SELECT: Tìm tất cả agent_id thuộc managerId
-    // 2. INSERT: Thêm (agent_id, targetAmount, month, year) cho mỗi agent tìm được
-    // 3. ON DUPLICATE KEY UPDATE: Nếu đã có target cho agent đó, nó sẽ tự động UPDATE
-    String sql = """
-        INSERT INTO Agent_Targets (agent_id, target_amount, target_month, target_year)
-        (
-            SELECT 
-                agent_id, 
-                ? AS target_amount, 
-                ? AS target_month, 
-                ? AS target_year 
-            FROM 
-                Manager_Agent 
-            WHERE 
-                manager_id = ?
-        )
-        ON DUPLICATE KEY UPDATE
-            target_amount = VALUES(target_amount);
-    """;
     
-    try (Connection conn = DBConnector.makeConnection();
-         PreparedStatement ps = conn.prepareStatement(sql)) {
+    // ... (Hàm setTeamTarget()... giữ nguyên)
+    public boolean setTeamTarget(int managerId, BigDecimal targetAmount, int month, int year) {
+        String sql = """
+            INSERT INTO Agent_Targets (agent_id, target_amount, target_month, target_year)
+            (
+                SELECT 
+                    agent_id, 
+                    ? AS target_amount, 
+                    ? AS target_month, 
+                    ? AS target_year 
+                FROM 
+                    Manager_Agent 
+                WHERE 
+                    manager_id = ?
+            )
+            ON DUPLICATE KEY UPDATE
+                target_amount = VALUES(target_amount);
+        """;
         
-        ps.setBigDecimal(1, targetAmount); // Giá trị cho target_amount
-        ps.setInt(2, month);            // Giá trị cho target_month
-        ps.setInt(3, year);             // Giá trị cho target_year
-        ps.setInt(4, managerId);        // ID của Manager để lọc agent
-        
-        return ps.executeUpdate() > 0; // Trả về true nếu có dòng được thêm/cập nhật
-        
-    } catch (SQLException e) {
-        System.err.println("Lỗi khi set Team Target cho manager ID: " + managerId);
-        e.printStackTrace();
-        return false;
+        try (Connection conn = DBConnector.makeConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setBigDecimal(1, targetAmount); 
+            ps.setInt(2, month);
+            ps.setInt(3, year);
+            ps.setInt(4, managerId);
+            
+            return ps.executeUpdate() > 0; 
+            
+        } catch (SQLException e) {
+            System.err.println("Lỗi khi set Team Target cho manager ID: " + managerId);
+            e.printStackTrace();
+            return false;
+        }
     }
-}
 }

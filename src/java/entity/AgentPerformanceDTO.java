@@ -9,7 +9,7 @@ public class AgentPerformanceDTO {
     private double targetProgress;
     private double revenuePercentage;
     private double targetAmount;
-    
+    private double overAchievementRate;
     
     // Constructor đơn giản để mapping từ DB
     public AgentPerformanceDTO(int agentId, String agentName, double totalPremium, int contractsCount) {
@@ -97,6 +97,14 @@ public class AgentPerformanceDTO {
 
     public void setTargetAmount(double targetAmount) {
         this.targetAmount = targetAmount;
+    }
+
+    public double getOverAchievementRate() {
+        return overAchievementRate;
+    }
+
+    public void setOverAchievementRate(double overAchievementRate) {
+        this.overAchievementRate = overAchievementRate;
     }
     
 }
